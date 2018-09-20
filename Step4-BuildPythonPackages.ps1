@@ -38,7 +38,7 @@ $env:PYTHONPATH=""
 #
 $ErrorActionPreference = "Continue"
 SetLog "sip"
-Write-Host -NoNewline "building sip..."
+Write-Host "building sip..."
 cd $root\src-stage1-dependencies\sip-$sip_version
 # reset these in case previous run was stopped in mid-build
 $env:_LINK_ = ""
@@ -47,7 +47,7 @@ $env:_CL_ = ""
 Function MakeSip
 {
 	$type = $args[0]
-	Write-Host -NoNewline "$type..."
+	Write-Host -NoNewline "  $type..."
 	$dflag = if ($type -match "Debug") {"--debug"} else {""}
 	$kflag = if ($type -match "Dll") {""} else {" --static"}
 	$debugext = if ($type -match "Debug") {"_d"} else {""}
@@ -56,7 +56,9 @@ Function MakeSip
 		if (Test-Path sipconfig.py) {del sipconfig.py}
 		"FLAGS: $kflag $dflag" >> $Log 
 		"command line : configure.py $dflag $kflag -p win32-msvc2015" >> $Log
+		Write-Host -NoNewline "configuring..."
 		& $pythonroot\python$debugext.exe configure.py $dflag $kflag --platform win32-msvc2015 2>&1 >> $Log
+		Write-Host -NoNewline "building..."
 		nmake clean 2>&1 >> $Log
 		nmake 2>&1 >> $Log
 		New-Item -ItemType Directory -Force -Path ./build/x64/$type 2>&1 >> $Log
@@ -76,6 +78,7 @@ Function MakeSip
 		cd ..
 		copy sipdistutils.py ./build/x64/$type/sipdistutils.py
 		if ($type -match "Dll") {
+			Write-Host -NoNewline "installing..."
 			copy sipconfig.py ./build/x64/$type/sipconfig.py
     		nmake install 2>&1 >> $Log
 			Validate "$pythonroot/sip.exe" "$pythonroot/include/sip.h" "$pythonroot/lib/site-packages/sip$debugext.pyd" 
@@ -83,7 +86,7 @@ Function MakeSip
 		nmake clean 2>&1 >> $Log
 		$env:_CL_ = ""
 	} else {
-		Write-Host -NoNewline "already built..."
+		Write-Host "already built"
 	}
 
 }
@@ -98,7 +101,6 @@ $pythonroot = "$root\src-stage2-python\gr-python27-avx2"
 #MakeSip "Release-AVX2"
 MakeSip "ReleaseDLL-AVX2"
 $ErrorActionPreference = "Stop"
-"complete"
 
 #__________________________________________________________________________________________
 # PyQt
@@ -716,7 +718,7 @@ Function SetupPython
 	# requires Python, Pygobject
 	#
 	SetLog "$configuration pygtk"
-	cd $root\src-stage1-dependencies\pygtk-$pygtk_version
+	cd $root\src-stage1-dependencies\pygtk-$pygtk_version.0
 	if ((TryValidate "dist/gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gtk\_gtk.pyd") -eq $false) {
 		Write-Host -NoNewline "building PyGTK..."
 		if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
@@ -734,7 +736,7 @@ Function SetupPython
 		New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 2>&1 >> $Log
 		cd dist
 		Write-Host -NoNewline "crafting wheel from exe..."
-		& $pythonroot/Scripts/wheel.exe convert pygtk-$pygtk_version.win-amd64-py2.7.exe 2>&1 >> $Log
+		& $pythonroot/Scripts/wheel.exe convert pygtk-$pygtk_version.0.win-amd64-py2.7.exe 2>&1 >> $Log
 		move gtk-2.0/pygtk-cp27-none-win_amd64.whl gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl -Force 2>&1 >> $Log
 		cd ..
 		$env:_CL_ = ""
@@ -889,9 +891,9 @@ Function SetupPython
 	#
 	SetLog "$configuration pyzmq"
 	cd $root\src-stage1-dependencies\pyzmq-$pyzmq_version
-	if ((TryValidate "wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/zmq/libzmq.dll" "$pythonroot/lib/site-packages/zmq/devices/monitoredqueue.pyd" "$pythonroot/lib/site-packages/zmq/error.py") -eq $false) {
+	if ((TryValidate "wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/zmq/libzmq-v140-mt$flag-4_3_1.dll" "$pythonroot/lib/site-packages/zmq/devices/monitoredqueue.pyd" "$pythonroot/lib/site-packages/zmq/error.py") -eq $false) {
 		Write-Host -NoNewline "configuring pyzmq..."
-		if ($configuration -match "Debug") {$baseconfig="Debug"} else {$baseconfig="Release"}
+		if ($configuration -match "Debug") {$baseconfig="Debug"; $flag="-gd"} else {$baseconfig="Release"; $flag=""}
 		$ErrorActionPreference = "Continue"
 		# this stdint.h file prevents the import of the real stdint file and causes the build to fail
 		# TODO submit upstream patch
@@ -906,24 +908,26 @@ Function SetupPython
 		New-Item -ItemType Directory -Force libzmq/$configuration/lib 2>&1 >> $log
 		New-Item -ItemType Directory -Force libzmq/$configuration/include 2>&1 >> $log
 		Copy-Item ..\libzmq\include/*.h libzmq/$configuration/include/ 2>&1 >> $log
-		Copy-Item ..\libzmq\bin\x64\$baseconfig\v140\dynamic\libzmq.dll libzmq/$configuration/lib 2>&1 >> $log
-		Copy-Item ..\libzmq\bin\x64\$baseconfig\v140\dynamic\libzmq.lib libzmq/$configuration/lib 2>&1 >> $log
+		Copy-Item ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-4_3_1.dll libzmq/$configuration/lib/ 2>&1 >> $log
+		Copy-Item ..\libzmq\bin\$baseconfig\lib\libzmq-v140-mt$flag-4_3_1.lib libzmq/$configuration/lib/ 2>&1 >> $log
 		if ($configuration -match "AVX2") {$env:_CL_ = " /arch:AVX2 "} else {$env:_CL_ = ""}
-		$env:_LINK_ = " /MANIFEST "
+		$env:_LINK_ = " /MANIFEST /LIBPATH:libzmq/$configuration/lib "
 		$env:INCLUDE = $oldinclude + ";$root/libzmq/include"
 		$env:LINK = $oldlink
 		# don't run clean because it wipes out /dist folder as well
 		& $pythonroot/$pythonexe setup.py clean 2>&1 >> $log
-		cp ..\libzmq\bin\x64\$baseconfig\v140\dynamic\libzmq.dll .\zmq 
-		cp ..\libzmq\bin\x64\$baseconfig\v140\dynamic\libzmq.pdb .\zmq 
-		& $pythonroot/$pythonexe setup.py configure $debug --zmq=./libzmq/$configuration 2>&1 >> $log
+		cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-4_3_1.dll .\zmq\libzmq.dll 
+		if ($configuration -match "Debug") {
+			cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-4_3_1.pdb .\zmq\libzmq.pdb 
+		}
+		& $pythonroot/$pythonexe setup.py configure $debug --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
 		Write-Host -NoNewline "building..."
-		& $pythonroot/$pythonexe setup.py build_ext $debug --inplace 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build_ext $debug --inplace --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
 		# TODO a pyzmq socket test is failing which then prompts user to debug so disable for now so we don't slow down the build process
 		# Write-Host -NoNewline "testing..."
 		# & $pythonroot/$pythonexe setup.py test 2>&1 >> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
 		Write-Host -NoNewline "crafting wheel..."
 		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $log
 		# these can't be in dist because clean wipes out dist completely

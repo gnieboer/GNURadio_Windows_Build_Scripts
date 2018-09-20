@@ -268,8 +268,9 @@ if (!(Test-Path $root/src-stage3/src/gnuradio)) {
     # most packages we just get the most recent commit when coming from git
     # however, since this is the one most users might want to modify, we'll get more.
 	git clone --depth=150 --no-single-branch --recursive https://github.com/gnuradio/gnuradio.git 2>&1 >> $log 
-	git checkout maint
 	cd gnuradio
+	$mm = GetMajorMinor($gnuradio_version)
+	git checkout maint-$mm 
 	git pull --recurse-submodules=on
 	git submodule update
 	cd ..

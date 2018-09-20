@@ -111,10 +111,12 @@ function getPackage
 				sz x -y $archive >> $Log
 				if (!(Test-Path $root\$destdir\$archiveName.tar)) {
 					# some python .tar.gz files put the tar in a dist subfolder
-					cd dist
-					sz x -aoa -ttar -o"$root\$destdir" "$archiveName.tar" >> $Log
-					cd ..
-					rm -Recurse -Force dist >> $Log
+					if (Test-Path dist) {
+						cd dist
+						sz x -aoa -ttar -o"$root\$destdir" "$archiveName.tar" >> $Log
+						cd ..
+						rm -Recurse -Force dist >> $Log
+					}
 				} else {
 					sz x -aoa -ttar -o"$root\$destdir" "$archiveName.tar" >> $Log
 					del "$archiveName.tar" -Force
@@ -324,7 +326,6 @@ $wxpython_version = $Config.VersionInfo.wxpython
 $py2cairo_version = $Config.VersionInfo.py2cairo
 $pygobject_version = $Config.VersionInfo.pygobject 
 $pygtk_version = $Config.VersionInfo.pygtk
-$pygtk_gitversion = $Config.VersionInfo.pygtk_git
 $gsl_version = $Config.VersionInfo.gsl
 $boost_version = $Config.VersionInfo.boost 
 $boost_version_ = $Config.VersionInfo.boost_ 
@@ -333,6 +334,8 @@ $lapack_version = $Config.VersionInfo.lapack
 $openBLAS_version = $Config.VersionInfo.OpenBLAS 
 $UHD_version = $Config.VersionInfo.UHD
 $pyzmq_version = $Config.VersionInfo.pyzmq
+$libzmq_version = $Config.VersionInfo.libzmq
+$cppzmq_version = $Config.VersionInfo.cppzmq
 $lxml_version = $Config.VersionInfo.lxml
 $pkgconfig_version = $Config.VersionInfo.pkgconfig 
 $dp_version = $Config.VersionInfo.dp
@@ -436,18 +439,24 @@ if (!(Test-Path variable:global:oldpath))
 	}
 	popd
 	write-host "Visual Studio 2015 Command Prompt variables set." -ForegroundColor Yellow
-	# set Intel Fortran environment (if exists)... will detect 2016/2017 compilers only 
-	if (Test-Path env:IFORT_COMPILER17) {
-		& $env:IFORT_COMPILER17\bin\ifortvars.bat -arch intel64 -platform vs2015 
-		$Global:MY_IFORT = $env:IFORT_COMPILER17
+	# set Intel Fortran environment (if exists)... will detect 2016/2017/2018 compilers only 
+	if (Test-Path env:IFORT_COMPILER18) {
+		& $env:IFORT_COMPILER18\bin\ifortvars.bat -arch intel64 -platform vs2015 
+		$Global:MY_IFORT = $env:IFORT_COMPILER18
 		$Global:hasIFORT = $true
 	} else {
-		if (Test-Path env:IFORT_COMPILER16) {
-			& $env:IFORT_COMPILER16\bin\ifortvars.bat -arch intel64 -platform vs2015 
-			$Global:MY_IFORT = $env:IFORT_COMPILER16
+		if (Test-Path env:IFORT_COMPILER17) {
+			& $env:IFORT_COMPILER17\bin\ifortvars.bat -arch intel64 -platform vs2015 
+			$Global:MY_IFORT = $env:IFORT_COMPILER17
 			$Global:hasIFORT = $true
 		} else {
-			$Global:hasIFORT = $false
+			if (Test-Path env:IFORT_COMPILER16) {
+				& $env:IFORT_COMPILER16\bin\ifortvars.bat -arch intel64 -platform vs2015 
+				$Global:MY_IFORT = $env:IFORT_COMPILER16
+				$Global:hasIFORT = $true
+			} else {
+				$Global:hasIFORT = $false
+			}
 		}
 	}
 	# Now set a persistent variable holding the original path. vcvarsall will continue to add to the path until it explodes

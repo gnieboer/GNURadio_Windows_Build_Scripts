@@ -503,19 +503,55 @@ if ((TryValidate "bin/x64/Release/v140/dynamic/libsodium.dll" "bin/x64/Release/v
 # ____________________________________________________________________________________________________________
 # libzmq
 # must be after libsodium
+# libzmq switched to cmake, so thus why the two build options below
 SetLog "libzmq"
 Write-Host -NoNewline "building libzmq..."
-cd $root/src-stage1-dependencies/libzmq/builds/msvc
-if ((TryValidate "../../bin/x64/Release/v140/dynamic/libzmq.dll" "../../bin/x64/Release/v140/static/libzmq.lib" "../../bin/x64/Release/v140/ltcg/libzmq.lib" `
+if (Test-Path $root/src-stage1-dependencies/libzmq/builds/msvc) {
+	cd $root/src-stage1-dependencies/libzmq/builds/msvc
+	if ((TryValidate "../../bin/x64/Release/v140/dynamic/libzmq.dll" "../../bin/x64/Release/v140/static/libzmq.lib" "../../bin/x64/Release/v140/ltcg/libzmq.lib" `
 	"../../bin/x64/Debug/v140/dynamic/libzmq.dll" "../../bin/x64/Debug/v140/static/libzmq.lib" "../../bin/x64/Debug/v140/ltcg/libzmq.lib") -eq $false) {
-	cd build
-	& .\buildbase.bat ..\vs2015\libzmq.sln 14 2>&1 >> $Log
-	cd ../../../bin/x64
-	Validate "Release/v140/dynamic/libzmq.dll" "Release/v140/static/libzmq.lib" "Release/v140/ltcg/libzmq.lib" `
-		"Debug/v140/dynamic/libzmq.dll" "Debug/v140/static/libzmq.lib" "Debug/v140/ltcg/libzmq.lib"
+		cd build
+		& .\buildbase.bat ..\vs2015\libzmq.sln 14 2>&1 >> $Log
+		cd ../../../bin/x64
+		Validate "Release/v140/dynamic/libzmq.dll" "Release/v140/static/libzmq.lib" "Release/v140/ltcg/libzmq.lib" `
+			"Debug/v140/dynamic/libzmq.dll" "Debug/v140/static/libzmq.lib" "Debug/v140/ltcg/libzmq.lib"
+	} else {
+		Write-Host "already built"
+	}
 } else {
-	Write-Host "already built"
+	cd $root/src-stage1-dependencies/libzmq
+	if ((TryValidate "./bin/Release/bin/libzmq-v140-mt-4_3_1.dll" "./bin/Release/lib/libzmq-v140-mt-4_3_1.lib" "./bin/Release/lib/libzmq-v140-mt-s-4_3_1.lib" `
+	"./bin/Debug/bin/libzmq-v140-mt-gd-4_3_1.dll" "./bin/Debug/lib/libzmq-v140-mt-gd-4_3_1.lib" "./bin/Debug/lib/libzmq-v140-mt-sgd-4_3_1.lib") -eq $false) {
+	
+		#newer versions use cmake 
+		Write-Host ""
+		New-Item -ItemType Directory -Force $root\src-stage1-dependencies\libzmq\build 2>&1 >> $Log 
+		cd build
+		
+		Function MakeLibZMQ {
+			$type = $args[0]
+			$flag = if ($type -match "Debug") {"-gd"} else {""}
+			$sflag = if ($type -match "Debug") {"gd"} else {""}
+			Write-Host -NoNewline "  $type...configuring..."
+			cmake ..\ `
+				-Wno-dev `
+				-G "Visual Studio 14 Win64" `
+				-DCMAKE_BUILD_TYPE="$type" `
+				-DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/libzmq/bin/$type/" 2>&1 >> $Log 
+			Write-Host -NoNewline "building..."
+			msbuild ".\ZeroMQ.sln" /m /p:"configuration=$type;platform=x64" 2>&1 >> $Log 
+			Write-Host -NoNewline "installing..."
+			msbuild .\INSTALL.vcxproj /m /p:"configuration=$type;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+			$env:_CL_ = ""
+			Validate "../bin/$type/bin/libzmq-v140-mt$flag-4_3_1.dll" "../bin/$type/lib/libzmq-v140-mt$flag-4_3_1.lib" "../bin/$type/lib/libzmq-v140-mt-s$sflag-4_3_1.lib" 
+		}
+		MakeLibZMQ "Debug"
+		MakeLibZMQ "Release"
+	} else {
+		Write-Host "already built"
+	}
 }
+
 
 
 # ____________________________________________________________________________________________________________
@@ -902,12 +938,11 @@ if ((TryValidate "$root\src-stage2-python\gr-python27\lib\site-packages\requests
 # UHD 
 #
 # requires libusb, boost, python, mako
-# TODO copy over UHD.pdb in Release versions (cmake doesn't do it)
-
+# FYI BOOST_FORCE_SYMMETRIC_OPERATORS is required for debug versions because MSVC 2015 disable NRVO for debug builds which causes duplicate operator error
 SetLog "UHD"
 Write-Host "building uhd..."
 $ErrorActionPreference = "Continue"
-cd $root\src-stage1-dependencies\uhd-release_$UHD_version\host
+cd $root\src-stage1-dependencies\uhd-$UHD_version\host
 New-Item -ItemType Directory -Force -Path .\build  2>&1 >> $Log
 cd build 
 
@@ -925,6 +960,7 @@ Function makeUHD {
 			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
+			-DCMAKE_CXX_FLAGS=" /DBOOST_FORCE_SYMMETRIC_OPERATORS " `
 			-DBoost_INCLUDE_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/include/boost-1_60" `
 			-DBoost_LIBRARY_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/lib" `
 			-DLIBUSB_INCLUDE_DIRS="$root/src-stage1-dependencies/libusb/libusb" `
@@ -932,13 +968,13 @@ Function makeUHD {
 		Write-Host -NoNewline "building..."
 		msbuild .\UHD.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log 
 		Write-Host -NoNewline "installing..."
-		& cmake -DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/uhd-release_$UHD_version\dist\$configuration" -DBUILD_TYPE="$buildconfig" -P cmake_install.cmake 2>&1 >> $Log
-		New-Item -ItemType Directory -Path $root/src-stage1-dependencies/uhd-release_$UHD_version\dist\$configuration\share\uhd\examples\ -Force 2>&1 >> $Log
-		cp -Recurse -Force $root/src-stage1-dependencies/uhd-release_$UHD_version/host/build/examples/$buildconfig/* $root/src-stage1-dependencies/uhd-release_$UHD_version\dist\$configuration\share\uhd\examples\
+		& cmake -DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/uhd-$UHD_version\dist\$configuration" -DBUILD_TYPE="$buildconfig" -P cmake_install.cmake 2>&1 >> $Log
+		New-Item -ItemType Directory -Path $root/src-stage1-dependencies/uhd-$UHD_version\dist\$configuration\share\uhd\examples\ -Force 2>&1 >> $Log
+		cp -Recurse -Force $root/src-stage1-dependencies/uhd-$UHD_version/host/build/examples/$buildconfig/* $root/src-stage1-dependencies/uhd-$UHD_version\dist\$configuration\share\uhd\examples\
 		Validate "..\..\dist\$configuration\bin\uhd.dll" "..\..\dist\$configuration\lib\uhd.lib" "..\..\dist\$configuration\include\uhd.h"
 		$env:_CL_ = ""
 	} else {
-		Write-Host "  UHD $configuration already built"
+		Write-Host "  $configuration already built"
 	}
 }
 
@@ -1038,10 +1074,9 @@ if (!$BuildNumpyWithMKL -or $true) {
 # like scipy, this requires a fortran compiler to be installed, and gfortran doesn't work well with MSVC
 # so there isn't a free option, we look for Intel Fortran Compiler during setup.
 # Don't despair though, if not fort then we'll just download binary wheels later.
-# There is a bug in 3.6.0 where a library is misspelled and will give an error (zerbla vs xerbla in zgetrf2.f @ line 147, it is fixed in the SVN
 if (!$BuildNumpyWithMKL -and $hasIFORT) {
 	SetLog "lapack"
-	Write-Host -NoNewline "building lapack..."
+	Write-Host "building lapack..."
 	function MakeLapack {
 		$ErrorActionPreference = "Continue"
 		$configuration = $args[0]

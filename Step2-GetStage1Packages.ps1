@@ -21,8 +21,8 @@ cd $root/src-stage1-dependencies
 SetLog "GetPackages"
 
 # libzmq
-getPackage https://github.com/zeromq/libzmq.git
-getPackage https://github.com/zeromq/cppzmq.git
+getPackage https://github.com/zeromq/libzmq/archive/v$libzmq_version.zip
+getPackage https://github.com/zeromq/cppzmq/archive/v$cppzmq_version.zip
 
 # pyzmq
 getPackage https://github.com/zeromq/pyzmq/archive/v$pyzmq_version.zip 
@@ -81,7 +81,9 @@ if ($Config.BuildGTKFromSource) {
 
 } else {
 	"NOT building GTK from source, retrieving GTK VS2015 binaries"
-	GetPackage https://dl.hexchat.net/gtk-win32/vc14/x64/gtk-x64.7z
+	# These where built by the hexchat project, but they no longer host them
+	# so we are pulling a mirror from our own website.
+	GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gtk-x64.7z
 	# need to add a bunch of pkgconfig files so we can build pyGTK later
 	GetPatch pkgconfig.7z x64/lib/pkgconfig
 }
@@ -108,6 +110,7 @@ GetPatch python-pcbuild.vc14.zip python27/Python-2.7.10
 GetPatch python27_msvccompiler.7z python27\Python-2.7.10\Lib\distutils
 GetPackage https://pypi.python.org/packages/source/s/setuptools/setuptools-20.1.1.zip
 GetPackage https://pypi.python.org/packages/source/p/pip/pip-8.0.2.tar.gz
+GetPackage https://pypi.python.org/packages/source/p/pip/pip-9.0.1.tar.gz
 GetPackage https://pypi.python.org/packages/source/w/wheel/wheel-0.29.0.tar.gz
 #GetPackage https://www.python.org/ftp/python/2.7.11/Python-2.7.11.tar.xz
 #GetPatch python27_msvccompiler.7z Python-2.7.11\Lib\distutils
@@ -134,7 +137,7 @@ mkdir $root\src-stage1-dependencies\openssl\build\intermediate\x64\Release-AVX2 
 mkdir $root\src-stage1-dependencies\openssl\build\intermediate\x64\ReleaseDLL-AVX2 -Force >> $Log 
 
 # Qt
-GetPackage http://download.qt.io/official_releases/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz Qt4
+GetPackage http://download.qt.io/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz Qt4
 GetPackage http://download.qt.io/official_releases/qt/5.6/5.6.0/single/qt-everywhere-opensource-src-5.6.0.tar.gz Qt5
 
 # Boost
@@ -165,7 +168,7 @@ GetPackage https://github.com/cython/cython/archive/$cython_version.zip
 GetPackage https://github.com/numpy/numpy/archive/v$numpy_version.tar.gz
 
 # scipy 
-GetPackage https://github.com/scipy/scipy/releases/download/v$scipy_version/scipy-$scipy_version.tar.xz scipy
+GetPackage https://github.com/scipy/scipy/releases/download/v$scipy_version/scipy-$scipy_version.tar.gz scipy
 
 # pyopengl 
 GetPackage https://pypi.python.org/packages/source/P/PyOpenGL/PyOpenGL-$pyopengl_version.tar.gz
@@ -181,7 +184,8 @@ GetPatch runtests-windows.7z pygobject-$pygobject_version\tests
 GetPatch pygobject_gio-types.7z pygobject-$pygobject_version\gio
 
 # PyGTK
-GetPackage https://git.gnome.org/browse/pygtk/snapshot/PYGTK_$pygtk_gitversion.tar.gz pygtk-$pygtk_version
+# GetPackage http://ftp.gnome.org/pub/GNOME/sources/pygtk/$pygtk_version/pygtk-$pygtk_version.0.tar.gz
+GetPackage https://gitlab.gnome.org/Archive/pygtk/-/archive/windows/pygtk-windows.zip pygtk-$pygtk_version.0
 
 # py2cairo
 GetPackage http://cairographics.org/releases/py2cairo-$py2cairo_version.tar.bz2
@@ -204,7 +208,7 @@ GetPackage https://github.com/libusb/libusb/releases/download/v$libusb_version/l
 GetPatch libusb_VS2015.7z libusb
 
 # UHD
-GetPackage https://github.com/EttusResearch/uhd/archive/release_$UHD_Version.tar.gz uhd
+GetPackage https://github.com/EttusResearch/uhd/archive/v$UHD_Version.tar.gz uhd
 
 # libxslt
 GetPackage https://github.com/GNOME/libxslt/archive/v$libxslt_version.tar.gz libxslt 
@@ -224,8 +228,7 @@ if (!$BuildNumpyWithMKL) {
 
 # lapack reference build
 if (!$BuildNumpyWithMKL) {
-	GetPackage http://www.netlib.org/lapack/lapack-$lapack_version.tgz lapack
-	GetPatch lapack_$lapack_version.7z lapack/SRC
+	GetPackage http://www.netlib.org/lapack/lapack-$lapack_version.tar.gz lapack
 }
 
 # tensorflow

@@ -180,17 +180,30 @@ Function Consolidate {
 
 	# libzmq
 	Write-Host -NoNewline "Consolidating libzmq..."
-	cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/x64/$baseconfig/v140/dynamic/libzmq.* $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/libzmq/include/*.h $root/build/$configuration/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/cppzmq/*.hpp $root/build/$configuration/include/ 2>&1 >> $log
+	if ((Test-Path $root/src-stage1-dependencies/libzmq/bin/$baseconfig) -eq $true) {
+		#paths depend on whether the cmake version was used to build or not
+		if ($baseconfig -eq "Debug") {
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/bin/libzmq-v140-mt-gd-4_3_1.dll $root/build/$configuration/lib/ 2>&1 >> $log	
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/lib/libzmq-v140-mt-gd-4_3_1.lib $root/build/$configuration/lib/ 2>&1 >> $log	
+		} else {
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/bin/libzmq-v140-mt-4_3_1.dll $root/build/$configuration/lib/ 2>&1 >> $log	
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/lib/libzmq-v140-mt-4_3_1.lib $root/build/$configuration/lib/ 2>&1 >> $log			
+		}
+		cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/include/*.h $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/cppzmq/*.hpp $root/build/$configuration/include/ 2>&1 >> $log
+	} else {
+		cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/x64/$baseconfig/v140/dynamic/libzmq.* $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/libzmq/include/*.h $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/cppzmq/*.hpp $root/build/$configuration/include/ 2>&1 >> $log
+	}
 	"complete"
 
 	# uhd
 	Write-Host -NoNewline "Consolidating UHD..."
-	cp -Recurse -Force $root\src-stage1-dependencies\uhd-release_$UHD_version/dist/$configuration/bin/uhd.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root\src-stage1-dependencies\uhd-release_$UHD_version/dist/$configuration/lib/uhd.lib $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root\src-stage1-dependencies\uhd-release_$UHD_version/dist/$configuration/include/* $root/build/$configuration/include/ 2>&1 >> $log
-	robocopy "$root/src-stage1-dependencies/uhd-release_$uhd_version/dist/$configuration" "$root/build/$configuration/uhd" /e 2>&1 >> $log
+	cp -Recurse -Force $root\src-stage1-dependencies\uhd-$UHD_version/dist/$configuration/bin/uhd.dll $root/build/$configuration/lib/ 2>&1 >> $log
+	cp -Recurse -Force $root\src-stage1-dependencies\uhd-$UHD_version/dist/$configuration/lib/uhd.lib $root/build/$configuration/lib/ 2>&1 >> $log
+	cp -Recurse -Force $root\src-stage1-dependencies\uhd-$UHD_version/dist/$configuration/include/* $root/build/$configuration/include/ 2>&1 >> $log
+	robocopy "$root/src-stage1-dependencies/uhd-$uhd_version/dist/$configuration" "$root/build/$configuration/uhd" /e 2>&1 >> $log
 	"complete"
 
 	# portaudio
