@@ -66,50 +66,80 @@ Function Consolidate {
 	"complete"
 
 	# move Qt
-	Write-Host -NoNewline "Consolidating Qt4..."
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtCore$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtGui$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtOpenGL$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtSvg$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
-	#cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/qtmain$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/QtOpenGL* $root/build/$configuration/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/QtCore* $root/build/$configuration/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/QtGui* $root/build/$configuration/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/Qt $root/build/$configuration/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/bin $root/build/$configuration/ 2>&1 >> $log
-	# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
-	"[Paths]" | out-file -FilePath $root/build/$configuration/bin/qt.conf -encoding ASCII
-	"Prefix = $root/build/$configuration" | out-file -FilePath $root/build/$configuration/bin/qt.conf -encoding ASCII -append 
-	"complete"
-
-	# move Qt5
-	Write-Host -NoNewline "Consolidating Qt5..."
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Core$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Gui$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5OpenGL$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Svg$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Network$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Widgets$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Core$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Gui$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5OpenGL$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Svg$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Network$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Widgets$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtOpenGL* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtCore* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtGui* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtNetwork* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtSvg* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtWidgets* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin $root/build/$configuration/gqrx/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/cmake $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/mkspecs $root/build/$configuration/gqrx/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/plugins $root/build/$configuration/gqrx/ 2>&1 >> $log
-	# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
-	"[Paths]" | out-file -FilePath $root/build/$configuration/gqrx/bin/qt.conf -encoding ASCII
-	"Prefix = $root/build/$configuration/gqrx" | out-file -FilePath $root/build/$configuration/gqrx/bin/qt.conf -encoding ASCII -append 
-	"complete"
+	if ($mm -eq '3.7') {
+		Write-Host -NoNewline "Consolidating Qt4..."
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtCore$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtGui$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtOpenGL$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/QtSvg$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
+		#cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/lib/qtmain$d4.* $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/QtOpenGL* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/QtCore* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/QtGui* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/include/Qt $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt4/build/$configDLL/bin $root/build/$configuration/ 2>&1 >> $log
+		# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
+		"[Paths]" | out-file -FilePath $root/build/$configuration/bin/qt.conf -encoding ASCII
+		"Prefix = $root/build/$configuration" | out-file -FilePath $root/build/$configuration/bin/qt.conf -encoding ASCII -append 
+		"complete"
+		
+		# move Qt5
+		Write-Host -NoNewline "Consolidating Qt5..."
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Core$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Gui$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5OpenGL$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Svg$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Network$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Widgets$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Core$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Gui$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5OpenGL$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Svg$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Network$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Widgets$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtOpenGL* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtCore* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtGui* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtNetwork* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtSvg* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtWidgets* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin $root/build/$configuration/gqrx/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/cmake $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/mkspecs $root/build/$configuration/gqrx/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/plugins $root/build/$configuration/gqrx/ 2>&1 >> $log
+		# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
+		"[Paths]" | out-file -FilePath $root/build/$configuration/gqrx/bin/qt.conf -encoding ASCII
+		"Prefix = $root/build/$configuration/gqrx" | out-file -FilePath $root/build/$configuration/gqrx/bin/qt.conf -encoding ASCII -append 
+		"complete"
+	} else {
+		Write-Host -NoNewline "Consolidating Qt5..."
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin $root/build/$configuration/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/cmake $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/mkspecs $root/build/$configuration/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/plugins $root/build/$configuration/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Core$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Gui$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5OpenGL$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Svg$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Network$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/bin/Qt5Widgets$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Core$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Gui$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5OpenGL$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Svg$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Network$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/lib/Qt5Widgets$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtOpenGL* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtCore* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtGui* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtNetwork* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtSvg* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/include/QtWidgets* $root/build/$configuration/include/ 2>&1 >> $log
+		# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
+		"[Paths]" | out-file -FilePath $root/build/$configuration/bin/qt.conf -encoding ASCII
+		"Prefix = $root/build/$configuration" | out-file -FilePath $root/build/$configuration/bin/qt.conf -encoding ASCII -append 
+		"complete"
+	}
 
 	# move Qwt 5+ 6
 	# for now, move both sets of headers and if in case of conflict, use the qwt 6 ones
