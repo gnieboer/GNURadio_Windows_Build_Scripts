@@ -348,6 +348,7 @@ $PIL_version = $Config.VersionInfo.PIL
 $bitarray_version = $Config.VersionInfo.bitarray
 $mbedtls_version = $Config.VersionInfo.mbedtls
 $openlte_version = $Config.VersionInfo.openlte
+$mpir_version = $Config.VersionInfo.mpir
 
 # The below libraries will have AVX code detected, even for non-AVX builds
 # these libraries all have guards to ensure the feature is supported 

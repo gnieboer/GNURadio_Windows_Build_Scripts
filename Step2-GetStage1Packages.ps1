@@ -267,6 +267,9 @@ if ($mm -eq "3.8") {
 
 	# PyQt5
 	GetPackage http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-$PyQt5_version/PyQt5_gpl-$PyQt5_version.tar.gz PyQt5
+	
+	# MPIR
+	GetPackage http://mpir.org/mpir-$MPIR_version.zip mpir
 }
 
 # cleanup

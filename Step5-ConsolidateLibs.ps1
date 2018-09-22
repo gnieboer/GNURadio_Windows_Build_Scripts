@@ -278,6 +278,17 @@ Function Consolidate {
 		cp -Recurse -Force $root/src-stage1-dependencies/OpenBLAS-$openblas_version/build/$configuration/lib/libopenblas_static.lib $root/build/$configuration/lib/ 2>&1 >> $log
 	}
 	
+	# MPIR
+	if ($mm -eq "3.8") {
+		Write-Host -NoNewline "Consolidating MPIR..."
+		cp -Recurse -Force $root\src-stage1-dependencies\MPIR\lib\x64\$baseconfig\mpirxx.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\MPIR\lib\x64\$baseconfig\mpir.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\MPIR\lib\x64\$baseconfig\mpir.h $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\MPIR\lib\x64\$baseconfig\mpirxx.h $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\MPIR\lib\x64\$baseconfig\gmpxx.h $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\MPIR\lib\x64\$baseconfig\gmp.h $root/build/$configuration/include/ 2>&1 >> $log
+		"complete"
+	}
 	
 	Write-Host -NoNewline "Confirming AVX configuration..."
 	CheckNoAVX "$root/build/$configuration"

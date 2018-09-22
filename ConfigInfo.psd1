@@ -30,6 +30,7 @@
 		py2cairo = '1.10.0'
 		cheetah = '2.4.4'
 		gsl = '1.16'
+		mpir = '3.0.0'
 		pthreads = '2-9-1'
 		lxml = '3.6.0'
 		libxslt = '1.1.29'

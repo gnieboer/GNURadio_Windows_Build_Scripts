@@ -1184,6 +1184,29 @@ if ($mm -eq "3.8") {
 # ____________________________________________________________________________________________________________
 # PyQt5
 
+# ____________________________________________________________________________________________________________
+# MPIR
+
+	SetLog "MPIR"
+	Write-Host -NoNewline "Building MPIR..."
+	cd $root\src-stage1-dependencies\mpir\build.vc14 
+	if ((TryValidate "../dll/x64/Release/mpir.dll" "../dll/x64/Release/mpir.lib"  "../dll/x64/Release/mpir.pdb" `
+		"../dll/x64/Debug/mpir.dll" "../dll/x64/Debug/mpir.lib"  "../dll/x64/Debug/mpir.pdb" `
+		"../lib/x64/Release/mpirxx.lib" "../lib/x64/Release/mpir.lib"  "../lib/x64/Release/mpir.pdb" `
+		"../lib/x64/Debug/mpirxx.lib" "../lib/x64/Debug/mpir.lib"  "../lib/x64/Debug/mpir.pdb"		) -eq $false) {
+		./msbuild.bat gc dll x64 release 2>&1 >> $Log
+		./msbuild.bat gc dll x64 debug 2>&1 >> $Log
+		./msbuild.bat gc lib x64 release 2>&1 >> $Log
+		./msbuild.bat gc lib x64 debug 2>&1 >> $Log
+		./msbuild.bat cxx lib x64 release 2>&1 >> $Log
+		./msbuild.bat cxx lib x64 debug 2>&1 >> $Log
+		Validate "../dll/x64/Release/mpir.dll" "../dll/x64/Release/mpir.lib"  "../dll/x64/Release/mpir.pdb" `
+		"../dll/x64/Debug/mpir.dll" "../dll/x64/Debug/mpir.lib"  "../dll/x64/Debug/mpir.pdb"`
+		"../lib/x64/Release/mpirxx.lib" "../lib/x64/Release/mpir.lib"  "../lib/x64/Release/mpir.pdb" `
+		"../lib/x64/Debug/mpirxx.lib" "../lib/x64/Debug/mpir.lib"  "../lib/x64/Debug/mpir.pdb"	
+	} else {
+		Write-Host "already built"
+	}
 }
 
 
