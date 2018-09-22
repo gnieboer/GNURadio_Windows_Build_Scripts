@@ -315,6 +315,7 @@ $qwt_version = $Config.VersionInfo.qwt
 $qwt6_version = $Config.VersionInfo.qwt6
 $sip_version = $Config.VersionInfo.sip
 $PyQt_version = $Config.VersionInfo.PyQt
+$PyQt5_version = $Config.VersionInfo.PyQt5
 $cython_version = $Config.VersionInfo.Cython
 $numpy_version = $Config.VersionInfo.numpy
 $scipy_version = $Config.VersionInfo.scipy
