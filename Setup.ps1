@@ -297,6 +297,8 @@ function CheckNoAVX
 			if ($AVX_Whitelist -notcontains $lib.Name ) {
 				Write-Host -BackgroundColor Black -ForegroundColor Red $lib.FullName + ": AVX FOUND <-----------------------------" 
 				$avxfound = $true
+			} else {
+			Write-Host -NoNewLine "."
 			}
 		}
 	}

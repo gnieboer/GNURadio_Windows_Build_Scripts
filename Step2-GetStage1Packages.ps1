@@ -35,6 +35,7 @@ getPatch libpng-1.6.21-vs2015.7z libpng\projects\vstudio-vs2015
 GetPackage https://github.com/gnieboer/gettext-msvc.git
 GetPackage http://ftp.gnu.org/gnu/gettext/gettext-0.19.4.tar.gz
 GetPackage http://ftp.gnu.org/gnu/libiconv/libiconv-1.14.tar.gz
+cd $root/src-stage1-dependencies
 cp gettext-0.19.4\* .\gettext-msvc\gettext-0.19.4 -Force -Recurse
 cp libiconv-1.14\* .\gettext-msvc\libiconv-1.14 -Force -Recurse
 del .\libiconv-1.14 -Force -Recurse

@@ -293,12 +293,16 @@ Function Consolidate {
 	cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/freetype.lib $root/build/$configuration/lib/ 2>&1 >> $log
 	cp -Recurse -Force $root/src-stage1-dependencies/x64/include/freetype $root/build/$configuration/include/ 2>&1 >> $log
 	cp -Recurse -Force $root/src-stage1-dependencies/x64/include/ft2build.h $root/build/$configuration/include/  2>&1 >> $log
+	"complete"
 
 	#polarssl / mbedTLS
+	Write-Host -NoNewline "Consolidating polarSSL..."
 	cp -Recurse -Force $root/src-stage1-dependencies/mbedTLS-mbedtls-$mbedTLS_version/dist/$configuration/lib/*.lib $root/build/$configuration/lib/ 2>&1 >> $log
 	cp -Recurse -Force $root\src-stage1-dependencies\mbedTLS-mbedtls-$mbedTLS_version/dist/$configuration/include/* $root/build/$configuration/include/ 2>&1 >> $log
-
+	"complete"
+	
 	#lapack / openblas
+	Write-Host -NoNewline "Consolidating openBLAS + LAPACK..."
 	cp -Recurse -Force $root/src-stage1-dependencies/lapack/dist/$configuration/lib/*.lib $root/build/$configuration/lib/ 2>&1 >> $log
 	if ($BuildNumpyWithMKL)
 	{
@@ -307,6 +311,7 @@ Function Consolidate {
 	} else {
 		cp -Recurse -Force $root/src-stage1-dependencies/OpenBLAS-$openblas_version/build/$configuration/lib/libopenblas_static.lib $root/build/$configuration/lib/ 2>&1 >> $log
 	}
+	"complete"
 	
 	# MPIR
 	if ($mm -eq "3.8") {
