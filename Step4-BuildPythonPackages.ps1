@@ -787,6 +787,35 @@ Function SetupPython
 	}
 
 	#__________________________________________________________________________________________
+	# Pyyaml
+	# requires Python
+	#
+	SetLog "$configuration pyyaml"
+	if ($mm -eq "3.8") {
+		cd $root\src-stage1-dependencies\pyyaml
+		if ((TryValidate "dist/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl") -eq $false) {
+			Write-Host -NoNewline "building pyyaml..."
+			$ErrorActionPreference = "Continue" 
+			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
+			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  2>&1 >> $Log
+			Write-Host -NoNewline "installing..."
+			& $pythonroot/$pythonexe setup.py install 2>&1 >> $Log
+			Write-Host -NoNewline "creating exe..."
+			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
+			Write-Host -NoNewline "crafting wheel..."
+			& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
+			cd dist
+			move ./pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.whl pyyaml/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
+			cd ..
+			$ErrorActionPreference = "Stop" 
+			Validate "dist/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl"
+		} else {
+			Write-Host "pyyaml already built..."
+		}
+	}
+	
+	#__________________________________________________________________________________________
 	# wxpython
 	#
 	# v3.0.2 is not VC140 compatible, so the patch fixes those things

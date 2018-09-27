@@ -192,6 +192,9 @@ GetPackage https://gitlab.gnome.org/Archive/pygtk/-/archive/windows/pygtk-window
 GetPackage http://cairographics.org/releases/py2cairo-$py2cairo_version.tar.bz2
 GetPatch py2cairo-$py2cairo_version.7z py2cairo-$py2cairo_version
 
+# pyyaml
+GetPackage http://pyyaml.org/download/pyyaml/PyYAML-$pyyaml_version.zip pyyaml
+
 # pkgconfig
 GetPackage https://pypi.python.org/packages/source/p/pkgconfig/pkgconfig-$pkgconfig_version.tar.gz
 GetPackage http://downloads.sourceforge.net/project/pkgconfiglite/0.28-1/pkg-config-lite-0.28-1_bin-win32.zip
