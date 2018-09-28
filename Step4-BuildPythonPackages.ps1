@@ -821,7 +821,7 @@ Function SetupPython
 	SetLog "$configuration pyyaml"
 	if ($mm -eq "3.8") {
 		cd $root\src-stage1-dependencies\pyyaml
-		if ((TryValidate "dist/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl") -eq $false) {
+		if ((TryValidate "dist/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/yaml/__init__.py") -eq $false) {
 			Write-Host -NoNewline "building pyyaml..."
 			$ErrorActionPreference = "Continue" 
 			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
@@ -834,10 +834,10 @@ Function SetupPython
 			Write-Host -NoNewline "crafting wheel..."
 			& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
 			cd dist
-			move ./pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.whl pyyaml/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
+			move ./pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.whl pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
 			cd ..
 			$ErrorActionPreference = "Stop" 
-			Validate "dist/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl"
+			Validate "dist/pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/yaml/__init__.py"
 		} else {
 			Write-Host "pyyaml already built..."
 		}
