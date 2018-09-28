@@ -27,7 +27,7 @@
 		PyQt = '4.11.4'
 		PyQt5 = '5.6'
 		pyopengl = '3.1.0'
-		py2cairo = '1.10.0'
+		py2cairo = '1.17.1'
 		pyyaml = '3.13'
 		cheetah = '2.4.4'
 		gsl = '1.16'

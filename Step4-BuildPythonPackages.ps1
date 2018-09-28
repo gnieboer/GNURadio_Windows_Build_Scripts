@@ -678,39 +678,34 @@ Function SetupPython
 	# uses wierd setup python script called WAF which has an archive embedded in it which
 	# creates files that then fail to work.  So we need to extract them and then patch them
 	# and run again.
-	SetLog "$configuration py2cairo"
-	cd $root\src-stage1-dependencies\py2cairo-$py2cairo_version
-	if ((TryValidate "$pythonroot\lib\site-packages\cairo\_cairo.pyd") -eq $false) {
+	SetLog "$configuration pycairo"
+	cd $root\src-stage1-dependencies\pycairo-$py2cairo_version
+	if ((TryValidate "$pythonroot\lib\site-packages\pycairo-$py2cairo_version-py2.7-win-amd64.egg\cairo\_cairo.pyd") -eq $false) {
 		Write-Host -NoNewline "configuring py2cairo..."
-		$env:path = "$root\bin;$root\src-stage1-dependencies\x64\bin;" + $oldPath
 		$ErrorActionPreference = "Continue" 
-		# HACK the below will fail, but will run the command to unpack the rest of the library
-		# what we really should do here is run just the python needed to unpack the library
-		# and not intentionally run code that will error out
-		& $pythonroot/$pythonexe waf configure --nocache --out=build --prefix=build/x64/$configuration  2>&1 >> $log
-		Copy-Item -Force msvc.py .\waf-1.6.3-3c3129a3ec8fb4a5bbc7ba3161463b22\waflib\Tools\msvc.py 2>&1 >> $log
-		Copy-Item -Force python.py .\waf-1.6.3-3c3129a3ec8fb4a5bbc7ba3161463b22\waflib\Tools\python.py 2>&1 >> $log
-		# now it will work
-		& $pythonroot/$pythonexe waf configure --nocache --out=build --prefix=build/x64/$configuration  2>&1 >> $log
+		$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;" + $oldpath
+		$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
+		if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
+		if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
 		Write-Host -NoNewline "building..."
 		$env:INCLUDE = "$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/cairo;" + $oldInclude 
 		$env:LIB = "$root/src-stage1-dependencies/cairo/build/x64/Release;$root/src-stage1-dependencies/cairo/build/x64/ReleaseDLL;$pythonroot/libs;" + $oldlib 
 		$env:_CL_ = "/MD$d /I$root/src-stage1-dependencies/x64/include /I$root/src-stage1-dependencies/x64/include/cairo /DCAIRO_WIN32_STATIC_BUILD" 
 		$env:_LINK_ = "/DEFAULTLIB:cairo /DEFAULTLIB:pixman-1 /DEFAULTLIB:freetype /LIBPATH:$root/src-stage1-dependencies/x64/lib /LIBPATH:$pythonroot/libs"
-		& $pythonroot/$pythonexe waf build --nocache --out=build --prefix=build/x64/$configuration --includedir=$root\src-stage1\dependencies\x64\include 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  2>&1 >> $Log
+		Write-Host -NoNewline "installing..."
+		& $pythonroot/$pythonexe setup.py install --single-version-externally-managed  --root=/ 2>&1 >> $Log
+		Write-Host -NoNewline "creating wheel..."
+		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
 		$env:_LINK_ = ""
 		$env:_CL_ = ""
 		$env:LIB = $oldLib
 		$env:INCLUDE = $oldInclude 
-		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe waf install --nocache --out=build --prefix=build/x64/$configuration 2>&1 >> $log
 		cp -Recurse -Force build/x64/$configuration/lib/python2.7/site-packages/cairo $pythonroot\lib\site-packages 2>&1 >> $log
 		if ($configuration -match "Debug") {
 			cp -Force "$pythonroot\lib\site-packages\cairo\_cairo.pyd" "$pythonroot\lib\site-packages\cairo\_cairo_d.pyd"
 		}
-		cp -Force $root\src-stage1-dependencies\py2cairo-$py2cairo_version\pycairo.pc $pythonroot\lib\pkgconfig\
-		& $pythonroot/$pythonexe waf clean  2>&1 >> $log
-		Validate "$pythonroot\lib\site-packages\cairo\_cairo.pyd"
+		Validate "$pythonroot\lib\site-packages\pycairo-$py2cairo_version-py2.7-win-amd64.egg\cairo\_cairo.pyd"
 	} else {
 		Write-Host "py2cairo already built..."
 	}

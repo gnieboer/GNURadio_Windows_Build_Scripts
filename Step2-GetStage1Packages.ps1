@@ -194,8 +194,8 @@ if ($mm -eq "3.7") {
 GetPackage https://gitlab.gnome.org/Archive/pygtk/-/archive/windows/pygtk-windows.zip pygtk-$pygtk_version.0
 
 # py2cairo
-GetPackage http://cairographics.org/releases/py2cairo-$py2cairo_version.tar.bz2
-GetPatch py2cairo-$py2cairo_version.7z py2cairo-$py2cairo_version
+GetPackage https://github.com/pygobject/pycairo/archive/v$py2cairo_version.zip
+#GetPatch py2cairo-$py2cairo_version.7z py2cairo-$py2cairo_version
 
 # pyyaml
 GetPackage http://pyyaml.org/download/pyyaml/PyYAML-$pyyaml_version.zip pyyaml
