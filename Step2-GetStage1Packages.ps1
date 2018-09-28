@@ -16,6 +16,8 @@ if (Test-Path $mypath\Setup.ps1) {
 	. $root\scripts\Setup.ps1 -Force
 }
 
+$mm = GetMajorMinor($gnuradio_version)
+
 # Retrieve packages needed for Stage 1
 cd $root/src-stage1-dependencies
 SetLog "GetPackages"
@@ -178,12 +180,15 @@ GetPackage https://pypi.python.org/packages/source/P/PyOpenGL/PyOpenGL-$pyopengl
 GetPackage https://pypi.python.org/packages/source/P/PyOpenGL-accelerate/PyOpenGL-accelerate-$pyopengl_version.tar.gz
 
 # pygobject
-$mm = GetMajorMinor($pygobject_version)
-GetPackage http://ftp.gnome.org/pub/GNOME/sources/pygobject/$mm/pygobject-$pygobject_version.tar.xz
-GetPatch gtk-pkgconfig.7z x64/lib
-GetPatch runtests-windows.7z pygobject-$pygobject_version\tests
-GetPatch pygobject_gio-types.7z pygobject-$pygobject_version\gio
-
+if ($mm -eq "3.7") {
+	$pygmm = GetMajorMinor($pygobject_version)
+	GetPackage http://ftp.gnome.org/pub/GNOME/sources/pygobject/$pygmm/pygobject-$pygobject_version.tar.xz
+	GetPatch gtk-pkgconfig.7z x64/lib
+	GetPatch runtests-windows.7z pygobject-$pygobject_version\tests
+	GetPatch pygobject_gio-types.7z pygobject-$pygobject_version\gio
+} else {
+	GetPackage https://gitlab.gnome.org/GNOME/pygobject/-/archive/$pygobject3_version/pygobject-$pygobject3_version.zip
+}
 # PyGTK
 # GetPackage http://ftp.gnome.org/pub/GNOME/sources/pygtk/$pygtk_version/pygtk-$pygtk_version.0.tar.gz
 GetPackage https://gitlab.gnome.org/Archive/pygtk/-/archive/windows/pygtk-windows.zip pygtk-$pygtk_version.0
@@ -262,7 +267,6 @@ GetPackage https://pypi.python.org/packages/0a/da/9f61d28a20c42b4963334efacfd257
 GetPackage https://github.com/ARMmbed/mbedtls/archive/mbedtls-$mbedtls_version.tar.gz mbedtls
 	
 # get GNURadio 3.8+ dependencies
-$mm = GetMajorMinor($gnuradio_version)
 if ($mm -eq "3.8") {
 	# log4cpp
 	$mm = GetMajorMinor($log4cpp_version)

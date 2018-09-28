@@ -719,35 +719,68 @@ Function SetupPython
 	# Pygobject
 	# requires Python
 	#
-	# VERSION WARNING: higher than 2.28 does not have setup.py so do not try to use
+	# 2.X VERSION WARNING: higher than 2.28 does not have setup.py so do not try to use )
 	#
 	SetLog "$configuration pygobject"
-	cd $root\src-stage1-dependencies\Pygobject-$pygobject_version
-	if ((TryValidate "dist/gtk-2.0/pygobject-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gobject\_gobject.pyd") -eq $false) {
-		Write-Host -NoNewline "building Pygobject..."
-		$ErrorActionPreference = "Continue" 
-		$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;" + $oldpath
-		$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
-		if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
-		if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
-		& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading  2>&1 >> $Log
-		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install  2>&1 >> $Log
-		Write-Host -NoNewline "creating exe..."
-		& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
-		Write-Host -NoNewline "crafting wheel from exe..."
-		New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 2>&1 >> $Log
-		cd dist
-		& $pythonroot/Scripts/wheel.exe convert pygobject-$pygobject_version.win-amd64-py2.7.exe 2>&1 >> $Log
-		move gtk-2.0/pygobject-cp27-none-win_amd64.whl gtk-2.0/pygobject-cp27-none-win_amd64.$configuration.whl -Force
-		cd ..
-		$env:_CL_ = ""
-		$env:PATH = $oldPath
-		$env:PKG_CONFIG_PATH = ""
-		$ErrorActionPreference = "Stop" 
-		Validate "dist/gtk-2.0/pygobject-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gobject\_gobject.pyd"
+	if ($mm -eq "3.8") {
+		cd $root\src-stage1-dependencies\Pygobject-$pygobject3_version
+		if ((TryValidate "dist/gtk-3.0/pygobject-$pygobject3_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gi\_gi.pyd") -eq $false) {
+			Write-Host -NoNewline "building Pygobject 3..."
+			$ErrorActionPreference = "Continue" 
+			$env:INCLUDE = "$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/glib-2.0;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/cairo;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/lib/glib-2.0/include;$root/src-stage1-dependencies/x64/include/gobject-introspection-1.0;$root/src-stage1-dependencies/x64/include/gtk-3.0" + $oldInclude 
+			$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;" + $oldpath
+			$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
+			$env:LIB = "$root/src-stage1-dependencies/x64/lib;" + $oldlib
+			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
+			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  2>&1 >> $Log
+			Write-Host -NoNewline "installing..."
+			& $pythonroot/$pythonexe setup.py install --single-version-externally-managed  --root=/ 2>&1 >> $Log
+			Write-Host -NoNewline "creating exe..."
+			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
+			Write-Host -NoNewline "crafting wheel"
+			& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
+			New-Item -ItemType Directory -Force -Path .\dist\gtk-3.0 2>&1 >> $Log
+			cd dist
+			move ./pygobject-$pygobject3_version-cp27-cp27${d}m-win_amd64.whl gtk-3.0/pygobject-$pygobject3_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
+			cd ..
+			$env:_CL_ = ""
+			$env:LIB = $oldLIB 
+			$env:PATH = $oldPath
+			$env:PKG_CONFIG_PATH = ""
+			$ErrorActionPreference = "Stop" 
+			Validate "dist/gtk-3.0/pygobject-$pygobject3_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gi\_gi.pyd"
+		} else {
+			Write-Host "pygobject3 already built..."
+		}
 	} else {
-		Write-Host "pygobject already built..."
+		cd $root\src-stage1-dependencies\Pygobject-$pygobject_version
+		if ((TryValidate "dist/gtk-2.0/pygobject-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gobject\_gobject.pyd") -eq $false) {
+			Write-Host -NoNewline "building Pygobject..."
+			$ErrorActionPreference = "Continue" 
+			$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;" + $oldpath
+			$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
+			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
+			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading  2>&1 >> $Log
+			Write-Host -NoNewline "installing..."
+			& $pythonroot/$pythonexe setup.py install  2>&1 >> $Log
+			Write-Host -NoNewline "creating exe..."
+			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
+			Write-Host -NoNewline "crafting wheel from exe..."
+			New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 2>&1 >> $Log
+			cd dist
+			& $pythonroot/Scripts/wheel.exe convert pygobject-$pygobject_version.win-amd64-py2.7.exe 2>&1 >> $Log
+			move gtk-2.0/pygobject-cp27-none-win_amd64.whl gtk-2.0/pygobject-cp27-none-win_amd64.$configuration.whl -Force
+			cd ..
+			$env:_CL_ = ""
+			$env:PATH = $oldPath
+			$env:PKG_CONFIG_PATH = ""
+			$ErrorActionPreference = "Stop" 
+			Validate "dist/gtk-2.0/pygobject-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gobject\_gobject.pyd"
+		} else {
+			Write-Host "pygobject already built..."
+		}
 	}
 
 	#__________________________________________________________________________________________

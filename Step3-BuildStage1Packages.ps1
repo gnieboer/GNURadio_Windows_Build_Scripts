@@ -255,6 +255,9 @@ if ($Config.BuildGTKFromSource) {
 	# no action needed here if we are using the binaries.
 	# if we use the premade build environment from hexchat, that
 	# would replace the above code.
+	# 
+	# below is the command line used to build gtk3 using the gvsbuild code on github.  Similar to these scripts, there be dragons and some manual tweaking is required, not for the faint of heart.
+	# z:/gr-build/python36/python.exe ./build.py build --vs-ver 14 -p x64 -c release --build-dir z:\gr-build\src-stage1-dependencies\gvsbuild\build --msys-dir z:/gr-build/msys64 --patches-root-dir z:/gr-build/src-stage1-dependencies/gvsbuild/patches --python-dir z:/gr-build/Python36 --py-wheel --enable-gi --win-sdk-ver 10.0.15063.0 gtk3-full
 }
 # ____________________________________________________________________________________________________________
 # SDL

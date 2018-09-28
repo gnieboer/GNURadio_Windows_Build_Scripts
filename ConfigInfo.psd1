@@ -46,6 +46,7 @@
 		openlte = '00-20-04'
 		wxpython = '3.0.2.0'# Changing to 3.1+ will require other code changes
 		pygobject = '2.28.6'# Changing to 2.29+ will require other code changes (but don't because 2.29 doesn't have the same setup.py)
+		pygobject3 = '3.30.4'
 		pygtk = '2.24'    # Changing to 2.25+ will require other code changes
 		qt = '4.8.7'        # This isn't actually used.  4.8.7 is hardcoded but 4.8.7 is the last 4.x version to the change to Qt5 will change much more
 		python = '2.7.10'   # This isn't actually used.  2.7.10 is hardcoded 
