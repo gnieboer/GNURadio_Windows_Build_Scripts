@@ -36,7 +36,7 @@
 		lxml = '3.6.0'
 		libxslt = '1.1.29'
 		pkgconfig = '1.1.0'
-		log4cpp = '1.1.1'
+		log4cpp = '1.1.3'
 		libusb = '1.0.21'   
 		fftw = '3.3.6-pl2'      
 		matplotlib = '2.0.0'

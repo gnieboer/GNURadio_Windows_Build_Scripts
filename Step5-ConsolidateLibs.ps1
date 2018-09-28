@@ -182,8 +182,12 @@ Function Consolidate {
 	$mm = GetMajorMinor($gnuradio_version)
 	if ($mm -eq "3.8") {
 		Write-Host -NoNewline "Consolidating log4cpp..."
-		cp -Recurse -Force $root/src-stage1-dependencies/log4cpp/msvc14/x64/$baseconfig/log4cpp.* $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/log4cpp/include/log4cpp $root/build/$configuration/include/ 2>&1 >> $log
+		New-Item -ItemType Directory -Force -Path $root/build/$configuration/include/log4cpp/threading 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\log4cpp\msvc14\x64\$baseconfig\log4cpp.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\log4cpp\msvc14\x64\$baseconfig\log4cpp.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\log4cpp\include\log4cpp\*.hh $root/build/$configuration/include/log4cpp/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\log4cpp\include\log4cpp\*.h $root/build/$configuration/include/log4cpp/ 2>&1 >> $log
+		cp -Recurse -Force $root\src-stage1-dependencies\log4cpp\include\log4cpp\threading\*.hh $root/build/$configuration/include/log4cpp/threading/ 2>&1 >> $log
 		"complete"
 	}
 

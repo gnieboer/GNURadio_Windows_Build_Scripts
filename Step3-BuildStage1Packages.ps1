@@ -1174,12 +1174,12 @@ if ($mm -eq "3.8") {
 	SetLog "log4cpp"
 	Write-Host -NoNewline "Building log4cpp..."
 	cd $root\src-stage1-dependencies\log4cpp\msvc14
-	if ((TryValidate "x64/Release/log4cpp.dll" "x64/Release/log4cpp.pdb"  "x64/Release/log4cppLIB.lib" `
-		"x64/Debug/log4cpp.dll" "x64/Debug/log4cpp.pdb"  "x64/Debug/log4cppD.lib" ) -eq $false) {
+	if ((TryValidate "x64/Release/log4cpp.dll" "x64/Release/log4cpp.pdb"  "x64/Release/log4cpp.lib" `
+		"x64/Debug/log4cpp.dll" "x64/Debug/log4cpp.pdb"  "x64/Debug/log4cpp.lib" ) -eq $false) {
 		msbuild msvc14.sln /m /p:"configuration=Release;platform=x64" >> $Log
 		msbuild msvc14.sln /m /p:"configuration=Debug;platform=x64" >> $Log
-		Validate "x64/Release/log4cpp.dll" "x64/Release/log4cpp.pdb"  "x64/Release/log4cppLIB.lib" `
-			"x64/Debug/log4cpp.dll" "x64/Debug/log4cpp.pdb"  "x64/Debug/log4cppD.lib" 
+		Validate "x64/Release/log4cpp.dll" "x64/Release/log4cpp.pdb"  "x64/Release/log4cpp.lib" `
+			"x64/Debug/log4cpp.dll" "x64/Debug/log4cpp.pdb"  "x64/Debug/log4cpp.lib" 
 	} else {
 		Write-Host "already built"
 	}
