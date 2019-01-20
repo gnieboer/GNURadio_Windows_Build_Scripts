@@ -93,10 +93,6 @@ function BuildGNURadio {
 		-DCMAKE_BUILD_TYPE="$buildtype" `
 		-Wno-dev
 	$ErrorActionPreference = "Stop"
-	# current errors to investigate:
-	#
-	# incorrectly detects compiler (vs 10.0) nuisance only?
-	# doesn't find MSVC-ASM ? (nasm) how would nasm be used?
 	
 	# before we build we need to trim from SWIG cmd.exe lines in the VS projects, as cmd.exe has a 8192 character limit, and some of the swig commands will likely be > 9000
 	# the good news is that the includes are very repetitive so we can use a swizzy regex to get rid to them
