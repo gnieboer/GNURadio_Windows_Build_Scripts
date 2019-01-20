@@ -948,6 +948,21 @@ Function SetupPython
 	}
 
 	#__________________________________________________________________________________________
+	# pygi
+	#
+	# python only packages
+	SetLog "$configuration pygi"
+	if ((TryValidate "$pythonroot/lib/site-packages/pygi.py") -eq $false) {
+		Write-Host -NoNewline "installing pygi using pip..."
+		$ErrorActionPreference = "Continue" # pip will "error" on debug
+		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install -U pygi -t $pythonroot\lib\site-packages 2>&1 >> $log
+		$ErrorActionPreference = "Stop"
+		Validate "$pythonroot/lib/site-packages/pygi.py"
+	} else {
+		Write-Host "pygi already installed..."
+	}
+	
+	#__________________________________________________________________________________________
 	# lxml
 	#
 	# this was a royal pain to get to statically link the dependent libraries
