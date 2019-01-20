@@ -733,7 +733,7 @@ Function SetupPython
 			& $pythonroot/$pythonexe setup.py install --single-version-externally-managed  --root=/ 2>&1 >> $Log
 			Write-Host -NoNewline "creating exe..."
 			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
-			Write-Host -NoNewline "crafting wheel"
+			Write-Host -NoNewline "crafting wheel..."
 			& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
 			New-Item -ItemType Directory -Force -Path .\dist\gtk-3.0 2>&1 >> $Log
 			cd dist

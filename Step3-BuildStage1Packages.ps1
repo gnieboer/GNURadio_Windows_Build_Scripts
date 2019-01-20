@@ -942,6 +942,7 @@ if ((TryValidate "$root\src-stage2-python\gr-python27\lib\site-packages\requests
 #
 # requires libusb, boost, python, mako
 # FYI BOOST_FORCE_SYMMETRIC_OPERATORS is required for debug versions because MSVC 2015 disable NRVO for debug builds which causes duplicate operator error
+
 SetLog "UHD"
 Write-Host "building uhd..."
 $ErrorActionPreference = "Continue"
