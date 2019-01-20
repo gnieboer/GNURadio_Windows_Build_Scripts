@@ -783,35 +783,40 @@ Function SetupPython
 	# requires Python, Pygobject
 	#
 	SetLog "$configuration pygtk"
-	cd $root\src-stage1-dependencies\pygtk-$pygtk_version.0
-	if ((TryValidate "dist/gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gtk\_gtk.pyd") -eq $false) {
-		Write-Host -NoNewline "building PyGTK..."
-		if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
-		$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;$pythonroot/Scripts;$pythonroot;" + $oldpath
-		$env:_CL_ = "/I$root/src-stage1-dependencies/x64/lib/gtk-2.0/include /I$root/src-stage1-dependencies/py2cairo-$py2cairo_version/src " + $env:_CL_
-		if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
-		$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
-		$ErrorActionPreference = "Continue" 
-		& $pythonroot/$pythonexe setup.py clean 2>&1 >> $Log
-		& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading 2>&1 >> $log
-		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install 2>&1 >> $Log
-		Write-Host -NoNewline "building exe..."
-		& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
-		New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 2>&1 >> $Log
-		cd dist
-		Write-Host -NoNewline "crafting wheel from exe..."
-		& $pythonroot/Scripts/wheel.exe convert pygtk-$pygtk_version.0.win-amd64-py2.7.exe 2>&1 >> $Log
-		move gtk-2.0/pygtk-cp27-none-win_amd64.whl gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl -Force 2>&1 >> $Log
-		cd ..
-		$env:_CL_ = ""
-		$env:_LINK_ = ""
-		$env:PATH = $oldPath
-		$env:PKG_CONFIG_PATH = ""
-		$ErrorActionPreference = "Stop" 
-		Validate "dist/gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gtk\_gtk.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "skipping pygtk as using GTK3" >> $Log
+		Write-Host "skipping pygtk as using GTK3"
 	} else {
-		Write-Host "pyGTK already built..."
+		cd $root\src-stage1-dependencies\pygtk-$pygtk_version.0
+		if ((TryValidate "dist/gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gtk\_gtk.pyd") -eq $false) {
+			Write-Host -NoNewline "building PyGTK..."
+			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
+			$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;$pythonroot/Scripts;$pythonroot;" + $oldpath
+			$env:_CL_ = "/I$root/src-stage1-dependencies/x64/lib/gtk-2.0/include /I$root/src-stage1-dependencies/py2cairo-$py2cairo_version/src " + $env:_CL_
+			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
+			$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
+			$ErrorActionPreference = "Continue" 
+			& $pythonroot/$pythonexe setup.py clean 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading 2>&1 >> $log
+			Write-Host -NoNewline "installing..."
+			& $pythonroot/$pythonexe setup.py install 2>&1 >> $Log
+			Write-Host -NoNewline "building exe..."
+			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
+			New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 2>&1 >> $Log
+			cd dist
+			Write-Host -NoNewline "crafting wheel from exe..."
+			& $pythonroot/Scripts/wheel.exe convert pygtk-$pygtk_version.0.win-amd64-py2.7.exe 2>&1 >> $Log
+			move gtk-2.0/pygtk-cp27-none-win_amd64.whl gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl -Force 2>&1 >> $Log
+			cd ..
+			$env:_CL_ = ""
+			$env:_LINK_ = ""
+			$env:PATH = $oldPath
+			$env:PKG_CONFIG_PATH = ""
+			$ErrorActionPreference = "Stop" 
+			Validate "dist/gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gtk-2.0\gtk\_gtk.pyd"
+		} else {
+			Write-Host "pyGTK already built..."
+		}
 	}
 
 	#__________________________________________________________________________________________
