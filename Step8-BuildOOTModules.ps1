@@ -22,6 +22,7 @@ if (Test-Path $mypath\Setup.ps1) {
 $configmode = $args[0]
 if ($configmode -eq $null) {$configmode = "all"}
 $env:PYTHONPATH=""
+$mm = GetMajorMinor($gnuradio_version)
 
 function BuildDrivers 
 {
@@ -560,27 +561,51 @@ function BuildOOTModules
 	cd $root/src-stage3/oot_code/gqrx-$gqrx_version/build/$configuration
 	$ErrorActionPreference = "Continue"
 	$env:_CL_ = ""
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration\gqrx" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
-		-DCMAKE_C_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
-		-DCMAKE_CXX_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
-		-Wno-dev 2>&1 >> $Log
+	if ($mm -eq "3.8") {	
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
+			-DCMAKE_C_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
+			-DCMAKE_CXX_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
+			-Wno-dev 2>&1 >> $Log
+	} else {
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration\gqrx" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
+			-DCMAKE_C_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
+			-DCMAKE_CXX_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
+			-Wno-dev 2>&1 >> $Log		
+	}
 	Write-Host -NoNewline "building..."
 	msbuild .\gqrx.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
 	Write-Host -NoNewline "installing..."
 	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	cp $root/build/$configuration/gqrx/bin/Qt5Network*.dll $root\src-stage3\staged_install\$configuration\bin\
-	cp $root/build/$configuration/gqrx/bin/Qt5Core*.dll $root\src-stage3\staged_install\$configuration\bin\
-	cp $root/build/$configuration/gqrx/bin/Qt5Gui*.dll $root\src-stage3\staged_install\$configuration\bin\
-	cp $root/build/$configuration/gqrx/bin/Qt5Widgets*.dll $root\src-stage3\staged_install\$configuration\bin\
-	cp $root/build/$configuration/gqrx/bin/Qt5Svg*.dll $root\src-stage3\staged_install\$configuration\bin\
-	New-Item -ItemType Directory $root\src-stage3\staged_install\$configuration\plugins -Force 2>&1 >> $Log
-	cp -Recurse -Force $root/build/$configuration/gqrx/plugins/platforms $root\src-stage3\staged_install\$configuration\bin
-	cp -Recurse -Force $root/build/$configuration/gqrx/plugins/iconengines $root\src-stage3\staged_install\$configuration\bin
-	cp -Recurse -Force $root/build/$configuration/gqrx/plugins/imageformats $root\src-stage3\staged_install\$configuration\bin
+	$mm = GetMajorMinor($gnuradio_version)
+	if ($mm -eq "3.8") {
+		cp $root/build/$configuration/bin/Qt5Network*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/bin/Qt5Core*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/bin/Qt5Gui*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/bin/Qt5Widgets*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/bin/Qt5Svg*.dll $root\src-stage3\staged_install\$configuration\bin\
+		New-Item -ItemType Directory $root\src-stage3\staged_install\$configuration\plugins -Force 2>&1 >> $Log
+		cp -Recurse -Force $root/build/$configuration/plugins/platforms $root\src-stage3\staged_install\$configuration\bin
+		cp -Recurse -Force $root/build/$configuration/plugins/iconengines $root\src-stage3\staged_install\$configuration\bin
+		cp -Recurse -Force $root/build/$configuration/plugins/imageformats $root\src-stage3\staged_install\$configuration\bin
+	} else {
+		cp $root/build/$configuration/gqrx/bin/Qt5Network*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/gqrx/bin/Qt5Core*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/gqrx/bin/Qt5Gui*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/gqrx/bin/Qt5Widgets*.dll $root\src-stage3\staged_install\$configuration\bin\
+		cp $root/build/$configuration/gqrx/bin/Qt5Svg*.dll $root\src-stage3\staged_install\$configuration\bin\
+		New-Item -ItemType Directory $root\src-stage3\staged_install\$configuration\plugins -Force 2>&1 >> $Log
+		cp -Recurse -Force $root/build/$configuration/gqrx/plugins/platforms $root\src-stage3\staged_install\$configuration\bin
+		cp -Recurse -Force $root/build/$configuration/gqrx/plugins/iconengines $root\src-stage3\staged_install\$configuration\bin
+		cp -Recurse -Force $root/build/$configuration/gqrx/plugins/imageformats $root\src-stage3\staged_install\$configuration\bin
+	}
 	"[Paths]" | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII
 	"Prefix = ." | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII -append 
 	$env:_CL_ = ""

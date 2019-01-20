@@ -26,6 +26,7 @@ if (Test-Path $mypath\Setup.ps1) {
 
 $pythonexe = "python.exe"
 $pythondebugexe = "python_d.exe"
+$mm = GetMajorMinor($gnuradio_version)
 
 cd $root
 
@@ -37,9 +38,11 @@ Function Consolidate {
 	New-Item -ItemType Directory -Force -Path $root/build/$configuration 2>&1 >> $log
 	# gqrx requires Qt5, not 4, and can get confused about headers between the two so we will
 	# copy a different set of libraries to a gqrx subdirectory.
-	New-Item -ItemType Directory -Force -Path $root/build/$configuration/gqrx/bin 2>&1 >> $log
-	New-Item -ItemType Directory -Force -Path $root/build/$configuration/gqrx/include 2>&1 >> $log
-	New-Item -ItemType Directory -Force -Path $root/build/$configuration/gqrx/lib 2>&1 >> $log
+	if ($mm -eq '3.7') {
+		New-Item -ItemType Directory -Force -Path $root/build/$configuration/gqrx/bin 2>&1 >> $log
+		New-Item -ItemType Directory -Force -Path $root/build/$configuration/gqrx/include 2>&1 >> $log
+		New-Item -ItemType Directory -Force -Path $root/build/$configuration/gqrx/lib 2>&1 >> $log
+	}
 	Write-Host ""
     Write-Host "Starting Consolidation for $configuration"
 	# set up various variables we'll need
@@ -179,7 +182,6 @@ Function Consolidate {
 	"complete"
 
 	# log4cpp
-	$mm = GetMajorMinor($gnuradio_version)
 	if ($mm -eq "3.8") {
 		Write-Host -NoNewline "Consolidating log4cpp..."
 		New-Item -ItemType Directory -Force -Path $root/build/$configuration/include/log4cpp/threading 2>&1 >> $log
