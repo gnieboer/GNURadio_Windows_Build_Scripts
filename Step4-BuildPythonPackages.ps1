@@ -1016,12 +1016,12 @@ Function SetupPython
 		}
 		& $pythonroot/$pythonexe setup.py configure $debug --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
 		Write-Host -NoNewline "building..."
-		& $pythonroot/$pythonexe setup.py build_ext $debug --inplace --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build_ext $debug --zmq=./libzmq/$configuration --inplace --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
 		# TODO a pyzmq socket test is failing which then prompts user to debug so disable for now so we don't slow down the build process
 		# Write-Host -NoNewline "testing..."
 		# & $pythonroot/$pythonexe setup.py test 2>&1 >> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install  --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
 		Write-Host -NoNewline "crafting wheel..."
 		& $pythonroot/$pythonexe setup.py bdist_wheel --zmq=./libzmq/$configuration 2>&1 >> $log
 		# these can't be in dist because clean wipes out dist completely
