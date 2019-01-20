@@ -273,32 +273,70 @@ Function Consolidate {
 
 	# gtk
 	Write-Host -NoNewline "Consolidating gtk..."
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gtk-win32-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gdk-win32-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangocairo-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangowin32-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangoft2-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pango-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gdk_pixbuf-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/cairo.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/atk-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/harfbuzz.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gio-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gobject-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gmodule-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gthread-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/glib-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libintl.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/fontconfig.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pixman-1.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libxml2.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libpng16.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/iconv.dll $root/build/$configuration/lib/ 2>&1 >> $log
-    cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/zlib1.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libffi.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/freetype.lib $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/include/freetype $root/build/$configuration/include/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/x64/include/ft2build.h $root/build/$configuration/include/  2>&1 >> $log
+	if ($mm -eq "3.8") {
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gtk-3-3.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gdk-3-3.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangocairo-1.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangowin32-1.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangoft2-1.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pango-1.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/fribidi-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/freetype.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/girepository-1.0-1.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gdk_pixbuf-2.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/cairo.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/cairo-gobject.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/epoxy-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/atk-1.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/harfbuzz.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gio-2.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gobject-2.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gmodule-2.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gthread-2.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/glib-2.0-0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/intl.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/fontconfig.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/pixman-1.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libxml2.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libpng16.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/iconv.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/zlib1.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/ffi-7.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/freetype.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/include/freetype2/freetype $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/include/freetype2/ft2build.h $root/build/$configuration/include/  2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/share/gir-1.0 $root/build/$configuration/share/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/gdk-pixbuf-2.0 $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/girepository-1.0 $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/gobject-introspection $root/build/$configuration/lib/ 2>&1 >> $log
+	} else {
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gtk-win32-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gdk-win32-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangocairo-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangowin32-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pangoft2-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pango-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gdk_pixbuf-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/cairo.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/atk-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/harfbuzz.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gio-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gobject-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gmodule-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gthread-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/glib-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libintl.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/fontconfig.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pixman-1.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libxml2.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libpng16.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/iconv.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/zlib1.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/libffi.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/freetype.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/include/freetype $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/include/ft2build.h $root/build/$configuration/include/  2>&1 >> $log
+	}
 	"complete"
 
 	#polarssl / mbedTLS
