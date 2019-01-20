@@ -680,7 +680,7 @@ Function SetupPython
 	# and run again.
 	SetLog "$configuration pycairo"
 	cd $root\src-stage1-dependencies\pycairo-$py2cairo_version
-	if ((TryValidate "$pythonroot\lib\site-packages\pycairo-$py2cairo_version-py2.7-win-amd64.egg\cairo\_cairo.pyd") -eq $false) {
+	if ((TryValidate "$pythonroot\lib\site-packages\cairo\_cairo.pyd") -eq $false) {
 		Write-Host -NoNewline "configuring py2cairo..."
 		$ErrorActionPreference = "Continue" 
 		$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;" + $oldpath
@@ -705,7 +705,7 @@ Function SetupPython
 		if ($configuration -match "Debug") {
 			cp -Force "$pythonroot\lib\site-packages\cairo\_cairo.pyd" "$pythonroot\lib\site-packages\cairo\_cairo_d.pyd"
 		}
-		Validate "$pythonroot\lib\site-packages\pycairo-$py2cairo_version-py2.7-win-amd64.egg\cairo\_cairo.pyd"
+		Validate "$pythonroot\lib\site-packages\cairo\_cairo.pyd"
 	} else {
 		Write-Host "py2cairo already built..."
 	}
