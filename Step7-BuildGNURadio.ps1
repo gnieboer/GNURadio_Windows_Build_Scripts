@@ -20,6 +20,7 @@ if (Test-Path $mypath\Setup.ps1) {
 $configmode = $args[0]
 if ($configmode -eq $null) {$configmode = "all"}
 $env:PYTHONPATH=""
+$mm = GetMajorMinor($gnuradio_version)
 
 # prep for cmake
 if (!(Test-Path $root/src-stage3/build)) {
@@ -158,9 +159,16 @@ function BuildGNURadio {
 	}
 
 	# ensure the GR build went well by checking for newmod package, and if found then build
-	Validate  $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/CMakeLists.txt
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/build 
-	cd $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/build
+	if ($mm -eq "3.8")
+	{
+		Validate  $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/CMakeLists.txt
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/build 
+		cd $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/build
+	} else {
+		Validate  $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/CMakeLists.txt
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/build 
+		cd $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/build
+	}
 	$ErrorActionPreference = "Continue"
 	cmake ../ `
 		-G "Visual Studio 14 2015 Win64" `

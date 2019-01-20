@@ -3,7 +3,7 @@
 #
 @{
 	VersionInfo = @{
-		gnuradio = '3.7.13.4' 
+		gnuradio = '3.8.0.0' 
 		volk = '1.4'
 		openssl = '1.0.2n'
 		UHD = '3.13.0.1'
