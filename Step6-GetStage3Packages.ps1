@@ -18,6 +18,7 @@ if (Test-Path $mypath\Setup.ps1) {
 } else {
 	. $root\scripts\Setup.ps1 -Force
 }
+$mm = GetMajorMinor($gnuradio_version)
 
 # ____________________________________________________________________________________________________________
 #
@@ -30,19 +31,19 @@ GetPatch airspy_vs2015.7z airspy/libairspy/vc -Stage3
 #
 # bladeRF
 #
-GetPackage https://github.com/Nuand/bladeRF.git -Stage3
+GetPackage https://github.com/Nuand/bladeRF.git -Stage3 -branch "$bladerf_version"
 
 # ____________________________________________________________________________________________________________
 #
 # rtl-sdr
 #
-GetPackage git://git.osmocom.org/rtl-sdr.git -Stage3
+GetPackage git://git.osmocom.org/rtl-sdr.git -Stage3 -branch "$rtlsdr_version"
 
 # ____________________________________________________________________________________________________________
 #
 # hackRF
 #
-GetPackage https://github.com/mossmann/hackrf.git -Stage3
+GetPackage https://github.com/mossmann/hackrf.git -Stage3 -branch "$hackrf_version"
 
 # ____________________________________________________________________________________________________________
 #
