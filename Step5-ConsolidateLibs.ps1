@@ -151,10 +151,10 @@ Function Consolidate {
 	if ($configuration -match "AVX2") {$qwtdir = "Release-AVX2"} else {$qwtdir = "Debug-Release"}
 	New-Item -ItemType Directory -Force -Path $root/build/$configuration/include/qwt 2>&1 >> $log
 	New-Item -ItemType Directory -Force -Path $root/build/$configuration/include/qwt6 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qwt-$qwt_version/build/x64/$qwtdir/lib/qwt$d5.* $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qwt-$qwt_version/build/x64/$qwtdir/include/* $root/build/$configuration/include/qwt/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qwt-$qwt6_version/build/x64/$configuration/lib/qwt$d6.* $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root/src-stage1-dependencies/Qwt-$qwt6_version/build/x64/$configuration/include/* $root/build/$configuration/include/qwt6/ 2>&1 >> $log
+	cp -Recurse -Force $root/src-stage1-dependencies/qwt-$qwt_version/build/x64/$qwtdir/lib/qwt$d5.* $root/build/$configuration/lib/ 2>&1 >> $log
+	cp -Recurse -Force $root/src-stage1-dependencies/qwt-$qwt_version/build/x64/$qwtdir/include/* $root/build/$configuration/include/qwt/ 2>&1 >> $log
+	cp -Recurse -Force $root/src-stage1-dependencies/qwt-${qwt6_version}/build/x64/$configDLL/lib/qwt$d6.* $root/build/$configuration/lib/ 2>&1 >> $log
+	cp -Recurse -Force $root/src-stage1-dependencies/qwt-${qwt6_version}/build/x64/$configDLL/include/* $root/build/$configuration/include/qwt6/ 2>&1 >> $log
 	"complete"
 
 	# move qwtplot3d
