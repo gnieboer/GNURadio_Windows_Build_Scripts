@@ -3,6 +3,7 @@ echo setting gnuradio environment
 
 REM --- Change the below to 3.7 for 3.7 releases
 set GR_VERSION=3.7
+set GR_PREFIX=%~dp0\..
 
 REM --- Set Python environment ---
 set PYTHONHOME=%~dp0..\gr-python27
