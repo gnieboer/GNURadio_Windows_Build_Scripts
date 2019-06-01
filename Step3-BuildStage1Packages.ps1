@@ -655,7 +655,7 @@ $env:Path = $oldPath
 # ____________________________________________________________________________________________________________
 # Qt5
 #
-# not needed specifically by GNURadio (as of 3.7) but is used by gqrx
+# used by GNURadio (as of 3.8) and is used by gqrx 
 # needs openssl and python
 #
 SetLog "Qt5"
