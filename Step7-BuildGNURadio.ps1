@@ -118,7 +118,15 @@ function BuildGNURadio {
 
 	# Then combine it into a useable staged install with the dependencies it will need
 	Write-Host -NoNewline "moving add'l libraries..."
-	cp $root/build/$configuration/lib/*.dll $root\src-stage3\staged_install\$configuration\bin\
+	cp -Recurse -Force $root/build/$configuration/lib/*.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+	if ($mm -eq "3.8")
+	{
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Svg.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5OpenGL.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Widgets.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Gui.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Core.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+	}
 	"complete"
 
 	Write-Host -NoNewline "moving python..."
