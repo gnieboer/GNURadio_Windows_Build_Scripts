@@ -101,7 +101,11 @@ GetPackage https://github.com/glfw/glfw.git -Stage3
 #
 # gqrx
 #
-GetPackage https://github.com/csete/gqrx/archive/v$gqrx_version.zip -Stage3
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/lukaskuzmiak/gqrx -Stage3 -Branch "3.8_tech_preview_compatibility"
+} else {
+	GetPackage https://github.com/csete/gqrx/archive/v$gqrx_version.zip -Stage3
+}
 
 # ____________________________________________________________________________________________________________
 #
