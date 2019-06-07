@@ -289,6 +289,8 @@ function BuildDrivers
 		-DLIBRTLSDR_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\rtlsdr.lib" `
 		-DLIBOSMOSDR_INCLUDE_DIRS="$root\src-stage3\staged_install\$configuration\include\"  `
 		-DLIBOSMOSDR_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\osmosdr.lib" `
+		-DVOLK_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\volk.lib" `
+		-DVOLK_INCLUDE_DIRS="$root\src-stage3\staged_install\$configuration\include\"  `
 		-DCMAKE_CXX_FLAGS="/DNOMINMAX /D_TIMESPEC_DEFINED $arch /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB /I$root/build/$configuration/include /EHsc " `
 		-DCMAKE_C_FLAGS="/DNOMINMAX /D_TIMESPEC_DEFINED $arch  /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB /EHsc " `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
