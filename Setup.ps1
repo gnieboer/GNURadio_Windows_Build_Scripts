@@ -322,6 +322,7 @@ $png_version = $Config.VersionInfo.libpng
 $sdl_version = $Config.VersionInfo.SDL
 $cppunit_version = $Config.VersionInfo.cppunit
 $openssl_version = $Config.VersionInfo.openssl
+$qt5_version = $Config.VersionInfo.qt5
 $qwt_version = $Config.VersionInfo.qwt
 ${qwt6_version} = $Config.VersionInfo.qwt6
 $sip_version = $Config.VersionInfo.sip

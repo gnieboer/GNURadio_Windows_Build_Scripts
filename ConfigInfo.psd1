@@ -49,6 +49,7 @@
 		pygobject3 = '3.30.4'
 		pygtk = '2.24'    # Changing to 2.25+ will require other code changes
 		qt = '4.8.7'        # This isn't actually used.  4.8.7 is hardcoded but 4.8.7 is the last 4.x version to the change to Qt5 will change much more
+		qt5 = '5.12.3'
 		python = '2.7.10'   # This isn't actually used.  2.7.10 is hardcoded 
 		dp = '1.5'        # dependency pack version
 		# OOT modules

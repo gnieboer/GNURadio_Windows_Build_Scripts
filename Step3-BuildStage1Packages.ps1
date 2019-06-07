@@ -665,31 +665,36 @@ Function MakeQt5
 {
 	$type = $args[0] 
 	Write-Host -NoNewline "  $type...configuring..."
-	$ssltype = ($type -replace "Dll", "") -replace "-AVX2", ""
+	$ssltype = ($type -replace "DLL", "") -replace "-AVX2", ""
 	$flags = if ($type -match "Debug") {"-debug"} else {"-release"}
 	$debug = if ($type -match "Debug") {"d"} else {""}
-	$staticflag = if ($type -match "Dll") {""} else {"-static"}
+	$staticflag = if ($type -match "DLL") {""} else {"-static"}
 	if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 "; $archflags=@('-sse3','-ssse3','-sse4.1','-sse4.2','-avx','-avx2')} else {$env:_CL_ = ""; $archflags=""}
 	cd $root/src-stage1-dependencies/Qt5
-	if ((TryValidate "build/$type/bin/qmake.exe" "build/$type/bin/Qt5Core$debug.dll" "build/$type/bin/Qt5OpenGL$debug.dll" "build/$type/bin/Qt5Svg$debug.dll" "build/$type/bin/Qt5Gui$debug.dll") -eq $false) {
+	if ((TryValidate "build/$type/qtbase/bin/qmake.exe" "build/$type/qtbase/bin/Qt5Core$debug.dll" "build/$type/qtbase/bin/Qt5OpenGL$debug.dll" "build/$type/qtbase/bin/Qt5Svg$debug.dll" "build/$type/qtbase/bin/Qt5Gui$debug.dll") -eq $false) {
 		if (Test-Path  $root/src-stage1-dependencies/Qt5/build/$type) {rm -r -Force $root/src-stage1-dependencies/Qt5/build/$type}
 		New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5/build/$type >> $Log
 		cd $root/src-stage1-dependencies/Qt5/build/$type
-		../../configure.bat $flags $staticflag -prefix $root/src-stage1-dependencies/Qt5/build/$type `
+		$env:QMAKESPEC = ""
+		$env:XQMAKESPEC = ""
+		$env:QMAKEPATH = ""
+		$env:QMAKEFEATURES = ""
+		$env:OPENSSL_LIBS="-L$root\src-stage1-dependencies\openssl\build\x64\$ssltype -lssleay32 -llibeay32"
+		$env:_CL_ = " /DCBOR_NO_HALF_FLOAT_TYPE " # CBOR uses an intrinsic not available in MSVC 2015
+		../../configure.bat $flags $staticflag -prefix $root/src-stage1-dependencies/Qt5/build/$type/qtbase `
 			-skip qtdeclarative -skip qttools -skip qtconnectivity -skip qtscript -skip qtcanvas3d -skip qtdoc -skip qtserialbus -skip qtserialport `
-			-skip qtwebview -skip qtactiveqt -skip qtenginio -skip qtandroidextras -skip qtwebsockets -skip qtwebengine -skip qtwebchannel -skip qtxmlpatterns `
+			-skip qtwebview -skip qtactiveqt -skip qtandroidextras -skip qtwebsockets -skip qtwebengine -skip qtwebchannel -skip qtxmlpatterns `
+			-skip qtlocation -skip qtgamepad -skip qtnetworkauth -skip qtspeech -skip qtwayland -skip qtmacextras -skip qtremoteobjects `
 			-nomake examples -nomake tools -nomake tests `
-			-platform win32-msvc2015 -opensource -confirm-license -qmake $archflags -sse2 -ltcg -directwrite -mp -qt-libpng -qt-libjpeg -opengl desktop `
-			-qt-sql-sqlite -plugin-sql-sqlite -openssl -L "$root\src-stage1-dependencies\openssl\build\x64\$ssltype" `
-			-l ssleay32 -l libeay32 -l crypt32 -l kernel32 -l user32 -l gdi32 -l winspool -l comdlg32 -l advapi32 -l shell32 -l ole32 -l oleaut32 -l uuid -l odbc32 -l odbccp32 -l advapi32 `
-			OPENSSL_LIBS="-L$root\src-stage1-dependencies\openssl\build\x64\$ssltype -lssleay32 -llibeay32" -I "$root\src-stage1-dependencies\openssl\build\x64\$ssltype\Include"  2>&1 >> $Log
+			-platform win32-msvc2015 -opensource -confirm-license $archflags -sse2 -ltcg -directwrite -mp -qt-libpng -qt-libjpeg -opengl desktop `
+			-openssl-linked -L "$root\src-stage1-dependencies\openssl\build\x64\$ssltype" -I "$root\src-stage1-dependencies\openssl\build\x64\$ssltype\Include"  2>&1 >> $Log
 		Write-Host -NoNewline "building..."
 		nmake module-qtbase 2>&1 >> $Log
 		nmake module-qtsvg 2>&1 >> $Log
 		nmake module-qtbase install 2>&1 >> $Log
 		nmake module-qtsvg install 2>&1 >> $Log
 		$env:_CL_ = ""
-		Validate "bin/qmake.exe" "bin/Qt5Core$debug.dll" "bin/Qt5OpenGL$debug.dll" "bin/Qt5Svg$debug.dll" "bin/Qt5Gui$debug.dll"
+		Validate "qtbase/bin/qmake.exe" "qtbase/bin/Qt5Core$debug.dll" "qtbase/bin/Qt5OpenGL$debug.dll" "qtbase/bin/Qt5Svg$debug.dll" "qtbase/bin/Qt5Gui$debug.dll"
 	} else {
 		Write-Host "already built"
 	}
@@ -697,7 +702,6 @@ Function MakeQt5
 cd $root/src-stage1-dependencies/Qt5
 # Various things in Qt build are intepreted as errors so 
 $ErrorActionPreference = "Continue"
-$env:QMAKESPEC = "$root/src-stage1-dependencies/Qt5/qtbase/mkspecs/win32-msvc2015"
 $env:QTDIR = "$root/src-stage1-dependencies/Qt5"
 $env:Path = "$root\src-stage1-dependencies\Qt5\qtbase\bin;" + $oldPath
 # debugDLL build
