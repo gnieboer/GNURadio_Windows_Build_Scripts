@@ -237,10 +237,10 @@ Function Consolidate {
 
 	# uhd
 	Write-Host -NoNewline "Consolidating UHD..."
-	cp -Recurse -Force $root\src-stage1-dependencies\uhd-$UHD_version/dist/$configuration/bin/uhd.dll $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root\src-stage1-dependencies\uhd-$UHD_version/dist/$configuration/lib/uhd.lib $root/build/$configuration/lib/ 2>&1 >> $log
-	cp -Recurse -Force $root\src-stage1-dependencies\uhd-$UHD_version/dist/$configuration/include/* $root/build/$configuration/include/ 2>&1 >> $log
-	robocopy "$root/src-stage1-dependencies/uhd-$uhd_version/dist/$configuration" "$root/build/$configuration/uhd" /e 2>&1 >> $log
+	cp -Recurse -Force $root\src-stage1-dependencies\uhd/dist/$configuration/bin/uhd.dll $root/build/$configuration/lib/ 2>&1 >> $log
+	cp -Recurse -Force $root\src-stage1-dependencies\uhd/dist/$configuration/lib/uhd.lib $root/build/$configuration/lib/ 2>&1 >> $log
+	cp -Recurse -Force $root\src-stage1-dependencies\uhd/dist/$configuration/include/* $root/build/$configuration/include/ 2>&1 >> $log
+	robocopy "$root/src-stage1-dependencies/uhd/dist/$configuration" "$root/build/$configuration/uhd" /e 2>&1 >> $log
 	"complete"
 
 	# portaudio

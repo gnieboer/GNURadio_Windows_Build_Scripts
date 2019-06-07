@@ -947,12 +947,12 @@ if ((TryValidate "$root\src-stage2-python\gr-python27\lib\site-packages\requests
 # UHD 
 #
 # requires libusb, boost, python, mako
-# FYI BOOST_FORCE_SYMMETRIC_OPERATORS is required for debug versions because MSVC 2015 disable NRVO for debug builds which causes duplicate operator error
+# FYI BOOST_FORCE_SYMMETRIC_OPERATORS is required for debug versions because MSVC 2015 disables NRVO for debug builds which causes duplicate operator error
 
 SetLog "UHD"
 Write-Host "building uhd..."
 $ErrorActionPreference = "Continue"
-cd $root\src-stage1-dependencies\uhd-$UHD_version\host
+cd $root\src-stage1-dependencies\uhd\host
 New-Item -ItemType Directory -Force -Path .\build  2>&1 >> $Log
 cd build 
 
@@ -970,7 +970,7 @@ Function makeUHD {
 			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
-			-DCMAKE_CXX_FLAGS=" /DBOOST_FORCE_SYMMETRIC_OPERATORS " `
+			-DCMAKE_CXX_FLAGS=" /DBOOST_FORCE_SYMMETRIC_OPERATORS /EHsc " `
 			-DBoost_INCLUDE_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/include/boost-1_60" `
 			-DBoost_LIBRARY_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/lib" `
 			-DLIBUSB_INCLUDE_DIRS="$root/src-stage1-dependencies/libusb/libusb" `
@@ -978,9 +978,9 @@ Function makeUHD {
 		Write-Host -NoNewline "building..."
 		msbuild .\UHD.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log 
 		Write-Host -NoNewline "installing..."
-		& cmake -DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/uhd-$UHD_version\dist\$configuration" -DBUILD_TYPE="$buildconfig" -P cmake_install.cmake 2>&1 >> $Log
-		New-Item -ItemType Directory -Path $root/src-stage1-dependencies/uhd-$UHD_version\dist\$configuration\share\uhd\examples\ -Force 2>&1 >> $Log
-		cp -Recurse -Force $root/src-stage1-dependencies/uhd-$UHD_version/host/build/examples/$buildconfig/* $root/src-stage1-dependencies/uhd-$UHD_version\dist\$configuration\share\uhd\examples\
+		& cmake -DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/uhd\dist\$configuration" -DBUILD_TYPE="$buildconfig" -P cmake_install.cmake 2>&1 >> $Log
+		New-Item -ItemType Directory -Path $root/src-stage1-dependencies/uhd\dist\$configuration\share\uhd\examples\ -Force 2>&1 >> $Log
+		cp -Recurse -Force $root/src-stage1-dependencies/uhd/host/build/examples/$buildconfig/* $root/src-stage1-dependencies/uhd\dist\$configuration\share\uhd\examples\
 		Validate "..\..\dist\$configuration\bin\uhd.dll" "..\..\dist\$configuration\lib\uhd.lib" "..\..\dist\$configuration\include\uhd.h"
 		$env:_CL_ = ""
 	} else {

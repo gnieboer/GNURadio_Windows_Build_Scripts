@@ -218,7 +218,7 @@ GetPackage https://github.com/libusb/libusb/releases/download/v$libusb_version/l
 GetPatch libusb_VS2015.7z libusb
 
 # UHD
-GetPackage https://github.com/EttusResearch/uhd/archive/v$UHD_Version.tar.gz uhd
+GetPackage https://github.com/EttusResearch/uhd.git -branch v$UHD_Version
 
 # libxslt
 GetPackage https://github.com/GNOME/libxslt/archive/v$libxslt_version.tar.gz libxslt 

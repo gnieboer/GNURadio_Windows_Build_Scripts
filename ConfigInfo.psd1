@@ -5,8 +5,8 @@
 	VersionInfo = @{
 		gnuradio = '3.8.0.0' 
 		volk = '1.4'
-		UHD = '3.13.0.1'
 		openssl = '1.0.2r'
+		UHD = '3.14.1.0-rc1'
 		gqrx = '2.11.5'
 		Cython = '0.28.5'
 		numpy = '1.15.1'
