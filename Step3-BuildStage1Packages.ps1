@@ -129,6 +129,7 @@ if ((TryValidate "..\build\X64\Debug\lib\libxml2.lib" "..\build\X64\Release\lib\
 	& cscript.exe configure.js iconv=yes compiler=msvc zlib=yes python=yes cruntime="/MD /arch:AVX2"  debug=no prefix="..\build\x64\Release-AVX2" static=no lib="..\..\gettext-msvc\x64\Release;..\..\zlib-1.2.8\contrib\vstudio\vc14\x64\ZLibStatRelease" include="..\..\gettext-msvc\libiconv-1.14;..\..\zlib-1.2.8" 2>&1 >> $Log
 	nmake Makefile.msvc libxml install 2>&1 >> $Log
 	nmake clean 2>&1 >> $Log
+	Validate "..\build\X64\Debug\lib\libxml2.lib" "..\build\X64\Release\lib\libxml2.lib" "..\build\X64\Release-AVX2\lib\libxml2.lib" "..\build\X64\Debug\bin\libxml2.dll" "..\build\X64\Release\bin\libxml2.dll" "..\build\X64\Release-AVX2\bin\libxml2.dll"
 	$ErrorActionPreference = "Stop"
 	"complete"
 } else {
