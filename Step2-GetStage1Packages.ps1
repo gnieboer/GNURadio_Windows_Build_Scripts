@@ -44,7 +44,7 @@ del .\libiconv-1.14 -Force -Recurse
 del .\gettext-0.19.4 -Force -Recurse
 
 # libxml2 
-GetPackage https://github.com/GNOME/libxml2.git
+GetPackage https://github.com/GNOME/libxml2.git -branch "v$libxml2_version"
 
 if ($Config.BuildGTKFromSource) {
 

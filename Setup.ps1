@@ -351,6 +351,7 @@ $UHD_version = $Config.VersionInfo.UHD
 $pyzmq_version = $Config.VersionInfo.pyzmq
 $libzmq_version = $Config.VersionInfo.libzmq
 $cppzmq_version = $Config.VersionInfo.cppzmq
+$libxml2_version = $Config.VersionInfo.libxml2
 $lxml_version = $Config.VersionInfo.lxml
 $pkgconfig_version = $Config.VersionInfo.pkgconfig 
 $dp_version = $Config.VersionInfo.dp

@@ -33,6 +33,7 @@
 		gsl = '1.16'
 		mpir = '3.0.0'
 		pthreads = '2-9-1'
+		libxml2 = '2.9.9'
 		lxml = '3.6.0'
 		libxslt = '1.1.29'
 		pkgconfig = '1.1.0'
