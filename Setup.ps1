@@ -305,6 +305,15 @@ function CheckNoAVX
 	if ($avxfound -eq $true) {throw ""  2>&1 >> $null}
 }
 
+# must have already set fortran path for the below to work
+function CheckFortran 
+{
+	$iserr = $false
+	$varout = "$Global:MY_IFORT\bin\intel64\ifort.exe" 2>&1
+	$varout | foreach { if ($_ -match "error") {$iserr = $true} }
+	return $iserr
+}
+
 #load configuration variables
 $mypath =  Split-Path $script:MyInvocation.MyCommand.Path
 $Config = Import-LocalizedData -BaseDirectory $mypath -FileName ConfigInfo.psd1 
@@ -447,23 +456,28 @@ if (!(Test-Path variable:global:oldpath))
 	write-host "Visual Studio 2015 Command Prompt variables set." -ForegroundColor Yellow
 	# set Intel Fortran environment (if exists)... will detect 2016/2017/2018 compilers only 
 	if (Test-Path env:IFORT_COMPILER18) {
-		& $env:IFORT_COMPILER18\bin\ifortvars.bat -arch intel64 -platform vs2015 
+		& $env:IFORT_COMPILER18\bin\ifortvars.bat -arch intel64 vs2015 
 		$Global:MY_IFORT = $env:IFORT_COMPILER18
-		$Global:hasIFORT = $true
+		$Global:hasIFORT = CheckFortran
 	} else {
 		if (Test-Path env:IFORT_COMPILER17) {
 			& $env:IFORT_COMPILER17\bin\ifortvars.bat -arch intel64 -platform vs2015 
 			$Global:MY_IFORT = $env:IFORT_COMPILER17
-			$Global:hasIFORT = $true
+			$Global:hasIFORT = CheckFortran
 		} else {
 			if (Test-Path env:IFORT_COMPILER16) {
 				& $env:IFORT_COMPILER16\bin\ifortvars.bat -arch intel64 -platform vs2015 
 				$Global:MY_IFORT = $env:IFORT_COMPILER16
-				$Global:hasIFORT = $true
+				$Global:hasIFORT = CheckFortran
 			} else {
 				$Global:hasIFORT = $false
 			}
 		}
+	}
+	if ($Global:hasIFORT) {
+		Write-Host "Fortran compiler found"
+	} else {
+		Write-Host "WARNING: Fortran compiler not found, some packages will be skipped"
 	}
 	# Now set a persistent variable holding the original path. vcvarsall will continue to add to the path until it explodes
 	Set-Variable -Name oldpath -Value "$env:Path" -Description "original %Path%" -Option readonly -Scope "Global"
