@@ -3,7 +3,7 @@
 #
 @{
 	VersionInfo = @{
-		gnuradio = '3.8.0.0' 
+		gnuradio = '3.7.13.5' 
 		volk = '1.4'
 		openssl = '1.0.2r'
 		UHD = '3.14.1.0-rc1'
@@ -51,7 +51,7 @@
 		qt = '4.8.7'        # This isn't actually used.  4.8.7 is hardcoded but 4.8.7 is the last 4.x version to the change to Qt5 will change much more
 		qt5 = '5.12.3'
 		python = '2.7.10'   # This isn't actually used.  2.7.10 is hardcoded 
-		dp = '1.5'        # dependency pack version
+		dp = '1.6'        # dependency pack version
 		# OOT modules
 		bladerf = '2018.08'
 		rtlsdr = '0.6.0'

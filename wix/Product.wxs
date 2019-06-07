@@ -3,7 +3,7 @@
   <Product Id="CAD51E8A-3E3C-48B2-ABC3-DCB0D9F643C8"
            Name="GNURadio-3.7"
            Language="1033"
-           Version="1.5.0"
+           Version="1.6.0"
            Manufacturer="GCN Development"
            UpgradeCode="DAAD3429-A564-45FE-9A06-E1FE30A7E907">
     <Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" />
