@@ -108,8 +108,8 @@ function BuildGNURadio {
 		Copy-Item -Force "$filename.temp" "$filename"
 		Remove-Item "$filename.temp"	
 	}
-	FixSwigIncludes "$root\src-stage3\build\$configuration\gr-blocks\swig\blocks_swig5_gr_blocks_swig_a6e57.vcxproj"
-	FixSwigIncludes "$root\src-stage3\build\$configuration\gr-blocks\swig\blocks_swig4_gr_blocks_swig_a6e57.vcxproj"
+	if (Test-Path -Path "$root\src-stage3\build\$configuration\gr-blocks\swig\blocks_swig5_gr_blocks_swig_a6e57.vcxproj") { FixSwigIncludes "$root\src-stage3\build\$configuration\gr-blocks\swig\blocks_swig5_gr_blocks_swig_a6e57.vcxproj"}
+	if (Test-Path -Path "$root\src-stage3\build\$configuration\gr-blocks\swig\blocks_swig4_gr_blocks_swig_a6e57.vcxproj") { FixSwigIncludes "$root\src-stage3\build\$configuration\gr-blocks\swig\blocks_swig4_gr_blocks_swig_a6e57.vcxproj"}
 	"complete"
 
 	# NOW we build gnuradio finally
