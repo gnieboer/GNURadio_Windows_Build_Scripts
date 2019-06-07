@@ -222,8 +222,8 @@ function BuildDrivers
 	cmake ../../ `
 		-G "Visual Studio 14 2015 Win64" `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
-		-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
+		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
+		-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
 		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27$debug_ext.lib" `
 		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
@@ -231,7 +231,6 @@ function BuildDrivers
 		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib/" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime " `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DFFTW3F_LIBRARIES="$root/build/Release/lib/libfftw3f.lib" `
 		-DFFTW3F_INCLUDE_DIRS="$root/build/Release/include/" `
