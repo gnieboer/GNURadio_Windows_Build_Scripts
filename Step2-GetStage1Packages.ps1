@@ -23,8 +23,8 @@ cd $root/src-stage1-dependencies
 SetLog "GetPackages"
 
 # libzmq
-getPackage https://github.com/zeromq/libzmq.git
-getPackage https://github.com/zeromq/cppzmq.git
+getPackage https://github.com/zeromq/libzmq.git -branch "v$libzmq_version"
+getPackage https://github.com/zeromq/cppzmq.git -branch "v$cppzmq_version"
 
 # pyzmq
 getPackage https://github.com/zeromq/pyzmq/archive/v$pyzmq_version.zip 
