@@ -99,6 +99,7 @@ function BuildGNURadio {
 	
 	# before we build we need to trim from SWIG cmd.exe lines in the VS projects, as cmd.exe has a 8192 character limit, and some of the swig commands will likely be > 9000
 	# the good news is that the includes are very repetitive so we can use a swizzy regex to get rid to them
+	# These directories may not exist in GR 3.8
 	Write-Host -NoNewline "Fixing swig > 8192 char includes..."
 	Function FixSwigIncludes
 	{
@@ -129,6 +130,11 @@ function BuildGNURadio {
 		cp -Recurse -Force $root/build/$configuration/bin/Qt5Widgets.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
 		cp -Recurse -Force $root/build/$configuration/bin/Qt5Gui.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
 		cp -Recurse -Force $root/build/$configuration/bin/Qt5Core.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/lib/gobject-introspection $root\src-stage3\staged_install\$configuration\lib\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/lib/girepository-1.0 $root\src-stage3\staged_install\$configuration\lib\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/lib/gdk-pixbuf-2.0 $root\src-stage3\staged_install\$configuration\lib\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/share/glib-2.0 $root\src-stage3\staged_install\$configuration\share\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/share/gir-1.0 $root\src-stage3\staged_install\$configuration\share\  2>&1 >> $Log 
 	}
 	"complete"
 
