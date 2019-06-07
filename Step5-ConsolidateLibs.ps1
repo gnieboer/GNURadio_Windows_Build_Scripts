@@ -317,8 +317,9 @@ Function Consolidate {
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/freetype.lib $root/build/$configuration/lib/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/include/freetype2/freetype $root/build/$configuration/include/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/include/freetype2/ft2build.h $root/build/$configuration/include/  2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/share/glib-2.0 $root/build/$configuration/share/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/share/gir-1.0 $root/build/$configuration/share/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/gdk-pixbuf-2.0 $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/gdk-pixbuf-2.0 $root/build/$configuration/lib/ 2>&1 >> $log 
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/girepository-1.0 $root/build/$configuration/lib/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/lib/gobject-introspection $root/build/$configuration/lib/ 2>&1 >> $log
 	} else {
@@ -330,6 +331,7 @@ Function Consolidate {
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/pango-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gdk_pixbuf-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/cairo.dll $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/freetype.dll $root/build/$configuration/lib/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/atk-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/harfbuzz.dll $root/build/$configuration/lib/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/x64/bin/gio-2.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
