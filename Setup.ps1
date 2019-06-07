@@ -450,8 +450,8 @@ if ((Get-Command "doxygen.exe" -ErrorAction SilentlyContinue) -eq $null)  {throw
 # set VS 2015 environment
 if (!(Test-Path variable:global:oldpath))
 {
-	pushd "$env:VS140COMNTOOLS"
-	cmd.exe /c "VsDevCmd.bat amd64&set" |
+	pushd "$env:VS140COMNTOOLS/../../VC"
+	cmd.exe /c "vcvarsall.bat amd64&set" |
 	foreach {
 		if ($_ -match "=") {
 			$v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
