@@ -90,8 +90,8 @@ function BuildGNURadio {
 		-DZEROMQ_LIBRARY_NAME="libzmq-v140-mt-$libzmquv" `
 		-DCMAKE_PREFIX_PATH="$root/build/$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration/" `
-		-DCMAKE_CXX_FLAGS="$archflag $runtime /W1" `
-		-DCMAKE_C_FLAGS="$archflag $runtime /W1" `
+		-DCMAKE_CXX_FLAGS="$archflag $runtime /W1 /DGSL_DLL " `
+		-DCMAKE_C_FLAGS="$archflag $runtime /W1 /DGSL_DLL " `
 		-DCMAKE_SHARED_LINKER_FLAGS=" /DEBUG /opt:ref,icf " `
 		-DSPHINX_EXECUTABLE="$pythonroot/Scripts/sphinx-build.exe" `
 		-DCMAKE_BUILD_TYPE="$buildtype" `
