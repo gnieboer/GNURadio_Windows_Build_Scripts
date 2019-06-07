@@ -1538,10 +1538,18 @@ function BuildOOTModules
 	}
 }
 
-# Release build
-if ($configmode -eq "1" -or $configmode -eq "all") {BuildDrivers "Release"; BuildOOTModules "Release"}
-if ($configmode -eq "2" -or $configmode -eq "all") {BuildDrivers "Release-AVX2"; BuildOOTModules "Release-AVX2"}
-if ($configmode -eq "3" -or $configmode -eq "all") {BuildDrivers "Debug"; BuildOOTModules "Debug"}
+# build options
+# Note that as of the current build, OOT modules are not supported in 3.8
+if ($mm -eq '3.8') {
+	if ($configmode -eq "1" -or $configmode -eq "all") {BuildDrivers "Release"}
+	if ($configmode -eq "2" -or $configmode -eq "all") {BuildDrivers "Release-AVX2"}
+	if ($configmode -eq "3" -or $configmode -eq "all") {BuildDrivers "Debug"}
+} else {
+	if ($configmode -eq "1" -or $configmode -eq "all") {BuildDrivers "Release"; BuildOOTModules "Release"}
+	if ($configmode -eq "2" -or $configmode -eq "all") {BuildDrivers "Release-AVX2"; BuildOOTModules "Release-AVX2"}
+	if ($configmode -eq "3" -or $configmode -eq "all") {BuildDrivers "Debug"; BuildOOTModules "Debug"}
+}
+
 
 cd $root/scripts 
 
