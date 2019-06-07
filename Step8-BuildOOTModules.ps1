@@ -349,8 +349,8 @@ function BuildOOTModules
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
 		-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
-		-DCMAKE_C_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
-		-DCMAKE_CXX_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+		-DCMAKE_C_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+		-DCMAKE_CXX_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
 		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
 		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
