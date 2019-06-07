@@ -164,6 +164,8 @@ if ($mm -eq "3.8") {
 	#
 	# building libraries separate from the actual install into Python
 	#
+	# TODO debug not working, needs validation as well, not just tryValidate
+	#
 	$ErrorActionPreference = "Continue"
 	SetLog "PyQt5"
 	cd $root\src-stage1-dependencies\PyQt5
@@ -201,15 +203,15 @@ if ($mm -eq "3.8") {
 		}
 	}
 
-	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
-	MakePyQt5 "DebugDLL"
-	#MakePyQt5 "Debug"
-	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
-	#MakePyQt5 "Release-AVX2"
-	MakePyQt5 "ReleaseDLL-AVX2"
 	$pythonroot = "$root\src-stage2-python\gr-python27"
 	#MakePyQt5 "Release"
 	MakePyQt5 "ReleaseDLL"
+	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
+	#MakePyQt5 "Release-AVX2"
+	MakePyQt5 "ReleaseDLL-AVX2"
+	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
+	MakePyQt5 "DebugDLL"
+	#MakePyQt5 "Debug"
 	$ErrorActionPreference = "Stop"
 	"complete"
 }
