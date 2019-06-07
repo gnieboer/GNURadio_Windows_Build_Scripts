@@ -218,12 +218,13 @@ Function Consolidate {
 	Write-Host -NoNewline "Consolidating libzmq..."
 	if ((Test-Path $root/src-stage1-dependencies/libzmq/bin/$baseconfig) -eq $true) {
 		#paths depend on whether the cmake version was used to build or not
+		$libzmquv = $libzmq_version -Replace '\.','_'
 		if ($baseconfig -eq "Debug") {
-			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/bin/libzmq-v140-mt-gd-4_3_1.dll $root/build/$configuration/lib/libzmq.dll 2>&1 >> $log	
-			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/lib/libzmq-v140-mt-gd-4_3_1.lib $root/build/$configuration/lib/libzmq.lib 2>&1 >> $log	
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/bin/libzmq-v140-mt-gd-$libzmquv.dll $root/build/$configuration/lib/ 2>&1 >> $log	
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/lib/libzmq-v140-mt-gd-$libzmquv.lib $root/build/$configuration/lib/ 2>&1 >> $log	
 		} else {
-			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/bin/libzmq-v140-mt-4_3_1.dll $root/build/$configuration/lib/libzmq.dll 2>&1 >> $log	
-			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/lib/libzmq-v140-mt-4_3_1.lib $root/build/$configuration/lib/libzmq.lib 2>&1 >> $log			
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/bin/libzmq-v140-mt-$libzmquv.dll $root/build/$configuration/lib/ 2>&1 >> $log	
+			cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/lib/libzmq-v140-mt-$libzmquv.lib $root/build/$configuration/lib/ 2>&1 >> $log			
 		}
 		cp -Recurse -Force $root/src-stage1-dependencies/libzmq/bin/$baseconfig/include/*.h $root/build/$configuration/include/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/cppzmq/*.hpp $root/build/$configuration/include/ 2>&1 >> $log

@@ -69,6 +69,7 @@ function BuildGNURadio {
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	$ErrorActionPreference = "Continue"
+	$libzmquv = $libzmq_version -Replace '\.','_'
 	# Always use the DLL version of Qt to avoid errors about parent being on a different thread.
 	cmake ../../src/gnuradio `
 		-G "Visual Studio 14 2015 Win64" `
@@ -84,6 +85,7 @@ function BuildGNURadio {
 		-DQWT_INCLUDE_DIRS="$root/build/$configuration/include/qwt6" `
 		-DQWT_LIBRARIES="$root/build/$configuration/lib/qwt${d}6.lib" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+		-DZEROMQ_LIBRARY_NAME="libzmq-v140-mt-$libzmquv" `
 		-DCMAKE_PREFIX_PATH="$root/build/$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration/" `
 		-DCMAKE_CXX_FLAGS="$archflag $runtime /W1" `

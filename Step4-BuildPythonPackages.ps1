@@ -1005,7 +1005,8 @@ Function SetupPython
 	#
 	SetLog "$configuration pyzmq"
 	cd $root\src-stage1-dependencies\pyzmq-$pyzmq_version
-	if ((TryValidate "wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/zmq/libzmq-v140-mt$flag-4_3_1.dll" "$pythonroot/lib/site-packages/zmq/devices/monitoredqueue.pyd" "$pythonroot/lib/site-packages/zmq/error.py") -eq $false) {
+	$libzmquv = $libzmq_version -Replace '\.','_'
+	if ((TryValidate "wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/zmq/libzmq-v140-mt$flag-$libzmquv.dll" "$pythonroot/lib/site-packages/zmq/devices/monitoredqueue.pyd" "$pythonroot/lib/site-packages/zmq/error.py") -eq $false) {
 		Write-Host -NoNewline "configuring pyzmq..."
 		if ($configuration -match "Debug") {$baseconfig="Debug"; $flag="-gd"} else {$baseconfig="Release"; $flag=""}
 		$ErrorActionPreference = "Continue"
@@ -1022,35 +1023,35 @@ Function SetupPython
 		New-Item -ItemType Directory -Force libzmq/$configuration/lib 2>&1 >> $log
 		New-Item -ItemType Directory -Force libzmq/$configuration/include 2>&1 >> $log
 		Copy-Item ..\libzmq\include/*.h libzmq/$configuration/include/ 2>&1 >> $log
-		Copy-Item ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-4_3_1.dll libzmq/$configuration/lib/ 2>&1 >> $log
-		Copy-Item ..\libzmq\bin\$baseconfig\lib\libzmq-v140-mt$flag-4_3_1.lib libzmq/$configuration/lib/ 2>&1 >> $log
+		Copy-Item ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-$libzmquv.dll libzmq/$configuration/lib/ 2>&1 >> $log
+		Copy-Item ..\libzmq\bin\$baseconfig\lib\libzmq-v140-mt$flag-$libzmquv.lib libzmq/$configuration/lib/ 2>&1 >> $log
 		if ($configuration -match "AVX2") {$env:_CL_ = " /arch:AVX2 "} else {$env:_CL_ = ""}
 		$env:_LINK_ = " /MANIFEST /LIBPATH:libzmq/$configuration/lib "
 		$env:INCLUDE = $oldinclude + ";$root/libzmq/include"
 		$env:LINK = $oldlink
 		# don't run clean because it wipes out /dist folder as well
 		& $pythonroot/$pythonexe setup.py clean 2>&1 >> $log
-		cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-4_3_1.dll .\zmq\libzmq.dll 
-		if ($configuration -match "Debug") {
-			cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-4_3_1.pdb .\zmq\libzmq.pdb 
-		}
-		& $pythonroot/$pythonexe setup.py configure $debug --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
+		#cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-$libzmquv.dll .\zmq\libzmq.dll 
+		#if ($configuration -match "Debug") {
+		#	cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-$libzmquv.pdb .\zmq\libzmq.pdb 
+		#}
+		& $pythonroot/$pythonexe setup.py configure $debug --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv 2>&1 >> $log
 		Write-Host -NoNewline "building..."
-		& $pythonroot/$pythonexe setup.py build_ext $debug --zmq=./libzmq/$configuration --inplace --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build_ext $debug --zmq=./libzmq/$configuration --inplace --libzmq=libzmq-v140-mt$flag-$libzmquv 2>&1 >> $log
 		# TODO a pyzmq socket test is failing which then prompts user to debug so disable for now so we don't slow down the build process
 		# Write-Host -NoNewline "testing..."
 		# & $pythonroot/$pythonexe setup.py test 2>&1 >> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-4_3_1 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv 2>&1 >> $log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel --zmq=./libzmq/$configuration 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv  2>&1 >> $log
 		# these can't be in dist because clean wipes out dist completely
 		move dist/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.whl wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force 2>&1 >> $log
 		$env:_LINK_ = ""
 		$env:_CL_ = ""
 		$env:INCLUDE = $oldinclude
 		$ErrorActionPreference = "Stop"
-		Validate "wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/zmq/libzmq.dll" "$pythonroot/lib/site-packages/zmq/devices/monitoredqueue.pyd" "$pythonroot/lib/site-packages/zmq/error.py"
+		Validate "wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/zmq/libzmq-v140-mt$flag-$libzmquv.dll" "$pythonroot/lib/site-packages/zmq/devices/monitoredqueue.pyd" "$pythonroot/lib/site-packages/zmq/error.py"
 	} else {
 		Write-Host "pyzmq already built..."
 	}

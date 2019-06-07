@@ -523,8 +523,9 @@ if (Test-Path $root/src-stage1-dependencies/libzmq/builds/msvc) {
 	}
 } else {
 	cd $root/src-stage1-dependencies/libzmq
-	if ((TryValidate "./bin/Release/bin/libzmq-v140-mt-4_3_1.dll" "./bin/Release/lib/libzmq-v140-mt-4_3_1.lib" "./bin/Release/lib/libzmq-v140-mt-s-4_3_1.lib" `
-	"./bin/Debug/bin/libzmq-v140-mt-gd-4_3_1.dll" "./bin/Debug/lib/libzmq-v140-mt-gd-4_3_1.lib" "./bin/Debug/lib/libzmq-v140-mt-sgd-4_3_1.lib") -eq $false) {
+	$libzmquv = $libzmq_version -Replace '\.','_'
+	if ((TryValidate "./bin/Release/bin/libzmq-v140-mt-$libzmquv.dll" "./bin/Release/lib/libzmq-v140-mt-$libzmquv.lib" "./bin/Release/lib/libzmq-v140-mt-s-$libzmquv.lib" `
+	"./bin/Debug/bin/libzmq-v140-mt-gd-$libzmquv.dll" "./bin/Debug/lib/libzmq-v140-mt-gd-$libzmquv.lib" "./bin/Debug/lib/libzmq-v140-mt-sgd-$libzmquv.lib") -eq $false) {
 	
 		#newer versions use cmake 
 		Write-Host ""
@@ -546,7 +547,7 @@ if (Test-Path $root/src-stage1-dependencies/libzmq/builds/msvc) {
 			Write-Host -NoNewline "installing..."
 			msbuild .\INSTALL.vcxproj /m /p:"configuration=$type;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
 			$env:_CL_ = ""
-			Validate "../bin/$type/bin/libzmq-v140-mt$flag-4_3_1.dll" "../bin/$type/lib/libzmq-v140-mt$flag-4_3_1.lib" "../bin/$type/lib/libzmq-v140-mt-s$sflag-4_3_1.lib" 
+			Validate "../bin/$type/bin/libzmq-v140-mt$flag-$libzmquv.dll" "../bin/$type/lib/libzmq-v140-mt$flag-$libzmquv.lib" "../bin/$type/lib/libzmq-v140-mt-s$sflag-$libzmquv.lib" 
 		}
 		MakeLibZMQ "Debug"
 		MakeLibZMQ "Release"
