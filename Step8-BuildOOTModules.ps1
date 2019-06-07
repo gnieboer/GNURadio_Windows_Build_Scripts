@@ -196,7 +196,7 @@ function BuildDrivers
 	New-Item -ItemType Directory $root/src-stage3/staged_install/$configuration/share/uhd/images -Force 2>&1 >> $log 
 	"complete"
 	Write-Host -NoNewline "downloading $configuration UHD firmware images..."
-	if ($configuration -match "Debug") {$ErrorActionPreference = "Continue"}
+	$ErrorActionPreference = "Continue"
 	& $pythonroot/$pythonexe $root/src-stage3/staged_install/$configuration/lib/uhd/utils/uhd_images_downloader.py -v -i "$root/src-stage3/staged_install/$configuration/share/uhd/images" 2>&1 >> $log 
 	"complete"
 	$ErrorActionPreference = "Stop"
