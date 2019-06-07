@@ -5,8 +5,8 @@
 #
 $ErrorActionPreference = "Stop"
 
-$Global:root = Read-Host "Please choose an absolute root directory for this build. <c:\gr-build>"
-if (!$root) {$root = "C:\gr-build"}
+$Global:root = Read-Host "Please choose an absolute root directory for this build. <Z:\gr-build>"
+if (!$root) {$root = "Z:\gr-build"}
 if (!(Test-Path -isValid -LiteralPath $root)) {
     Write-Host "'$root' is not a valid path.  Exiting script."
     return
