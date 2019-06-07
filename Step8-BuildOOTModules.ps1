@@ -217,6 +217,7 @@ function BuildDrivers
 	cd $root/src-stage3/oot_code/gr-iqbal/build/$configuration 
 	$env:_CL_ = " $arch $runtime "
 	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG "
+	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
 	if (Test-Path CMakeCache.txt) {Remove-Item -Force CMakeCache.txt} # Don't keep the old cache because if the user is fixing a config problem it may not re-check the fix
 	cmake ../../ `
 		-G "Visual Studio 14 2015 Win64" `
@@ -263,6 +264,8 @@ function BuildDrivers
 	$ErrorActionPreference = "Continue"
 	$env:LIB = "$root/build/$configuration/lib;" + $oldlib
 	$env:_CL_ = " $arch $runtime "
+	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  /DEBUG "
+	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
 	if ($configuration -match "AVX") {$SIMD="-DUSE_SIMD=""AVX"""} else {$SIMD=""}
 	& cmake ../../ `
 		-G "Visual Studio 14 2015 Win64" `
@@ -302,6 +305,7 @@ function BuildDrivers
 	(Get-Content $root\src-stage3\staged_install\$configuration\bin\osmocom_fft.py).replace('/dev/null', 'nul') | Set-Content $root\src-stage3\staged_install\$configuration\bin\osmocom_fft.py
 	Validate "$root\src-stage3\oot_code\gr-osmosdr\build\$configuration\lib\$buildconfig\gnuradio-osmosdr.dll"
 	CheckNoAVX "$root\src-stage3\oot_code\gr-osmosdr\build\$configuration\lib\$buildconfig"
+	$env:_LINK_ = ""
 }
 
 function BuildOOTModules 
@@ -334,6 +338,7 @@ function BuildOOTModules
 	Copy-Item -Force $root\src-stage3\staged_install\$configuration\include\gnuradio\swig\gnuradio.i $root/bin/Lib
 	cd $root/src-stage3/oot_code/gr-acars2/build/$configuration 
 	$linkflags = " /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
+	if ($mm -eq '3.8') {$linkflags = $linkflags  + " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib "}
 	$env:_LINK_= ""
 	$env:_CL_ = ""
 	$env:Path="" 
@@ -425,6 +430,7 @@ function BuildOOTModules
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-air-modes/build/$configuration  2>&1 >> $Log
 	cd $root/src-stage3/oot_code/gr-air-modes/build/$configuration 
 	$linkflags = " /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
+	if ($mm -eq '3.8') {$linkflags = $linkflags  + " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib "}
 	$env:_CL_ = ""
 	$env:Path= "$root/build/$configuration/lib;" + $oldPath
 	$env:PYTHONPATH="$pythonroot/Lib/site-packages"
@@ -507,6 +513,7 @@ function BuildOOTModules
 		}
 		$env:_CL_ = ""
 		$env:_LINK_= " /DEBUG /OPT:ref,icf "
+		if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
 		$env:Path = $env:AMDAPPSDKROOT + ";" + $oldPath 
 		cmake ../../ `
 			-G "Visual Studio 14 2015 Win64" `
@@ -622,7 +629,7 @@ function BuildOOTModules
 	Write-Host -NoNewline "configuring $configuration Armadillo..."
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/armadillo-7.800.1/build/$configuration  2>&1 >> $Log
 	cd $root/src-stage3/oot_code/armadillo-7.800.1/build/$configuration 
-	$linkflags= " /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
+	$linkflags= " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	cmake ../../ `
@@ -660,7 +667,7 @@ function BuildOOTModules
 		cd $root/src-stage3/oot_code/gr-specest/build/$configuration 
 		# the quotes that are likely to be in the below path make it impossible to added to the cmake config
 		$env:_LINK_ = " /LIBPATH:""${MY_IFORT}compiler/lib/intel64_win/"" "
-		$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib /NODEFAULTLIB:LIBCMT.lib /NODEFAULTLIB:LIBCMTD.lib  /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+		$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib /NODEFAULTLIB:LIBCMT.lib /NODEFAULTLIB:LIBCMTD.lib  /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
 		if ($configuration -match "AVX2") {$fortflags = " /QaxCORE-AVX2 /QxCORE-AVX2 /tune:haswell /arch:AVX2 "} else {$fortflags = " /arch:SSE2 "}
 		$froot = $root.Replace('\','/')
 		# set path to empty to ensure another GR install is not located
@@ -768,6 +775,7 @@ function BuildOOTModules
 	cd $root/src-stage3/oot_code/gr-cdma/build/$configuration
 	$env:_CL_=" $arch /DNOMINMAX  /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi "
 	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
 	(Get-Content "../../python/cdma_parameters.py").replace('/home/anastas/gr-cdma/', '../lib/site-packages/cdma') | Set-Content "../../python/cdma_parameters.py"
 	$ErrorActionPreference = "Continue"
 	$env:Path="" 
@@ -814,6 +822,7 @@ function BuildOOTModules
 	cd $root/src-stage3/oot_code/gr-rds/build/$configuration
 	$env:_CL_ = " $arch ";
 	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
 	$ErrorActionPreference = "Continue"
 	$env:Path="" 
 	& cmake ../../ `
