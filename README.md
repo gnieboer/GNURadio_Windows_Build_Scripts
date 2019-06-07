@@ -21,12 +21,14 @@ Other Applications: gqrx
 Windows 10 64-bit (though binaries will run on Win 7)
 
 The following tools must be installed:  
-- MS Visual Studio 2015 (Community or higher)  
+- MS Visual Studio 2015 
 - Git For Windows  
-- CMake 3.3
+- CMake 3.13
 - Doxygen  
 - ActiveState Perl  
 - Wix toolset for VS 2015  
+
+Please note that Visual Studio 2017 is not yet supported.
 
 Also, the complete build requires no less than **120 GB** of free disk space.
 
@@ -60,7 +62,7 @@ Once complete, msi files can be found in the [root]/src-stage4-installer/dist su
 
 6- The following devices are NOT currently supported: FCD Pro+, RFSPACE, MiriSDR, SoapySDR, SDRPlay
 
-7- CMake 3.3 is the only version currently supported.  CMake 3.5 has been reported to have issues detecting the custom python install when at the BuildGNURadio step. 
+7- CMake 3.13 is the only version currently supported, though versions after 3.5 may be successful; older versions have been reported to have issues detecting the custom python install when at the BuildGNURadio step. 
 
 8- Zadig must be manually added to the /bin directory prior to MSI creation
 
