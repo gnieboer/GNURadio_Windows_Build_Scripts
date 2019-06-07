@@ -131,7 +131,6 @@ if ((TryValidate "..\build\X64\Debug\lib\libxml2.lib" "..\build\X64\Release\lib\
 	nmake clean 2>&1 >> $Log
 	Validate "..\build\X64\Debug\lib\libxml2.lib" "..\build\X64\Release\lib\libxml2.lib" "..\build\X64\Release-AVX2\lib\libxml2.lib" "..\build\X64\Debug\bin\libxml2.dll" "..\build\X64\Release\bin\libxml2.dll" "..\build\X64\Release-AVX2\bin\libxml2.dll"
 	$ErrorActionPreference = "Stop"
-	"complete"
 } else {
 	Write-Host "already built"
 }
