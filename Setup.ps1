@@ -365,7 +365,6 @@ $bitarray_version = $Config.VersionInfo.bitarray
 $mbedtls_version = $Config.VersionInfo.mbedtls
 $openlte_version = $Config.VersionInfo.openlte
 $mpir_version = $Config.VersionInfo.mpir
-
 $bladerf_version = $Config.VersionInfo.bladerf
 $rtlsdr_version = $Config.VersionInfo.rtlsdr 
 $hackrf_version = $Config.VersionInfo.hackrf
