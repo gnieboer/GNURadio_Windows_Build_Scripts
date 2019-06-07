@@ -79,6 +79,7 @@ function BuildGNURadio {
 		-DPYTHON_LIBRARY="$pythonroot\Libs\python27.lib" `
 		-DPYTHON_LIBRARY_DEBUG="$pythonroot\Libs\python27_d.lib" `
 		-DPYTHON_INCLUDE_DIR="$pythonroot\include"  `
+		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DQT_QMAKE_EXECUTABLE="$root/build/$configuration/bin/qmake.exe" `
 		-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
 		-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
