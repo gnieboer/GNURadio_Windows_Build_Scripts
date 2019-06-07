@@ -439,7 +439,7 @@ Set-Alias cmake (Get-Command "cmake.exe").Source
 if ((Get-Command "perl.exe" -ErrorAction SilentlyContinue) -eq $null)  {throw "ActiveState Perl must be installed and on the path.  Aborting script"} 
 	
 # MSVC 2015
-if (-not ((Get-Command msbuild).Version.Major -eq 14)) {throw "Visual Studio 2015 must be installed.  Aborting script"} 
+if ($env:VS140COMNTOOLS -eq $null) {throw "Visual Studio 2015 must be installed.  Aborting script"} 
 
 # WIX
 if (-not (test-path $env:WIX)) {throw "WIX toolset must be installed.  Aborting script"}
@@ -450,9 +450,8 @@ if ((Get-Command "doxygen.exe" -ErrorAction SilentlyContinue) -eq $null)  {throw
 # set VS 2015 environment
 if (!(Test-Path variable:global:oldpath))
 {
-	$VCdir  = (Get-Command cl).Source | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent
-	pushd "${VCdir}"
-	cmd.exe /c "vcvarsall.bat amd64&set" |
+	pushd "$env:VS140COMNTOOLS"
+	cmd.exe /c "VsDevCmd.bat amd64&set" |
 	foreach {
 		if ($_ -match "=") {
 			$v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
