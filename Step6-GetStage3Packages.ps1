@@ -24,7 +24,7 @@ $mm = GetMajorMinor($gnuradio_version)
 #
 # airspy
 #
-GetPackage https://github.com/airspy/host.git airspy -Stage3
+GetPackage https://github.com/airspy/airspyone_host.git airspy -Stage3 -branch "$airspy_version"
 GetPatch airspy_vs2015.7z airspy/libairspy/vc -Stage3
 
 # ____________________________________________________________________________________________________________
@@ -168,7 +168,7 @@ GetPackage https://github.com/gnieboer/gr-ais.git -Stage3 -branch "msvc-fixes"
 #
 # gr-display
 #
-GetPackage https://github.com/dl1ksv/gr-display.git -Stage3
+GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 -branch "$grdisplay_version"
 
 # ____________________________________________________________________________________________________________
 #

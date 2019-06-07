@@ -51,6 +51,12 @@
 		qt = '4.8.7'        # This isn't actually used.  4.8.7 is hardcoded but 4.8.7 is the last 4.x version to the change to Qt5 will change much more
 		python = '2.7.10'   # This isn't actually used.  2.7.10 is hardcoded 
 		dp = '1.5'        # dependency pack version
+		# OOT modules
+		bladerf = '2018.08'
+		rtlsdr = '0.6.0'
+		hackrf = 'v2018.01.1'
+		airspy = 'v1.0.9'
+		grdisplay = 'v3.7.3'   # last version for GR 3.7
 		# TODO The following libraries are currently downloaded from current git snapshot.  This should be replaced by specific release tags
 		# PyQwt (5.2.1, abandoned, no releases marked)
 		# zlib (1.2.8 but should rarely change)

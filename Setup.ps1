@@ -364,6 +364,11 @@ $mbedtls_version = $Config.VersionInfo.mbedtls
 $openlte_version = $Config.VersionInfo.openlte
 $mpir_version = $Config.VersionInfo.mpir
 
+$bladerf_version = $Config.VersionInfo.bladerf
+$rtlsdr_version = $Config.VersionInfo.rtlsdr 
+$hackrf_version = $Config.VersionInfo.hackrf
+$airspy_version = $Config.VersionInfo.airspy
+$grdisplay_version = $Config.VersionInfo.grdisplay
 # The below libraries will have AVX code detected, even for non-AVX builds
 # these libraries all have guards to ensure the feature is supported 
 # whether in the code itself or because the intel fortran compiler added them
