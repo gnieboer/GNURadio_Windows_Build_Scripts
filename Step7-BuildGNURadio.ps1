@@ -71,6 +71,7 @@ function BuildGNURadio {
 	$ErrorActionPreference = "Continue"
 	$libzmquv = $libzmq_version -Replace '\.','_'
 	# Always use the DLL version of Qt to avoid errors about parent being on a different thread.
+	if ($mm -eq '3.8') {$qwtinc = '6'; $qwtlib='5'} else {$qwtinc = ''; $qwtlib='5'}
 	cmake ../../src/gnuradio `
 		-G "Visual Studio 14 2015 Win64" `
 		-DPYTHON_EXECUTABLE="$pythonroot\$pythonexe" `
@@ -82,8 +83,8 @@ function BuildGNURadio {
 		-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
 		-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
 		-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-		-DQWT_INCLUDE_DIRS="$root/build/$configuration/include/qwt6" `
-		-DQWT_LIBRARIES="$root/build/$configuration/lib/qwt${d}6.lib" `
+		-DQWT_INCLUDE_DIRS="$root/build/$configuration/include/qwt$qwtinc" `
+		-DQWT_LIBRARIES="$root/build/$configuration/lib/qwt${d}$qwtlib.lib" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DZEROMQ_LIBRARY_NAME="libzmq-v140-mt-$libzmquv" `
 		-DCMAKE_PREFIX_PATH="$root/build/$configuration" `
