@@ -269,7 +269,7 @@ Function Consolidate {
 	cp -Recurse -Force $root/src-stage1-dependencies/libusb/x64/$configuration/dll/libusb-1.0.dll $root/build/$configuration/MS64/dll/ 2>&1 >> $log # purely so bladeRF will build as is
 	cp -Recurse -Force $root/src-stage1-dependencies/libusb/x64/$configuration/dll/libusb-1.0.lib $root/build/$configuration/lib/ 2>&1 >> $log
 	cp -Recurse -Force $root/src-stage1-dependencies/libusb/x64/$configuration/dll/libusb-1.0.dll $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/libusb/libusb/libusb.h $root/build/$configuration/include/ 2>&1 >> $log
+	cp -Recurse -Force $root/src-stage1-dependencies/libusb/libusb/libusb.h $root/build/$configuration/include/ 2>&1 >> $log
 	"complete"
 
 	# pthreads
