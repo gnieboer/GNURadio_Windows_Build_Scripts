@@ -451,7 +451,7 @@ if (!(Test-Path variable:global:oldpath))
 {
 	$VCdir  = (Get-Command cl).Source | Split-Path -Parent | Split-Path -Parent | Split-Path -Parent
 	pushd "${VCdir}"
-	cmd /c "vcvarsall.bat amd64&set" |
+	cmd.exe /c "vcvarsall.bat amd64&set" |
 	foreach {
 		if ($_ -match "=") {
 			$v = $_.split("="); set-item -force -path "ENV:\$($v[0])"  -value "$($v[1])"
