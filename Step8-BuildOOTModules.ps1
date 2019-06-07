@@ -527,8 +527,8 @@ function BuildOOTModules
 			-DOpenCL_INCLUDE_DIR="$env:AMDAPPSDKROOT/include" `
 			-DFREETYPE2_PKG_INCLUDE_DIRS="$root/build/$configuration/include" `
 			-DFREETYPE2_PKG_LIBRARY_DIRS="$root/build/$configuration/lib" `
-			-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /Zi /EHsc " `
-			-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /Zi /EHsc" `
+			-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX /DWIN32 /D_WINDOWS /W3 /Zi /EHsc " `
+			-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX  /DWIN32 /D_WINDOWS /W3 /Zi /EHsc" `
 			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
 			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
 			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
