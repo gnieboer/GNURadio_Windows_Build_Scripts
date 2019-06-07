@@ -726,50 +726,54 @@ function BuildOOTModules
 	#
 	SetLog "gr-inspector $configuration"
 	if ($configuration -match "Debug") {
-		Write-Host "skipping gr-inspector in debug"
+		Write-Host "skipping gr-inspector in debug" | Tee-Object -FilePath $Log
 	} else {
-		Write-Host -NoNewline "configuring $configuration gr-inspector..."
-		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-inspector/build/$configuration 2>&1 >> $Log
-		cd $root/src-stage3/oot_code/gr-inspector/build/$configuration
-		$env:_CL_=""
-		$env:_LINK_= " /DEBUG:FULL "
-		$ErrorActionPreference = "Continue"
-		$env:Path="" 
-		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
-			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-			-DCMAKE_C_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
-			-DCMAKE_CXX_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
-			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-			-DQT_QWTPLOT3D_LIBRARY="$root\build\$configuration\lib\qwtplot3d.lib" `
-			-DQT_QWTPLOT3D_INCLUDE_DIR="$root\build\$configuration\include\qwt3d" `
-			-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
-			-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
-			-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-			-DQWT_INCLUDE_DIRS="$root\build\$configuration\include\qwt6" `
-			-DQWT_LIBRARIES="$root\build\$configuration\lib\qwt${debugext}6.lib" `
-			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi " `
-			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /Zi " `
-			-Wno-dev 2>&1 >> $Log
-		$env:Path = $oldPath
-		Write-Host -NoNewline "building gr-inspector..."
-		msbuild .\gr-inspector.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-		Write-Host -NoNewline "installing..."
-		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-		# copy the examples across
-		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector 2>&1 >> $Log
-		cp -Recurse -Force $root/src-stage3/oot_code/gr-inspector/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector 2>&1 >> $Log
-		$env:_CL_ = ""
-		$env:_LINK_ = ""
-		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-inspector.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\inspector\_inspector_swig.pyd"
+		if ($mm -eq "3.8") {
+			Write-Host "skipping gr-inspector in v3.8 as requires Qt4" | Tee-Object -FilePath $Log
+		} else {
+			Write-Host -NoNewline "configuring $configuration gr-inspector..."
+			New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-inspector/build/$configuration 2>&1 >> $Log
+			cd $root/src-stage3/oot_code/gr-inspector/build/$configuration
+			$env:_CL_=""
+			$env:_LINK_= " /DEBUG:FULL "
+			$ErrorActionPreference = "Continue"
+			$env:Path="" 
+			& cmake ../../ `
+				-G "Visual Studio 14 2015 Win64" `
+				-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+				-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+				-DCMAKE_C_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
+				-DCMAKE_CXX_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
+				-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+				-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+				-DBOOST_ROOT="$root/build/$configuration/" `
+				-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+				-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+				-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+				-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+				-DQT_QWTPLOT3D_LIBRARY="$root\build\$configuration\lib\qwtplot3d.lib" `
+				-DQT_QWTPLOT3D_INCLUDE_DIR="$root\build\$configuration\include\qwt3d" `
+				-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
+				-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
+				-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
+				-DQWT_INCLUDE_DIRS="$root\build\$configuration\include\qwt6" `
+				-DQWT_LIBRARIES="$root\build\$configuration\lib\qwt${debugext}6.lib" `
+				-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+				-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi " `
+				-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /Zi " `
+				-Wno-dev 2>&1 >> $Log
+			$env:Path = $oldPath
+			Write-Host -NoNewline "building gr-inspector..."
+			msbuild .\gr-inspector.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+			Write-Host -NoNewline "installing..."
+			msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+			# copy the examples across
+			New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector 2>&1 >> $Log
+			cp -Recurse -Force $root/src-stage3/oot_code/gr-inspector/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector 2>&1 >> $Log
+			$env:_CL_ = ""
+			$env:_LINK_ = ""
+			Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-inspector.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\inspector\_inspector_swig.pyd"
+		}
 	}
 	# ____________________________________________________________________________________________________________
 	#
