@@ -27,6 +27,7 @@ if (Test-Path $mypath\Setup.ps1) {
 $pythonexe = "python.exe"
 $pythondebugexe = "python_d.exe"
 $mm = GetMajorMinor($gnuradio_version)
+Write-Host "Consolidating for version $mm"
 
 cd $root
 
