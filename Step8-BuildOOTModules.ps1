@@ -565,11 +565,12 @@ function BuildOOTModules
 	#
 	SetLog "gqrx $configuration"
 	Write-Host -NoNewline "configuring $configuration gqrx..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gqrx-$gqrx_version/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gqrx-$gqrx_version/build/$configuration
-	$ErrorActionPreference = "Continue"
 	$env:_CL_ = ""
 	if ($mm -eq "3.8") {	
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gqrx/build/$configuration 2>&1 >> $Log
+		cd $root/src-stage3/oot_code/gqrx/build/$configuration
+		$ErrorActionPreference = "Continue"
+		$env:_LINK_= " /DEBUG  $root/build/$configuration/lib/log4cpp.lib "
 		& cmake ../../ `
 			-G "Visual Studio 14 2015 Win64" `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
@@ -578,22 +579,10 @@ function BuildOOTModules
 			-DCMAKE_C_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
 			-DCMAKE_CXX_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
 			-Wno-dev 2>&1 >> $Log
-	} else {
-		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
-			-DCMAKE_PREFIX_PATH="$root\build\$configuration\gqrx" `
-			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-			-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
-			-DCMAKE_C_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
-			-DCMAKE_CXX_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
-			-Wno-dev 2>&1 >> $Log		
-	}
-	Write-Host -NoNewline "building..."
-	msbuild .\gqrx.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	$mm = GetMajorMinor($gnuradio_version)
-	if ($mm -eq "3.8") {
+		Write-Host -NoNewline "building..."
+		msbuild .\gqrx.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log		
 		cp $root/build/$configuration/bin/Qt5Network*.dll $root\src-stage3\staged_install\$configuration\bin\
 		cp $root/build/$configuration/bin/Qt5Core*.dll $root\src-stage3\staged_install\$configuration\bin\
 		cp $root/build/$configuration/bin/Qt5Gui*.dll $root\src-stage3\staged_install\$configuration\bin\
@@ -603,7 +592,25 @@ function BuildOOTModules
 		cp -Recurse -Force $root/build/$configuration/plugins/platforms $root\src-stage3\staged_install\$configuration\bin
 		cp -Recurse -Force $root/build/$configuration/plugins/iconengines $root\src-stage3\staged_install\$configuration\bin
 		cp -Recurse -Force $root/build/$configuration/plugins/imageformats $root\src-stage3\staged_install\$configuration\bin
+		"[Paths]" | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII
+		"Prefix = ." | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII -append 
+		$env:_LINK_= ""
 	} else {
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gqrx/build/$configuration 2>&1 >> $Log
+		cd $root/src-stage3/oot_code/gqrx/build/$configuration
+		$ErrorActionPreference = "Continue"
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration\gqrx" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
+			-DCMAKE_C_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
+			-DCMAKE_CXX_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `
+			-Wno-dev 2>&1 >> $Log	
+		Write-Host -NoNewline "building..."
+		msbuild .\gqrx.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log			
 		cp $root/build/$configuration/gqrx/bin/Qt5Network*.dll $root\src-stage3\staged_install\$configuration\bin\
 		cp $root/build/$configuration/gqrx/bin/Qt5Core*.dll $root\src-stage3\staged_install\$configuration\bin\
 		cp $root/build/$configuration/gqrx/bin/Qt5Gui*.dll $root\src-stage3\staged_install\$configuration\bin\
@@ -613,9 +620,9 @@ function BuildOOTModules
 		cp -Recurse -Force $root/build/$configuration/gqrx/plugins/platforms $root\src-stage3\staged_install\$configuration\bin
 		cp -Recurse -Force $root/build/$configuration/gqrx/plugins/iconengines $root\src-stage3\staged_install\$configuration\bin
 		cp -Recurse -Force $root/build/$configuration/gqrx/plugins/imageformats $root\src-stage3\staged_install\$configuration\bin
+		"[Paths]" | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII
+		"Prefix = ." | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII -append 
 	}
-	"[Paths]" | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII
-	"Prefix = ." | out-file -FilePath $root/src-stage3/staged_install/$configuration/bin/qt.conf -encoding ASCII -append 
 	$env:_CL_ = ""
 	Validate "$root/src-stage3/staged_install/$configuration/bin/gqrx.exe"
 
