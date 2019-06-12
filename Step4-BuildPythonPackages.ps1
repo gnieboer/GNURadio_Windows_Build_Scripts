@@ -678,9 +678,10 @@ Function SetupPython
 	#__________________________________________________________________________________________
 	# py2cairo
 	# requires pkg-config
-	# uses wierd setup python script called WAF which has an archive embedded in it which
-	# creates files that then fail to work.  So we need to extract them and then patch them
-	# and run again.
+	# While the latest version gets rid of the WAF build system (thank you!) 
+	# the new version doesn't generate a pkgconfig file that pyGTK is looking for later.
+	# So we need to manually build it for the moment
+	#
 	SetLog "$configuration pycairo"
 	cd $root\src-stage1-dependencies\pycairo-$py2cairo_version
 	if ((TryValidate "$pythonroot\lib\site-packages\cairo\_cairo.pyd") -eq $false) {
@@ -708,6 +709,16 @@ Function SetupPython
 		if ($configuration -match "Debug") {
 			cp -Force "$pythonroot\lib\site-packages\cairo\_cairo.pyd" "$pythonroot\lib\site-packages\cairo\_cairo_d.pyd"
 		}
+		# Create pc file manually
+		"prefix=$root\src-stage1-dependencies\py2cairo-$py2cairo_version\build\x64\$configuration" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII
+		"" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII -append
+		"Name: Pycairo" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII -append
+		"Description: Python bindings for cairo" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII -append
+		"Version: $py2cairo_version" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII -append
+		"Requires: cairo" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII -append
+		"Cflags: -I$root\src-stage1-dependencies\py2cairo-$py2cairo_version\build\x64\$configuration\include/pycairo" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII -append
+		"Libs:" | out-file -FilePath $pythonroot/lib/pkgconfig/pycairo.pc -encoding ASCII -append
+		
 		Validate "$pythonroot\lib\site-packages\cairo\_cairo.pyd"
 	} else {
 		Write-Host "py2cairo already built..."
