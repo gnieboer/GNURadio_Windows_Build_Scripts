@@ -795,7 +795,7 @@ Function SetupPython
 			Write-Host -NoNewline "building PyGTK..."
 			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
 			$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;$pythonroot/Scripts;$pythonroot;" + $oldpath
-			$env:_CL_ = "/I$root/src-stage1-dependencies/x64/lib/gtk-2.0/include /I$root/src-stage1-dependencies/py2cairo-$py2cairo_version/src " + $env:_CL_
+			$env:_CL_ = "/I$root/src-stage1-dependencies/x64/lib/gtk-2.0/include /I$root/src-stage1-dependencies/pycairo-$py2cairo_version/cairo " + $env:_CL_
 			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
 			$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
 			$ErrorActionPreference = "Continue" 
