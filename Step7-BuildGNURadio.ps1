@@ -70,8 +70,10 @@ function BuildGNURadio {
 	$env:_LINK_ = ""
 	$ErrorActionPreference = "Continue"
 	$libzmquv = $libzmq_version -Replace '\.','_'
-	# Always use the DLL version of Qt to avoid errors about parent being on a different thread.
+	if ($configuration -match "Debug") { $libzmquv = "gd-" + $libzmquv}
+	# Qwt6 is linked to Qt5 and fails on GR3.7, so ensure qwt5 is used
 	if ($mm -eq '3.8') {$qwtinc = '6'; $qwtlib='5'} else {$qwtinc = ''; $qwtlib='5'}
+	# Always use the DLL version of Qt to avoid errors about parent being on a different thread.
 	cmake ../../src/gnuradio `
 		-G "Visual Studio 14 2015 Win64" `
 		-DPYTHON_EXECUTABLE="$pythonroot\$pythonexe" `
