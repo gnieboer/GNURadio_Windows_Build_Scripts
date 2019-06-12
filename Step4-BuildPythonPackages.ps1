@@ -543,15 +543,16 @@ Function SetupPython
 		# because we can't mix MSVC and gfortran libraries
 		# So if we get here, we need to use the binary .whl instead
 		# Note that these are specifically built VS 2015 x64 versions for python 2.7.
+		# note the no-deps flag so we don't install 2x versions of numpy which will cause issues 
 		if ((TryValidate "$pythonroot/lib/site-packages/scipy/linalg/_flapack.pyd"  "$pythonroot/lib/site-packages/scipy/linalg/cython_lapack.pyd"  "$pythonroot/lib/site-packages/scipy/sparse/_sparsetools.pyd") -eq $false) {
 			$ErrorActionPreference = "Continue"
 			if ($BuildNumpyWithMKL) {
 				Write-Host -NoNewline "installing MKL scipy from wheel..."
 				Write-Host -NoNewline "Compatible Fortran compiler not available, installing scipy from custom binary wheel..."
-				& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/mkl/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
+				& $pythonroot/Scripts/pip.exe --no-deps --disable-pip-version-check  install http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/mkl/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
 			} else {
 				Write-Host -NoNewline "installing OpenBLAS scipy from wheel..."
-				& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/openBLAS/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
+				& $pythonroot/Scripts/pip.exe --no-deps --disable-pip-version-check  install http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/openBLAS/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
 			}
 			$ErrorActionPreference = "Stop"
 			Validate "$pythonroot/lib/site-packages/scipy/linalg/_flapack.pyd"  "$pythonroot/lib/site-packages/scipy/linalg/cython_lapack.pyd"  "$pythonroot/lib/site-packages/scipy/sparse/_sparsetools.pyd"
