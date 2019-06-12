@@ -90,29 +90,29 @@ Function Consolidate {
 		# move Qt5
 		Write-Host -NoNewline "Consolidating Qt5..."
 		New-Item -ItemType Directory -Force -Path $root/build/$configuration/gqrx/src/corelib/global/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Core$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Gui$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5OpenGL$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Svg$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Network$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Widgets$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Core$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Gui$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5OpenGL$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Svg$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Network$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Widgets$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtOpenGL* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtCore* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtGui* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtNetwork* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtSvg* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtWidgets* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin $root/build/$configuration/gqrx/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/cmake $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/mkspecs $root/build/$configuration/gqrx/ 2>&1 >> $log
-		robocopy "$root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/src/" "$root/build/$configuration/gqrx/src/" "*.h" /s /xd ".moc" ".tracegen" 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/plugins $root/build/$configuration/gqrx/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Core$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Gui$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5OpenGL$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Svg$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Network$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Widgets$q5d.dll $root/build/$configuration/gqrx/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Core$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Gui$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5OpenGL$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Svg$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Network$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Widgets$q5d.lib $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtOpenGL* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtCore* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtGui* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtNetwork* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtSvg* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtWidgets* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin $root/build/$configuration/gqrx/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/cmake $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/mkspecs $root/build/$configuration/gqrx/ 2>&1 >> $log
+		robocopy "$root/src-stage1-dependencies/Qt5Build/build/$configDLL/qtbase/src/" "$root/build/$configuration/gqrx/src/" "*.h" /s /xd ".moc" ".tracegen" 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/plugins $root/build/$configuration/gqrx/ 2>&1 >> $log
 		# Fix a hardcoded mkspec file location
 		((Get-Content -path $root/build/$configuration/gqrx/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake -Raw) -Replace '\${_qt5Core_install_prefix}/../../../qtbase//mkspecs/win32-msvc',"$root/build/$configuration/gqrx/mkspecs/win32-msvc") | % {$_ -Replace "\\", "/"} | Set-Content -Path $root/build/$configuration/gqrx/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake
 		# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
@@ -122,31 +122,31 @@ Function Consolidate {
 	} else {
 		Write-Host -NoNewline "Consolidating Qt5..."
 		New-Item -ItemType Directory -Force -Path $root/build/$configuration/src/corelib/global/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin $root/build/$configuration/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/cmake $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/mkspecs $root/build/$configuration/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/plugins $root/build/$configuration/ 2>&1 >> $log
-		robocopy "$root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/src/" "$root/build/$configuration/src/" "*.h" /s /xd ".moc" ".tracegen" 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Core$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Gui$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5OpenGL$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Svg$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Network$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/bin/Qt5Widgets$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Core$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Gui$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5OpenGL$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Svg$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Network$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/Qt5Widgets$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtOpenGL* $root/build/$configuration/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtCore* $root/build/$configuration/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtGui* $root/build/$configuration/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtNetwork* $root/build/$configuration/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtSvg* $root/build/$configuration/include/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/include/QtWidgets* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin $root/build/$configuration/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/cmake $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/mkspecs $root/build/$configuration/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Build/build/$configDLL/plugins $root/build/$configuration/ 2>&1 >> $log
+		robocopy "$root/src-stage1-dependencies/Qt5Stage/build/$configDLL/qtbase/src/" "$root/build/$configuration/src/" "*.h" /s /xd ".moc" ".tracegen" 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Core$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Gui$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5OpenGL$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Svg$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Network$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Widgets$q5d.dll $root/build/$configuration/bin/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Core$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Gui$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5OpenGL$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Svg$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Network$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/Qt5Widgets$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtOpenGL* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtCore* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtGui* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtNetwork* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtSvg* $root/build/$configuration/include/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtWidgets* $root/build/$configuration/include/ 2>&1 >> $log
 		#needed by gqrx but not gnuradio itself 
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/qtbase/lib/qtmain$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/qtbase/lib/qtmain$q5d.lib $root/build/$configuration/lib/ 2>&1 >> $log
 		# Fix a hardcoded mkspec file location
 		((Get-Content -path $root/build/$configuration/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake -Raw) -Replace '\${_qt5Core_install_prefix}/../../../qtbase//mkspecs/win32-msvc',"$root/build/$configuration/mkspecs/win32-msvc") | % {$_ -Replace "\\", "/"} | Set-Content -Path $root/build/$configuration/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake
 		# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
