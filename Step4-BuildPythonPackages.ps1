@@ -549,10 +549,10 @@ Function SetupPython
 			if ($BuildNumpyWithMKL) {
 				Write-Host -NoNewline "installing MKL scipy from wheel..."
 				Write-Host -NoNewline "Compatible Fortran compiler not available, installing scipy from custom binary wheel..."
-				& $pythonroot/Scripts/pip.exe --no-deps --disable-pip-version-check  install http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/mkl/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
+				& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install  --no-dependencies http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/mkl/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
 			} else {
 				Write-Host -NoNewline "installing OpenBLAS scipy from wheel..."
-				& $pythonroot/Scripts/pip.exe --no-deps --disable-pip-version-check  install http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/openBLAS/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
+				& $pythonroot/Scripts/pip.exe  --disable-pip-version-check  install --no-dependencies http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/openBLAS/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
 			}
 			$ErrorActionPreference = "Stop"
 			Validate "$pythonroot/lib/site-packages/scipy/linalg/_flapack.pyd"  "$pythonroot/lib/site-packages/scipy/linalg/cython_lapack.pyd"  "$pythonroot/lib/site-packages/scipy/sparse/_sparsetools.pyd"
