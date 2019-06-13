@@ -146,7 +146,7 @@ function BuildDrivers
 		-DFFTW_LIBRARIES="$root/build/$configuration/lib/libfftw3f.lib" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" 2>&1 >> $Log
 	Write-Host -NoNewline "building..."
-	msbuild .\hackrf.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\hackrf_all.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
 	Write-Host -NoNewline "installing..."
 	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
 	# this installs hackrf libs to the bin dir, we want to move them
