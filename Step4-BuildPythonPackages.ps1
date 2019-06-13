@@ -349,7 +349,7 @@ Function SetupPython
 	#
 	SetLog "$configuration numpy"
 	cd $root\src-stage1-dependencies\numpy-$numpy_version
-	if ((TryValidate "$pythonroot/lib/site-packages/numpy-$numpy_version-py2.7-win-amd64.egg/numpy/core/multiarray.pyd" "dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.$configuration.whl") -eq $false) {
+	if ((TryValidate "$pythonroot/lib/site-packages/numpy-$numpy_version-py2.7-win-amd64.egg/numpy/core/_multiarray_umath.pyd" "dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.$configuration.whl") -eq $false) {
 		Write-Host -NoNewline "configuring numpy..."
 		$ErrorActionPreference = "Continue"
 		# $static indicates if the MKL/OpenBLAS libraries will be linked statically into numpy/scipy or not.  numpy/scipy themselves will be built as DLLs/pyd's always
@@ -435,7 +435,7 @@ Function SetupPython
 		move dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.whl dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force 
 		$ErrorActionPreference = "Stop"
 		$env:_LINK_= ""
-		Validate "$pythonroot/lib/site-packages/numpy-$numpy_version-py2.7-win-amd64.egg/numpy/core/multiarray.pyd" "dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.$configuration.whl"
+		Validate "$pythonroot/lib/site-packages/numpy-$numpy_version-py2.7-win-amd64.egg/numpy/core/_multiarray_umath.pyd" "dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.$configuration.whl"
 	} else {
 		Write-Host "numpy already built..."
 	}

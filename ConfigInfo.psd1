@@ -9,7 +9,7 @@
 		UHD = '3.14.1.0-rc1'
 		gqrx = '2.11.5'
 		Cython = '0.28.5'
-		numpy = '1.15.1'
+		numpy = '1.16.4'
 		scipy = '1.1.0'
 		lapack = '3.8.0'
 		OpenBLAS  = '0.3.3'
