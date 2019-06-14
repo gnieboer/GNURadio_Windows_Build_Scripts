@@ -154,7 +154,11 @@ GetPackage https://github.com/anastas/gr-cdma.git -Stage3
 #
 # gr-rds
 #
-GetPackage https://github.com/bastibl/gr-rds.git -Stage3
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/bastibl/gr-rds.git -Stage3 -Branch "maint-3.8"
+} else {
+	GetPackage https://github.com/bastibl/gr-rds.git -Stage3 -Branch "maint-3.7"
+}
 
 # ____________________________________________________________________________________________________________
 #
