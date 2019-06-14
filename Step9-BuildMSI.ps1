@@ -51,6 +51,8 @@ Function ConsolidatePDBs {
 	pushd $root\src-stage1-dependencies
 	Get-ChildItem -Recurse -Filter "$configuration" -Directory | Get-ChildItem -Recurse -Directory | Get-ChildItem -Filter "*.pdb" | Copy-Item -Destination ..\src-stage4-installer\symbols\$configuration -Force
 	Get-ChildItem -Recurse -Filter "${configuration}DLL" -Directory | Get-ChildItem -Recurse -Directory | Get-ChildItem -Filter "*.pdb" | Copy-Item -Destination ..\src-stage4-installer\symbols\$configuration -Force
+	Get-ChildItem -Recurse -Filter "$configuration" -Directory | Get-ChildItem -Filter "*.pdb" | Copy-Item -Destination ..\src-stage4-installer\symbols\$configuration -Force
+	Get-ChildItem -Recurse -Filter "${configuration}DLL" -Directory | Get-ChildItem -Filter "*.pdb" | Copy-Item -Destination ..\src-stage4-installer\symbols\$configuration -Force
 	popd
 	pushd $root\src-stage3 
 	Get-ChildItem -Recurse -Filter "$configuration" -Directory | Get-ChildItem -Recurse -Directory | Get-ChildItem -Filter "*.pdb" | Copy-Item -Destination ..\src-stage4-installer\symbols\$configuration -Force
