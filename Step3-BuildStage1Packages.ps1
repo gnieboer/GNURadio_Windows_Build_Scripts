@@ -466,19 +466,19 @@ cd $root/src-stage1-dependencies/boost
 if ((TryValidate "build/x64/Debug/lib/boost_python-vc140-mt-gd-1_60.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-1_60.dll" `
 	"build/x64/Release/lib/boost_python-vc140-mt-1_60.dll" "build/x64/Release/lib/boost_system-vc140-mt-1_60.dll" `
 	"build/avx2/Release/lib/boost_python-vc140-mt-1_60.dll" "build/avx2/Release/lib/boost_system-vc140-mt-1_60.dll") -eq $false) {
-	cmd /c "bootstrap.bat" >> $Log
+	cmd.exe /c "bootstrap.bat" 2>&1 >> $Log
 	# point boost build to our custom python libraries
 	$doubleroot = $root -replace "\\", "\\"
-	Add-Content .\project-config.jam "`nusing python : 2.7 : $doubleroot\\src-stage2-python\\gr-python27\\python.exe : $doubleroot\\src-stage2-python\\gr-python27\\Include : $doubleroot\\src-stage2-python\\gr-python27\\Libs ;"
+	Add-Content .\project-config.jam "`nusing python : 2.7 : $doubleroot\\src-stage2-python\\gr-python27\\python.exe : $doubleroot\\src-stage2-python\\gr-python27\\Include : $doubleroot\\src-stage2-python\\gr-python27\\Libs ;" 2>&1 >> $Log
 	# always rebuild all because boost will reuse objects from a previous build with different command line options
 	# Optimized static+shared release libraries
-	$cores = Get-WmiObject -class win32_processor -Property "numberOfCores"
+	$cores = Get-WmiObject -class win32_processor -Property "numberOfCores" 
 	$corestr = $cores.NumberOfCores
-	cmd /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\avx2\Release --libdir=build\avx2\Release\lib --includedir=build\avx2\Release\include --stagedir=build\avx2\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags=""/arch:AVX2 /Ox /FS"" cflags=""/arch:AVX2 /Ox /FS"" install" >> $Log
+	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\avx2\Release --libdir=build\avx2\Release\lib --includedir=build\avx2\Release\include --stagedir=build\avx2\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags=""/arch:AVX2 /Ox /FS"" cflags=""/arch:AVX2 /Ox /FS"" install" 2>&1 >> $Log
 	# Regular  static+shared release libraries
-	cmd /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Release --libdir=build\x64\Release\lib --includedir=build\x64\Release\include --stagedir=build\x64\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags="" -FS"" cflags="" -FS"" install" >> $Log
+	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Release --libdir=build\x64\Release\lib --includedir=build\x64\Release\include --stagedir=build\x64\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags="" -FS"" cflags="" -FS"" install" 2>&1 >> $Log
 	# Regular  static+shared debug libraries
-	cmd /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Debug --libdir=build\x64\Debug\lib --includedir=build\x64\Debug\include --stagedir=build\x64\Debug --layout=versioned address-model=64 threading=multi link=static,shared variant=debug cxxflags="" -FS"" cflags="" -FS"" install" >> $Log
+	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Debug --libdir=build\x64\Debug\lib --includedir=build\x64\Debug\include --stagedir=build\x64\Debug --layout=versioned address-model=64 threading=multi link=static,shared variant=debug cxxflags="" -FS"" cflags="" -FS"" install" 2>&1 >> $Log
 	Validate "build/x64/Debug/lib/boost_python-vc140-mt-gd-1_60.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-1_60.dll" `
 		"build/x64/Release/lib/boost_python-vc140-mt-1_60.dll" "build/x64/Release/lib/boost_system-vc140-mt-1_60.dll" `
 		"build/avx2/Release/lib/boost_python-vc140-mt-1_60.dll" "build/avx2/Release/lib/boost_system-vc140-mt-1_60.dll"
