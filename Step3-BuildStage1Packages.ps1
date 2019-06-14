@@ -673,7 +673,7 @@ Function MakeQt5
     New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Build 2>&1 >> $Log
     New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Stage 2>&1 >> $Log
 	cd $root/src-stage1-dependencies/Qt5Build
-	if ((TryValidate "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/qmake.exe" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Core$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/Qt5OpenGL$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Svg$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Gui$debug.dll") -eq $false) {
+	if ((TryValidate "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/qmake.exe" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Core$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5OpenGL$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Svg$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Gui$debug.dll") -eq $false) {
 		if (Test-Path  $root/src-stage1-dependencies/Qt5/build/$type) {rm -r -Force $root/src-stage1-dependencies/Qt5/build/$type}
 		New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Build/build/$type >> $Log
         New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Stage/build/$type >> $Log
