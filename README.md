@@ -22,7 +22,7 @@ Windows 10 64-bit (though binaries will run on Win 7)
 
 The following tools must be installed:  
 - MS Visual Studio 2015 
-- Git For Windows  
+- Git For Windows  (not just the version that comes with MSVC)
 - CMake 3.13
 - Doxygen  
 - ActiveState Perl  
