@@ -110,7 +110,7 @@ Function Consolidate {
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtWidgets* $root/build/$configuration/gqrx/include/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin $root/build/$configuration/gqrx/ 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/cmake $root/build/$configuration/gqrx/lib/ 2>&1 >> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5/build/$configDLL/mkspecs $root/build/$configuration/gqrx/ 2>&1 >> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/mkspecs $root/build/$configuration/gqrx/ 2>&1 >> $log
 		robocopy "$root/src-stage1-dependencies/Qt5Build/build/$configDLL/qtbase/src/" "$root/build/$configuration/gqrx/src/" "*.h" /s /xd ".moc" ".tracegen" 2>&1 >> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/plugins $root/build/$configuration/gqrx/ 2>&1 >> $log
 		# Fix a hardcoded mkspec file location
