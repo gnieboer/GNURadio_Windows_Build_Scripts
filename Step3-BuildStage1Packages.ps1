@@ -811,7 +811,7 @@ Function MakeQwt6 {
 	nmake /NOLOGO install 2>&1 >> $Log
 }
 $ErrorActionPreference = "Continue"
-$env:QMAKESPEC = "win32-msvc2015"
+$env:QMAKESPEC = "win32-msvc"
 $env:QTDIR = "$root/src-stage1-dependencies/Qt5"
 cd $root\src-stage1-dependencies\qwt-$qwt6_version
 if ((TryValidate "build/x64/Debug/lib/qwtd.lib" "build/x64/DebugDLL/lib/qwtd6.dll" "build/x64/ReleaseDLL/lib/qwt6.dll" "build/x64/Release/lib/qwt.lib" `
