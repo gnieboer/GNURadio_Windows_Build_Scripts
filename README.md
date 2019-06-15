@@ -11,11 +11,18 @@ The finished MSI includes:
 
 Device Support: UHD, RTL-SDR, hackrf, airspy, BladeRF, osmoSDR, FCD
 
-GNURadio modules: 3.7.13.4 with all but gr-comedi modules built and included
+GNURadio modules: 3.7.13.5 with all but gr-comedi modules built and included
 
 OOT modules: gr-iqbal, gr-fosphor, gr-osmosdr, gr-acars, gr-adsb, gr-modtool, gr-air-modes, gr-ais, gr-ax25, gr-burst (incl. bitarray), gr-cdma, gr-display (incl. matplotlib), gr-eventstream, gr-inspector (incl. tensorflow), gr-lte, gr-mapper, gr-nacl, gr-paint (incl. PIL), gr-radar, gr-rds, gr-specest, OpenLTE, gr-gsm
 
 Other Applications: gqrx
+
+There are now two options for that for whatever your reason is, want to build these installers themselves.  The newest and recommended option is to use an AWS EC2 instance with a custom AMI that has successfully built these scripts, to avoid configuration issues.  I recommend a c5d.2xlarge because you must have the 200GB NVMe drive or larger.
+
+The AMI is: GnuRadio Windows Build - ami-0ac7160e7f16f76ac.  AMIs are regional, so you must be in N. Virginia to see it, but you should be able to make a copy as you wish.
+Once you log in, there are two shortcuts.  The first will initialize the NVMe to your Z: drive.  The second will run the scripts. 
+
+The second option is to build your own machine:
 
 <h2>PREREQUISITES</h2>
 Windows 10 64-bit (though binaries will run on Win 7)
