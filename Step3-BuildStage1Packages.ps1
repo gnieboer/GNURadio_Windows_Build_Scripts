@@ -953,12 +953,12 @@ SetLog "Requests"
 Write-Host -NoNewline "installing Requests using pip..."
 if ((TryValidate "$root\src-stage2-python\gr-python27\lib\site-packages\requests" "$root\src-stage2-python\gr-python27-avx2\lib\site-packages\requests" "$root\src-stage2-python\gr-python27-debug\lib\site-packages\requests") -eq $false) {
 	$pythonroot = "$root\src-stage2-python\gr-python27"
-	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
 	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
-	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
 	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
 	$ErrorActionPreference = "Continue" # pip will "error" on debug
-	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
 	$ErrorActionPreference = "Stop"
 	"complete"
 } else {
