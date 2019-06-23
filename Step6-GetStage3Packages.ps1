@@ -206,9 +206,7 @@ GetPackage https://github.com/gnieboer/gr-mapper.git -Stage3 -branch "msvc_fixes
 #
 # gr-nacl
 #
-# Awaiting incorporation of pull request 
-#
-GetPackage https://github.com/gnieboer/gr-nacl.git -Stage3 -branch "msvc_fixes"
+GetPackage https://github.com/stwunsch/gr-nacl -Stage3 
 
 # ____________________________________________________________________________________________________________
 #
