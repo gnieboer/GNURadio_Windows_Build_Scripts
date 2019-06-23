@@ -121,15 +121,15 @@ if ((TryValidate "..\build\X64\Debug\lib\libxml2.lib" "..\build\X64\Release\lib\
 
 	$ErrorActionPreference = "Continue"
 	# the "static" option builds the test programs statically link, not relevant to the libraries
-	& cscript.exe configure.js iconv=yes compiler=msvc zlib=yes python=yes cruntime=/MDd  debug=yes prefix="..\build\x64\Debug" static=no lib="..\..\gettext-msvc\x64\Debug;..\..\zlib-1.2.8\contrib\vstudio\vc14\x64\ZLibStatDebug" include="..\..\gettext-msvc\libiconv-1.14;..\..\zlib-1.2.8" 2>&1 >> $Log
-	nmake Makefile.msvc libxml install 2>&1 >> $Log
-	nmake clean 2>&1 >> $Log
-	& cscript.exe configure.js iconv=yes compiler=msvc zlib=yes python=yes cruntime=/MD  debug=no prefix="..\build\x64\Release" static=no lib="..\..\gettext-msvc\x64\Release;..\..\zlib-1.2.8\contrib\vstudio\vc14\x64\ZLibStatRelease" include="..\..\gettext-msvc\libiconv-1.14;..\..\zlib-1.2.8" 2>&1 >> $Log
-	nmake Makefile.msvc libxml install 2>&1 >> $Log
-	nmake clean 2>&1 >> $Log
-	& cscript.exe configure.js iconv=yes compiler=msvc zlib=yes python=yes cruntime="/MD /arch:AVX2"  debug=no prefix="..\build\x64\Release-AVX2" static=no lib="..\..\gettext-msvc\x64\Release;..\..\zlib-1.2.8\contrib\vstudio\vc14\x64\ZLibStatRelease" include="..\..\gettext-msvc\libiconv-1.14;..\..\zlib-1.2.8" 2>&1 >> $Log
-	nmake Makefile.msvc libxml install 2>&1 >> $Log
-	nmake clean 2>&1 >> $Log
+	& cscript.exe configure.js iconv=yes compiler=msvc zlib=yes python=yes cruntime=/MDd  debug=yes prefix="..\build\x64\Debug" static=no lib="..\..\gettext-msvc\x64\Debug;..\..\zlib-1.2.8\contrib\vstudio\vc14\x64\ZLibStatDebug" include="..\..\gettext-msvc\libiconv-1.14;..\..\zlib-1.2.8" *>> $Log
+	nmake Makefile.msvc libxml install *>> $Log
+	nmake clean *>> $Log
+	& cscript.exe configure.js iconv=yes compiler=msvc zlib=yes python=yes cruntime=/MD  debug=no prefix="..\build\x64\Release" static=no lib="..\..\gettext-msvc\x64\Release;..\..\zlib-1.2.8\contrib\vstudio\vc14\x64\ZLibStatRelease" include="..\..\gettext-msvc\libiconv-1.14;..\..\zlib-1.2.8" *>> $Log
+	nmake Makefile.msvc libxml install *>> $Log
+	nmake clean *>> $Log
+	& cscript.exe configure.js iconv=yes compiler=msvc zlib=yes python=yes cruntime="/MD /arch:AVX2"  debug=no prefix="..\build\x64\Release-AVX2" static=no lib="..\..\gettext-msvc\x64\Release;..\..\zlib-1.2.8\contrib\vstudio\vc14\x64\ZLibStatRelease" include="..\..\gettext-msvc\libiconv-1.14;..\..\zlib-1.2.8" *>> $Log
+	nmake Makefile.msvc libxml install *>> $Log
+	nmake clean *>> $Log
 	Validate "..\build\X64\Debug\lib\libxml2.lib" "..\build\X64\Release\lib\libxml2.lib" "..\build\X64\Release-AVX2\lib\libxml2.lib" "..\build\X64\Debug\bin\libxml2.dll" "..\build\X64\Release\bin\libxml2.dll" "..\build\X64\Release-AVX2\bin\libxml2.dll"
 	$ErrorActionPreference = "Stop"
 } else {
@@ -150,13 +150,13 @@ function MakeXSLT {
 	Write-Host -NoNewline "  $configuration..."
 	if ((TryValidate "..\build\$configuration\lib\libxslt.dll" "..\build\$configuration\lib\libxslt_a.lib") -eq $false) {
 		if ($configuration -match "Debug") {$de="yes"; $runtime="/MD"} else {$de="no"; $runtime="/MDd"}
-		& nmake /NOLOGO clean 2>&1 >> $Log 
+		& nmake /NOLOGO clean *>> $Log 
 		Write-Host -NoNewline "configuring..."
-		& cscript configure.js zlib=yes compiler=msvc cruntime="$runtime" static=yes prefix=..\build\$configuration include="../../zlib-1.2.8;../../libxml2/include;../../gettext-msvc/libiconv-1.14" lib="../../libxml2/build/x64/$configuration/lib;../../gettext-msvc/x64/$configuration;../../zlib-1.2.8/contrib/vstudio/vc14/x64/ZlibStat$configuration" debug=$de 2>&1 >> $Log 
+		& cscript configure.js zlib=yes compiler=msvc cruntime="$runtime" static=yes prefix=..\build\$configuration include="../../zlib-1.2.8;../../libxml2/include;../../gettext-msvc/libiconv-1.14" lib="../../libxml2/build/x64/$configuration/lib;../../gettext-msvc/x64/$configuration;../../zlib-1.2.8/contrib/vstudio/vc14/x64/ZlibStat$configuration" debug=$de *>> $Log 
 		Write-Host -NoNewline "building..." 
-		& nmake /NOLOGO 2>&1 >> $Log 
+		& nmake /NOLOGO *>> $Log 
 		Write-Host -NoNewline "installing..."
-		& nmake /NOLOGO install 2>&1 >> $Log 
+		& nmake /NOLOGO install *>> $Log 
 		if (Test-Path ..\build\$configuration\bin\libexslt.pdb) {Copy-Item -Path ..\build\$configuration\bin\libexslt.pdb ..\build\$configuration\lib}
 		if (Test-Path ..\build\$configuration\bin\libxslt.pdb) {Copy-Item -Path ..\build\$configuration\bin\libxslt.pdb ..\build\$configuration\lib}
 		Validate "..\build\$configuration\lib\libxslt.dll" "..\build\$configuration\lib\libxslt_a.lib"
@@ -437,9 +437,9 @@ Function gatherPython {
 	cd $root/src-stage1-dependencies/setuptools-20.1.1
 	& $pythonroot\$pythonexe setup.py install --single-version-externally-managed --root=/ 2>&1  >> $Log
 	cd $root/src-stage1-dependencies/pip-9.0.1
-	& $pythonroot\$pythonexe setup.py install --force 2>&1 >> $Log
+	& $pythonroot\$pythonexe setup.py install --force *>> $Log
 	cd $root\src-stage1-dependencies/wheel-0.29.0
-	& $pythonroot\$pythonexe setup.py install --force 2>&1 >> $Log
+	& $pythonroot\$pythonexe setup.py install --force *>> $Log
 	$ErrorActionPreference = "Stop"
 	$env:Path = $oldPath
 }
@@ -467,19 +467,19 @@ cd $root/src-stage1-dependencies/boost
 if ((TryValidate "build/x64/Debug/lib/boost_python-vc140-mt-gd-1_60.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-1_60.dll" `
 	"build/x64/Release/lib/boost_python-vc140-mt-1_60.dll" "build/x64/Release/lib/boost_system-vc140-mt-1_60.dll" `
 	"build/avx2/Release/lib/boost_python-vc140-mt-1_60.dll" "build/avx2/Release/lib/boost_system-vc140-mt-1_60.dll") -eq $false) {
-	cmd.exe /c "bootstrap.bat" 2>&1 >> $Log
+	cmd.exe /c "bootstrap.bat" *>> $Log
 	# point boost build to our custom python libraries
 	$doubleroot = $root -replace "\\", "\\"
-	Add-Content .\project-config.jam "`nusing python : 2.7 : $doubleroot\\src-stage2-python\\gr-python27\\python.exe : $doubleroot\\src-stage2-python\\gr-python27\\Include : $doubleroot\\src-stage2-python\\gr-python27\\Libs ;" 2>&1 >> $Log
+	Add-Content .\project-config.jam "`nusing python : 2.7 : $doubleroot\\src-stage2-python\\gr-python27\\python.exe : $doubleroot\\src-stage2-python\\gr-python27\\Include : $doubleroot\\src-stage2-python\\gr-python27\\Libs ;" *>> $Log
 	# always rebuild all because boost will reuse objects from a previous build with different command line options
 	# Optimized static+shared release libraries
 	$cores = Get-WmiObject -class win32_processor -Property "numberOfCores" 
 	$corestr = $cores.NumberOfCores
-	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\avx2\Release --libdir=build\avx2\Release\lib --includedir=build\avx2\Release\include --stagedir=build\avx2\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags=""/arch:AVX2 /Ox /FS"" cflags=""/arch:AVX2 /Ox /FS"" install" 2>&1 >> $Log
+	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\avx2\Release --libdir=build\avx2\Release\lib --includedir=build\avx2\Release\include --stagedir=build\avx2\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags=""/arch:AVX2 /Ox /FS"" cflags=""/arch:AVX2 /Ox /FS"" install" *>> $Log
 	# Regular  static+shared release libraries
-	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Release --libdir=build\x64\Release\lib --includedir=build\x64\Release\include --stagedir=build\x64\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags="" -FS"" cflags="" -FS"" install" 2>&1 >> $Log
+	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Release --libdir=build\x64\Release\lib --includedir=build\x64\Release\include --stagedir=build\x64\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags="" -FS"" cflags="" -FS"" install" *>> $Log
 	# Regular  static+shared debug libraries
-	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Debug --libdir=build\x64\Debug\lib --includedir=build\x64\Debug\include --stagedir=build\x64\Debug --layout=versioned address-model=64 threading=multi link=static,shared variant=debug cxxflags="" -FS"" cflags="" -FS"" install" 2>&1 >> $Log
+	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Debug --libdir=build\x64\Debug\lib --includedir=build\x64\Debug\include --stagedir=build\x64\Debug --layout=versioned address-model=64 threading=multi link=static,shared variant=debug cxxflags="" -FS"" cflags="" -FS"" install" *>> $Log
 	Validate "build/x64/Debug/lib/boost_python-vc140-mt-gd-1_60.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-1_60.dll" `
 		"build/x64/Release/lib/boost_python-vc140-mt-1_60.dll" "build/x64/Release/lib/boost_system-vc140-mt-1_60.dll" `
 		"build/avx2/Release/lib/boost_python-vc140-mt-1_60.dll" "build/avx2/Release/lib/boost_system-vc140-mt-1_60.dll"
@@ -515,7 +515,7 @@ if (Test-Path $root/src-stage1-dependencies/libzmq/builds/msvc) {
 	if ((TryValidate "../../bin/x64/Release/v140/dynamic/libzmq.dll" "../../bin/x64/Release/v140/static/libzmq.lib" "../../bin/x64/Release/v140/ltcg/libzmq.lib" `
 	"../../bin/x64/Debug/v140/dynamic/libzmq.dll" "../../bin/x64/Debug/v140/static/libzmq.lib" "../../bin/x64/Debug/v140/ltcg/libzmq.lib") -eq $false) {
 		cd build
-		& .\buildbase.bat ..\vs2015\libzmq.sln 14 2>&1 >> $Log
+		& .\buildbase.bat ..\vs2015\libzmq.sln 14 *>> $Log
 		cd ../../../bin/x64
 		Validate "Release/v140/dynamic/libzmq.dll" "Release/v140/static/libzmq.lib" "Release/v140/ltcg/libzmq.lib" `
 			"Debug/v140/dynamic/libzmq.dll" "Debug/v140/static/libzmq.lib" "Debug/v140/ltcg/libzmq.lib"
@@ -530,7 +530,7 @@ if (Test-Path $root/src-stage1-dependencies/libzmq/builds/msvc) {
 	
 		#newer versions use cmake 
 		Write-Host ""
-		New-Item -ItemType Directory -Force $root\src-stage1-dependencies\libzmq\build 2>&1 >> $Log 
+		New-Item -ItemType Directory -Force $root\src-stage1-dependencies\libzmq\build *>> $Log 
 		cd build
 		
 		Function MakeLibZMQ {
@@ -542,11 +542,11 @@ if (Test-Path $root/src-stage1-dependencies/libzmq/builds/msvc) {
 				-Wno-dev `
 				-G "Visual Studio 14 Win64" `
 				-DCMAKE_BUILD_TYPE="$type" `
-				-DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/libzmq/bin/$type/" 2>&1 >> $Log 
+				-DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/libzmq/bin/$type/" *>> $Log 
 			Write-Host -NoNewline "building..."
-			msbuild ".\ZeroMQ.sln" /m /p:"configuration=$type;platform=x64" 2>&1 >> $Log 
+			msbuild ".\ZeroMQ.sln" /m /p:"configuration=$type;platform=x64" *>> $Log 
 			Write-Host -NoNewline "installing..."
-			msbuild .\INSTALL.vcxproj /m /p:"configuration=$type;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+			msbuild .\INSTALL.vcxproj /m /p:"configuration=$type;platform=x64;BuildProjectReferences=false" *>> $Log
 			$env:_CL_ = ""
 			Validate "../bin/$type/bin/libzmq-v140-mt$flag-$libzmquv.dll" "../bin/$type/lib/libzmq-v140-mt$flag-$libzmquv.lib" "../bin/$type/lib/libzmq-v140-mt-s$sflag-$libzmquv.lib" 
 		}
@@ -599,15 +599,15 @@ Function MakeQt
 	if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 "} else {$env:_CL_ =""}
 	New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt4/build/$type/bin >> $Log
 	cp -Force $root\src-stage1-dependencies/Qt4/bin/qmake.exe $root/src-stage1-dependencies/Qt4/build/$type/bin
-	.\configure.exe $flags $staticflag -prefix $root/src-stage1-dependencies/Qt4/build/$type -platform win32-msvc2015 -opensource -confirm-license -qmake -ltcg -nomake examples -nomake network -nomake demos -nomake tools -nomake sql -no-script -no-scripttools -no-qt3support -sse2 -directwrite -mp -qt-libpng -qt-libjpeg -opengl desktop -graphicssystem opengl -no-webkit -qt-sql-sqlite -plugin-sql-sqlite -openssl -L "$root\src-stage1-dependencies\openssl\build\x64\$ssltype" -l ssleay32 -l libeay32 -l crypt32 -l kernel32 -l user32 -l gdi32 -l winspool -l comdlg32 -l advapi32 -l shell32 -l ole32 -l oleaut32 -l uuid -l odbc32 -l odbccp32 -l advapi32 OPENSSL_LIBS="-L$root\src-stage1-dependencies\openssl\build\x64\$ssltype -lssleay32 -llibeay32" -I "$root\src-stage1-dependencies\openssl\build\x64\$ssltype\Include" -make nmake  2>&1 >> $Log
+	.\configure.exe $flags $staticflag -prefix $root/src-stage1-dependencies/Qt4/build/$type -platform win32-msvc2015 -opensource -confirm-license -qmake -ltcg -nomake examples -nomake network -nomake demos -nomake tools -nomake sql -no-script -no-scripttools -no-qt3support -sse2 -directwrite -mp -qt-libpng -qt-libjpeg -opengl desktop -graphicssystem opengl -no-webkit -qt-sql-sqlite -plugin-sql-sqlite -openssl -L "$root\src-stage1-dependencies\openssl\build\x64\$ssltype" -l ssleay32 -l libeay32 -l crypt32 -l kernel32 -l user32 -l gdi32 -l winspool -l comdlg32 -l advapi32 -l shell32 -l ole32 -l oleaut32 -l uuid -l odbc32 -l odbccp32 -l advapi32 OPENSSL_LIBS="-L$root\src-stage1-dependencies\openssl\build\x64\$ssltype -lssleay32 -llibeay32" -I "$root\src-stage1-dependencies\openssl\build\x64\$ssltype\Include" -make nmake  *>> $Log
 	$env:_CL_ = $env:_CL_  + " /Zi /EHsc "
 	$env:_LINK_ = " /DEBUG:FULL "
 	Write-Host -NoNewline "building..."
-	nmake 2>&1 >> $Log
+	nmake *>> $Log
 	Write-Host -NoNewline "installing..."
-	nmake install 2>&1 >> $Log 
+	nmake install *>> $Log 
 	Copy-Item -Force $root\src-stage1-dependencies/Qt4/lib/*.pdb  $root/src-stage1-dependencies/Qt4/build/$type/lib
-	nmake confclean 2>&1 >> $Log
+	nmake confclean *>> $Log
 	$env:_CL_  = ""
 	Write-Host "done"
 }
@@ -627,15 +627,15 @@ if ((TryValidate "build/DebugDLL/bin/qmake.exe" "build/DebugDLL/lib/QtCored4.dll
 	# more experimentation needed.
 	if (Test-Path $root/src-stage1-dependencies/Qt4/Makefile) 
 	{
-		nmake clean 2>&1 >> $Log
-		nmake confclean 2>&1 >> $Log
-		nmake distclean 2>&1 >> $Log
+		nmake clean *>> $Log
+		nmake confclean *>> $Log
+		nmake distclean *>> $Log
 	}
 	# The below configure builds the base qmake.exe in the "root" directory and will point the environment to the main source tree.  Then the following build commands will convince Qt to build in a different directory
 	# while still using the original as the source base.  THIS IS A HACK.  Qt4 does not like there to be more than one build on the same machine and is very troublesome in that regard.
 	# If there are build fails, wipe the whole Qt4 directory and start over.  confclean doesn't do everything it promises.
-	.\configure.exe -opensource -confirm-license -platform win32-msvc2015 -qmake -make nmake -prefix .  -nomake examples -nomake network -nomake demos -nomake tools -nomake sql -no-script -no-scripttools -no-qt3support -sse2 -directwrite -mp 2>&1 >> $Log
-	nmake confclean 2>&1 >> $Log
+	.\configure.exe -opensource -confirm-license -platform win32-msvc2015 -qmake -make nmake -prefix .  -nomake examples -nomake network -nomake demos -nomake tools -nomake sql -no-script -no-scripttools -no-qt3support -sse2 -directwrite -mp *>> $Log
+	nmake confclean *>> $Log
 	# debugDLL build
 	MakeQT "DebugDLL"
 	# release AVX2 DLL build
@@ -671,8 +671,8 @@ Function MakeQt5
 	$debug = if ($type -match "Debug") {"d"} else {""}
 	$staticflag = if ($type -match "DLL") {"-shared"} else {"-static"}
 	if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 "; $archflags=@('-sse3','-ssse3','-sse4.1','-sse4.2','-avx','-avx2')} else {$env:_CL_ = ""; $archflags=""}
-    New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Build 2>&1 >> $Log
-    New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Stage 2>&1 >> $Log
+    New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Build *>> $Log
+    New-Item -ItemType Directory -Force -Path $root/src-stage1-dependencies/Qt5Stage *>> $Log
 	cd $root/src-stage1-dependencies/Qt5Build
 	if ((TryValidate "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/qmake.exe" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Core$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5OpenGL$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Svg$debug.dll" "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/Qt5Gui$debug.dll") -eq $false) {
 		if (Test-Path  $root/src-stage1-dependencies/Qt5/build/$type) {rm -r -Force $root/src-stage1-dependencies/Qt5/build/$type}
@@ -693,10 +693,10 @@ Function MakeQt5
 			-skip qtlocation -skip qtgamepad -skip qtnetworkauth -skip qtspeech -skip qtwayland -skip qtmacextras -skip qtremoteobjects `
 			-nomake examples -nomake tools -nomake tests `
 			-platform win32-msvc -opensource -confirm-license $archflags -sse2 -ltcg -directwrite -mp -qt-libpng -qt-libjpeg -opengl desktop `
-			-no-securetransport -openssl -L "$root\src-stage1-dependencies\openssl\build\x64\$ssltype" -I "$root\src-stage1-dependencies\openssl\build\x64\$ssltype\Include"  2>&1 >> $Log
+			-no-securetransport -openssl -L "$root\src-stage1-dependencies\openssl\build\x64\$ssltype" -I "$root\src-stage1-dependencies\openssl\build\x64\$ssltype\Include"  *>> $Log
 		Write-Host -NoNewline "building..."
-		nmake 2>&1 >> $Log
-		nmake install 2>&1 >> $Log
+		nmake *>> $Log
+		nmake install *>> $Log
 		$env:_CL_ = ""
         cd $root/src-stage1-dependencies/Qt5Stage/build/$type
 		Validate "bin/qmake.exe" "bin/Qt5Core$debug.dll" "bin/Qt5OpenGL$debug.dll" "bin/Qt5Svg$debug.dll" "bin/Qt5Gui$debug.dll"
@@ -734,11 +734,11 @@ SetLog "Qwt"
 Write-Host -NoNewline "building qwt5..."
 Function MakeQwt {
 	Write-Host -NoNewLine $args[0]"..."
-	nmake /NOLOGO clean 2>&1 >> $Log
-	nmake /NOLOGO distclean 2>&1 >> $Log
-	Invoke-Expression $command 2>&1 >> $Log
-	nmake /NOLOGO 2>&1 >>  $Log
-	nmake /NOLOGO install 2>&1 >> $Log
+	nmake /NOLOGO clean *>> $Log
+	nmake /NOLOGO distclean *>> $Log
+	Invoke-Expression $command *>> $Log
+	nmake /NOLOGO *>>  $Log
+	nmake /NOLOGO install *>> $Log
 }
 $ErrorActionPreference = "Continue"
 
@@ -876,7 +876,7 @@ Function MakeQwtPlot3d {
 	cd $root\src-stage1-dependencies\qwtplot3d
 	Write-Host -NoNewline "building QwtPlot3d $configuration..."
 	if ((TryValidate "build/$configuration/qwtplot3d.dll") -eq $false) {
-		New-Item -Force -ItemType Directory build/$configuration  2>&1 >> $Log  
+		New-Item -Force -ItemType Directory build/$configuration  *>> $Log  
 		if ($configuration -match "Debug") {$buildconfig="Debug"; $debug = "d"} else {$buildconfig="Release"; $debug = ""}
         if ($mm -eq "3.8") {
             $env:QMAKESPEC = "win32-msvc"
@@ -906,10 +906,10 @@ Function MakeQwtPlot3d {
         }
 		$env:Path = "${env:ProgramFiles(x86)}\Microsoft Visual Studio 14.0\VC\bin\amd64;$root\src-stage1-dependencies\Qt4\build\$configDLL\bin;" +  $oldPath
 		$ErrorActionPreference = "Continue"
-		& qmake.exe qwtplot3d.pro "CONFIG += zlib"  2>&1 >> $Log  
+		& qmake.exe qwtplot3d.pro "CONFIG += zlib"  *>> $Log  
 		# this invocation of qmake seems to get confused about what version of msvc to build for so we need to manually upgrade
-		devenv qwtplot3d.vcxproj /Upgrade 2>&1 >> $Log  
-		msbuild .\qwtplot3d.vcxproj /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log  
+		devenv qwtplot3d.vcxproj /Upgrade *>> $Log  
+		msbuild .\qwtplot3d.vcxproj /m /p:"configuration=$buildconfig;platform=x64" *>> $Log  
 		Move-Item -Force lib/qwtplot3d.lib build/$configuration
 		Move-Item -Force lib/qwtplot3d.dll build/$configuration
 		Move-Item -Force lib/qwtplot3d.exp build/$configuration
@@ -937,12 +937,12 @@ SetLog "Mako"
 Write-Host -NoNewline "installing Mako using pip..."
 if ((TryValidate "$root\src-stage2-python\gr-python27\lib\site-packages\mako" "$root\src-stage2-python\gr-python27-avx2\lib\site-packages\mako" "$root\src-stage2-python\gr-python27-debug\lib\site-packages\mako") -eq $false) {
 	$pythonroot = "$root\src-stage2-python\gr-python27"
-	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install mako -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install mako -U -t $pythonroot\lib\site-packages *>> $log
 	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
-	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install mako -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install mako -U -t $pythonroot\lib\site-packages *>> $log
 	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
 	$ErrorActionPreference = "Continue" # pip will "error" on debug
-	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install mako -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --disable-pip-version-check -v install mako -U -t $pythonroot\lib\site-packages *>> $log
 	$ErrorActionPreference = "Stop"
 	"complete"
 } else {
@@ -958,12 +958,12 @@ SetLog "Requests"
 Write-Host -NoNewline "installing Requests using pip..."
 if ((TryValidate "$root\src-stage2-python\gr-python27\lib\site-packages\requests" "$root\src-stage2-python\gr-python27-avx2\lib\site-packages\requests" "$root\src-stage2-python\gr-python27-debug\lib\site-packages\requests") -eq $false) {
 	$pythonroot = "$root\src-stage2-python\gr-python27"
-	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages *>> $log
 	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
-	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages *>> $log
 	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
 	$ErrorActionPreference = "Continue" # pip will "error" on debug
-	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+	& $pythonroot/Scripts/pip.exe --no-cache-dir --disable-pip-version-check -v install requests -U -t $pythonroot\lib\site-packages *>> $log
 	$ErrorActionPreference = "Stop"
 	"complete"
 } else {
@@ -980,7 +980,7 @@ SetLog "UHD"
 Write-Host "building uhd..."
 $ErrorActionPreference = "Continue"
 cd $root\src-stage1-dependencies\uhd\host
-New-Item -ItemType Directory -Force -Path .\build  2>&1 >> $Log
+New-Item -ItemType Directory -Force -Path .\build  *>> $Log
 cd build 
 
 Function makeUHD {
@@ -1001,12 +1001,12 @@ Function makeUHD {
 			-DBoost_INCLUDE_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/include/boost-1_60" `
 			-DBoost_LIBRARY_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/lib" `
 			-DLIBUSB_INCLUDE_DIRS="$root/src-stage1-dependencies/libusb/libusb" `
-			-DLIBUSB_LIBRARIES="$root/src-stage1-dependencies/libusb/x64/$configuration/lib/libusb-1.0.lib" 2>&1 >> $Log 
+			-DLIBUSB_LIBRARIES="$root/src-stage1-dependencies/libusb/x64/$configuration/lib/libusb-1.0.lib" *>> $Log 
 		Write-Host -NoNewline "building..."
-		msbuild .\UHD.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log 
+		msbuild .\UHD.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log 
 		Write-Host -NoNewline "installing..."
-		& cmake -DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/uhd\dist\$configuration" -DBUILD_TYPE="$buildconfig" -P cmake_install.cmake 2>&1 >> $Log
-		New-Item -ItemType Directory -Path $root/src-stage1-dependencies/uhd\dist\$configuration\share\uhd\examples\ -Force 2>&1 >> $Log
+		& cmake -DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/uhd\dist\$configuration" -DBUILD_TYPE="$buildconfig" -P cmake_install.cmake *>> $Log
+		New-Item -ItemType Directory -Path $root/src-stage1-dependencies/uhd\dist\$configuration\share\uhd\examples\ -Force *>> $Log
 		cp -Recurse -Force $root/src-stage1-dependencies/uhd/host/build/examples/$buildconfig/* $root/src-stage1-dependencies/uhd\dist\$configuration\share\uhd\examples\
 		Validate "..\..\dist\$configuration\bin\uhd.dll" "..\..\dist\$configuration\lib\uhd.lib" "..\..\dist\$configuration\include\uhd.h"
 		$env:_CL_ = ""
@@ -1075,7 +1075,7 @@ if (!$BuildNumpyWithMKL -or $true) {
 		if ($configuration -match "Debug") {$cmakebuildtype = "Debug"; $debug="ON"} else {$cmakebuildtype = "Release"; $debug="OFF"}
 		if ($configuration -match "AVX2") {$env:_CL_ = " -D__64BIT__ /arch:AVX2 "} else {$env:_CL_ = " -D__64BIT__ "}
 		Write-Host -NoNewline "  configuring $configuration..."
-		New-Item -ItemType Directory -Force $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration 2>&1 >> $Log 
+		New-Item -ItemType Directory -Force $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration *>> $Log 
 		cd $root\src-stage1-dependencies\openblas-$openblas_version\build\$configuration
 		if ((TryValidate "lib\libopenblas.lib" "lib\libopenblas.dll" "lib\libopenblas_static.lib") -eq $false) {
 			cmake ..\..\ `
@@ -1087,11 +1087,11 @@ if (!$BuildNumpyWithMKL -or $true) {
 				-DCMAKE_Fortran_COMPILER="ifort" `
 				-DCMAKE_Fortran_FLAGS=" /assume:underscore /names:lowercase " `
 				-DNO_LAPACKE="1" `
-				-DNO_LAPACK="1"  2>&1 >> $Log 
+				-DNO_LAPACK="1"  *>> $Log 
 			$env:__INTEL_POST_FFLAGS = " /assume:underscore /names:lowercase "
 			Write-Host -NoNewline "building..."
-			msbuild .\OpenBLAS.sln /m /p:"configuration=$cmakebuildtype;platform=x64" 2>&1 >> $Log 
-			cp $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration\lib\$cmakebuildtype\libopenblas.lib $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration\lib\libopenblas_static.lib 2>&1 >> $Log 
+			msbuild .\OpenBLAS.sln /m /p:"configuration=$cmakebuildtype;platform=x64" *>> $Log 
+			cp $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration\lib\$cmakebuildtype\libopenblas.lib $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration\lib\libopenblas_static.lib *>> $Log 
 			$env:_CL_ = ""
 			$env:__INTEL_POST_FFLAGS = ""
 			Validate "lib\libopenblas.lib" "lib\libopenblas.dll" "lib\libopenblas_static.lib"
@@ -1120,7 +1120,7 @@ if (!$BuildNumpyWithMKL -and $hasIFORT) {
 		if ($configuration -match "Debug") {$cmakebuildtype = "Debug"} else {$cmakebuildtype = "Release"}
 		if ($configuration -match "AVX2") {$env:_CL_ = " /arch:AVX2 "} else {$env:_CL_ = ""}
 		Write-Host -NoNewline "  configuring $configuration..."
-		New-Item -ItemType Directory -Force $root\src-stage1-dependencies\lapack\build\$configuration 2>&1 >> $Log 
+		New-Item -ItemType Directory -Force $root\src-stage1-dependencies\lapack\build\$configuration *>> $Log 
 		cd $root\src-stage1-dependencies\lapack\build\$configuration
 		if ((TryValidate "../../dist/$configuration/lib/blas.lib" "../../dist/$configuration/lib/lapack.lib") -eq $false) {
 			cmake ..\..\ `
@@ -1129,15 +1129,15 @@ if (!$BuildNumpyWithMKL -and $hasIFORT) {
 				-DCMAKE_BUILD_TYPE="$cmakebuildtype" `
 				-DPYTHON_EXECUTABLE="$pythonroot\$pythonexe" `
 				-DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/lapack/dist/$configuration/" `
-				-DCMAKE_Fortran_FLAGS=" /assume:underscore /names:lowercase " 2>&1 >> $Log 
+				-DCMAKE_Fortran_FLAGS=" /assume:underscore /names:lowercase " *>> $Log 
 			$env:__INTEL_POST_FFLAGS = " /assume:underscore /names:lowercase "
 			Write-Host -NoNewline "building..."
 			# use devenv instead of msbuild because of vfproj files unsupported by msbuild
-			devenv .\lapack.sln /project lapack /rebuild "$cmakebuildtype|x64"  2>&1 >> $Log 
-			devenv .\lapack.sln /project blas /rebuild "$cmakebuildtype|x64"  2>&1 >> $Log 
+			devenv .\lapack.sln /project lapack /rebuild "$cmakebuildtype|x64"  *>> $Log 
+			devenv .\lapack.sln /project blas /rebuild "$cmakebuildtype|x64"  *>> $Log 
 			Write-Host -NoNewline "packaging..."
 			# don't run the INSTALL vcproj because it will fail because the dependencies won't link
-			cmake -DBUILD_TYPE="$cmakebuildtype" -P cmake_install.cmake 2>&1 >> $Log 
+			cmake -DBUILD_TYPE="$cmakebuildtype" -P cmake_install.cmake *>> $Log 
 			$env:_CL_ = ""
 			$env:__INTEL_POST_FFLAGS = ""
 			Validate "../../dist/$configuration/lib/blas.lib" "../../dist/$configuration/lib/lapack.lib"
@@ -1164,7 +1164,7 @@ function MakembedTLS {
 	if ($configuration -match "AVX2") {$env:_CL_ = " /arch:AVX2 "} else {$env:_CL_ = ""}
 	if ($configuration -match "DLL") {$DLL = "ON"} else {$DLL = "OFF"}
 	Write-Host -NoNewline "  configuring $configuration..."
-	New-Item -ItemType Directory -Force $root\src-stage1-dependencies\mbedtls-mbedtls-$mbedtls_version\build\$configuration 2>&1 >> $Log 
+	New-Item -ItemType Directory -Force $root\src-stage1-dependencies\mbedtls-mbedtls-$mbedtls_version\build\$configuration *>> $Log 
 	cd $root\src-stage1-dependencies\mbedtls-mbedtls-$mbedtls_version\build\$configuration
 	if (((TryValidate "..\..\dist\$configuration\lib\mbedtls.dll") -eq $false -and ($DLL -eq "ON")) -or `
 		((TryValidate "..\..\dist\$configuration\lib\mbedtls.lib") -eq $false)) {
@@ -1174,11 +1174,11 @@ function MakembedTLS {
 			-DENABLE_TESTING="ON" `
 			-DCMAKE_BUILD_TYPE="$cmakebuildtype" `
 			-DUSE_SHARED_MBEDTLS_LIBRARY="$DLL" `
-			-DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/mbedtls-mbedtls-$mbedtls_version/dist/$configuration/" 2>&1 >> $Log 
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage1-dependencies/mbedtls-mbedtls-$mbedtls_version/dist/$configuration/" *>> $Log 
 		Write-Host -NoNewline "building..."
-		msbuild ".\mbed TLS.sln" /m /p:"configuration=$debug;platform=x64" 2>&1 >> $Log 
+		msbuild ".\mbed TLS.sln" /m /p:"configuration=$debug;platform=x64" *>> $Log 
 		Write-Host -NoNewline "installing..."
-		msbuild .\INSTALL.vcxproj /m /p:"configuration=$debug;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$debug;platform=x64;BuildProjectReferences=false" *>> $Log
 		$env:_CL_ = ""
 		if ($configuration -match "DLL") {
 			Validate "..\..\dist\$configuration\lib\mbedtls.lib" "..\..\dist\$configuration\lib\mbedtls.dll" 
@@ -1198,7 +1198,6 @@ MakembedTLS "ReleaseDLL"
 MakembedTLS "ReleaseDLL-AVX2"
 	
 # Build GNURadio 3.8+ dependencies only if applicable
-$mm = GetMajorMinor($gnuradio_version)
 if ($mm -eq "3.8") {
 
 # ____________________________________________________________________________________________________________
@@ -1231,12 +1230,12 @@ if ($mm -eq "3.8") {
 		"../dll/x64/Debug/mpir.dll" "../dll/x64/Debug/mpir.lib"  "../dll/x64/Debug/mpir.pdb" `
 		"../lib/x64/Release/mpirxx.lib" "../lib/x64/Release/mpir.lib"  "../lib/x64/Release/mpir.pdb" `
 		"../lib/x64/Debug/mpirxx.lib" "../lib/x64/Debug/mpir.lib"  "../lib/x64/Debug/mpir.pdb"		) -eq $false) {
-		./msbuild.bat gc dll x64 release 2>&1 >> $Log
-		./msbuild.bat gc dll x64 debug 2>&1 >> $Log
-		./msbuild.bat gc lib x64 release 2>&1 >> $Log
-		./msbuild.bat gc lib x64 debug 2>&1 >> $Log
-		./msbuild.bat cxx lib x64 release 2>&1 >> $Log
-		./msbuild.bat cxx lib x64 debug 2>&1 >> $Log
+		./msbuild.bat gc dll x64 release *>> $Log
+		./msbuild.bat gc dll x64 debug *>> $Log
+		./msbuild.bat gc lib x64 release *>> $Log
+		./msbuild.bat gc lib x64 debug *>> $Log
+		./msbuild.bat cxx lib x64 release *>> $Log
+		./msbuild.bat cxx lib x64 debug *>> $Log
 		Validate "../dll/x64/Release/mpir.dll" "../dll/x64/Release/mpir.lib"  "../dll/x64/Release/mpir.pdb" `
 		"../dll/x64/Debug/mpir.dll" "../dll/x64/Debug/mpir.lib"  "../dll/x64/Debug/mpir.pdb"`
 		"../lib/x64/Release/mpirxx.lib" "../lib/x64/Release/mpir.lib"  "../lib/x64/Release/mpir.pdb" `

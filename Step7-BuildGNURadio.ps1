@@ -119,30 +119,30 @@ function BuildGNURadio {
 	# NOW we build gnuradio finally
 	Write-Host -NoNewline "Build GNURadio $configuration..."
 	Write-Host -NoNewline "building..." 
-	msbuild .\gnuradio.sln /m /p:"configuration=$buildtype;platform=x64" 2>&1 >> $Log 
+	msbuild .\gnuradio.sln /m /p:"configuration=$buildtype;platform=x64" *>> $Log 
 	Write-Host -NoNewline "staging install..."
-	msbuild INSTALL.vcxproj  /m  /p:"configuration=$buildtype;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log 
+	msbuild INSTALL.vcxproj  /m  /p:"configuration=$buildtype;platform=x64;BuildProjectReferences=false" *>> $Log 
 
 	# Then combine it into a useable staged install with the dependencies it will need
 	Write-Host -NoNewline "moving add'l libraries..."
-	cp -Recurse -Force $root/build/$configuration/lib/*.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
+	cp -Recurse -Force $root/build/$configuration/lib/*.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
 	if ($mm -eq "3.8")
 	{
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Svg.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5OpenGL.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Widgets.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Gui.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Core.dll $root\src-stage3\staged_install\$configuration\bin\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/lib/gobject-introspection $root\src-stage3\staged_install\$configuration\lib\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/lib/girepository-1.0 $root\src-stage3\staged_install\$configuration\lib\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/lib/gdk-pixbuf-2.0 $root\src-stage3\staged_install\$configuration\lib\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/share/glib-2.0 $root\src-stage3\staged_install\$configuration\share\  2>&1 >> $Log 
-		cp -Recurse -Force $root/build/$configuration/share/gir-1.0 $root\src-stage3\staged_install\$configuration\share\  2>&1 >> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Svg.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5OpenGL.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Widgets.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Gui.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/bin/Qt5Core.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/lib/gobject-introspection $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/lib/girepository-1.0 $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/lib/gdk-pixbuf-2.0 $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/share/glib-2.0 $root\src-stage3\staged_install\$configuration\share\  *>> $Log 
+		cp -Recurse -Force $root/build/$configuration/share/gir-1.0 $root\src-stage3\staged_install\$configuration\share\  *>> $Log 
 	}
 	"complete"
 
 	Write-Host -NoNewline "moving python..."
-	Copy-Item -Force -Recurse -Path $pythonroot $root/src-stage3/staged_install/$configuration  2>&1 >> $Log
+	Copy-Item -Force -Recurse -Path $pythonroot $root/src-stage3/staged_install/$configuration  *>> $Log
 	if ((Test-Path $root/src-stage3/staged_install/$configuration/gr-python27) -and (($pythonroot -match "avx2") -or ($pythonroot -match "debug"))) 
 	{
 		del -Recurse -Force $root/src-stage3/staged_install/$configuration/gr-python27
@@ -151,14 +151,14 @@ function BuildGNURadio {
 	if ($pythonroot -match "debug") {Rename-Item $root/src-stage3/staged_install/$configuration/gr-python27-debug $root/src-stage3/staged_install/$configuration/gr-python27}
 	if ($configuration -match "debug") {
 		# calls python_d.exe instead
-		Copy-Item -Force -Path $root\src-stage3\src\run_gr_d.bat $root/src-stage3/staged_install/$configuration/bin/run_gr.bat  2>&1 >> $Log
+		Copy-Item -Force -Path $root\src-stage3\src\run_gr_d.bat $root/src-stage3/staged_install/$configuration/bin/run_gr.bat  *>> $Log
 	} else {
-		Copy-Item -Force -Path $root\src-stage3\src\run_gr.bat $root/src-stage3/staged_install/$configuration/bin  2>&1 >> $Log
+		Copy-Item -Force -Path $root\src-stage3\src\run_gr.bat $root/src-stage3/staged_install/$configuration/bin  *>> $Log
 	}
-	Copy-Item -Force -Path $root\src-stage3\src\run_GRC.bat $root/src-stage3/staged_install/$configuration/bin  2>&1 >> $Log
-	Copy-Item -Force -Path $root\src-stage3\src\run_gqrx.bat $root/src-stage3/staged_install/$configuration/bin  2>&1 >> $Log
-	Copy-Item -Force -Path $root\src-stage3\src\gr_filter_design.bat $root/src-stage3/staged_install/$configuration/bin  2>&1 >> $Log
-	Copy-Item -Force -Recurse -Path $root\src-stage3\icons $root/src-stage3/staged_install/$configuration/share  2>&1 >> $Log
+	Copy-Item -Force -Path $root\src-stage3\src\run_GRC.bat $root/src-stage3/staged_install/$configuration/bin  *>> $Log
+	Copy-Item -Force -Path $root\src-stage3\src\run_gqrx.bat $root/src-stage3/staged_install/$configuration/bin  *>> $Log
+	Copy-Item -Force -Path $root\src-stage3\src\gr_filter_design.bat $root/src-stage3/staged_install/$configuration/bin  *>> $Log
+	Copy-Item -Force -Recurse -Path $root\src-stage3\icons $root/src-stage3/staged_install/$configuration/share  *>> $Log
 
 	# the swig libraries aren't properly named for the debug build, so do it here
 	# We will repeat for the OOT modules	
@@ -194,8 +194,8 @@ function BuildGNURadio {
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration/" `
 		-Wno-dev
 	$ErrorActionPreference = "Stop"
-	msbuild .\gr-howto.sln /m /p:"configuration=$buildtype;platform=x64" 2>&1 >> $Log
-	msbuild INSTALL.vcxproj  /m  /p:"configuration=$buildtype;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\gr-howto.sln /m /p:"configuration=$buildtype;platform=x64" *>> $Log
+	msbuild INSTALL.vcxproj  /m  /p:"configuration=$buildtype;platform=x64;BuildProjectReferences=false" *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	

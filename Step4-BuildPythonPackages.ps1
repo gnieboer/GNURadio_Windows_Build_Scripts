@@ -57,11 +57,11 @@ Function MakeSip
 		"FLAGS: $kflag $dflag" >> $Log 
 		"command line : configure.py $dflag $kflag -p win32-msvc2015" >> $Log
 		Write-Host -NoNewline "configuring..."
-		& $pythonroot\python$debugext.exe configure.py $dflag $kflag --platform win32-msvc2015 2>&1 >> $Log
+		& $pythonroot\python$debugext.exe configure.py $dflag $kflag --platform win32-msvc2015 *>> $Log
 		Write-Host -NoNewline "building..."
-		nmake clean 2>&1 >> $Log
-		nmake 2>&1 >> $Log
-		New-Item -ItemType Directory -Force -Path ./build/x64/$type 2>&1 >> $Log
+		nmake clean *>> $Log
+		nmake *>> $Log
+		New-Item -ItemType Directory -Force -Path ./build/x64/$type *>> $Log
 		cd siplib
 		if ($type -match "Dll") {
 			copy sip$debugext.pyd ../build/x64/$type/sip$debugext.pyd
@@ -80,10 +80,10 @@ Function MakeSip
 		if ($type -match "Dll") {
 			Write-Host -NoNewline "installing..."
 			copy sipconfig.py ./build/x64/$type/sipconfig.py
-    		nmake install 2>&1 >> $Log
+    		nmake install *>> $Log
 			Validate "$pythonroot/sip.exe" "$pythonroot/include/sip.h" "$pythonroot/lib/site-packages/sip$debugext.pyd" 
 		}
-		nmake clean 2>&1 >> $Log
+		nmake clean *>> $Log
 		$env:_CL_ = ""
 	} else {
 		Write-Host "already built"
@@ -127,16 +127,16 @@ function MakePyQt
 		$env:_LINK_= ""
 		$env:Path = "$root\src-stage1-dependencies\Qt4\build\$type\bin;" + $oldpath
 
-		& $pythonroot\$thispython configure.py $flags --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg -b build/x64/$type/bin -d build/x64/$type/package -p build/x64/$type/plugins --sipdir build/x64/$type/sip 2>&1 >> $log
+		& $pythonroot\$thispython configure.py $flags --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg -b build/x64/$type/bin -d build/x64/$type/package -p build/x64/$type/plugins --sipdir build/x64/$type/sip *>> $log
 
 		# BUG FIX
 		"all: ;" > .\pylupdate\Makefile
 		"install : ;" >> .\pylupdate\Makefile
 		"clean : ;" >> .\pylupdate\Makefile
 
-		nmake 2>&1 >> $log
-		nmake install 2>&1 >> $log
-		nmake clean 2>&1 >> $log
+		nmake *>> $log
+		nmake install *>> $log
+		nmake clean *>> $log
 		$env:_CL_ = ""
 		$env:_LINK_ = ""
 		Write-Host -NoNewline "-done..."
@@ -185,16 +185,16 @@ if ($mm -eq "3.8") {
 			$env:_LINK_= ""
 			$env:Path = "$root\src-stage1-dependencies\Qt5\build\$type\bin;" + $oldpath
 
-			& $pythonroot\$thispython configure.py $flags --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtCore --enable QtOpenGL --enable QtGui --enable QtWidgets  --enable QtSvg --spec win32-msvc2015 -b build/x64/$type/bin -d build/x64/$type/package  --sipdir build/x64/$type/sip --sip $pythonroot/sip.exe 2>&1 >> $log
+			& $pythonroot\$thispython configure.py $flags --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtCore --enable QtOpenGL --enable QtGui --enable QtWidgets  --enable QtSvg --spec win32-msvc2015 -b build/x64/$type/bin -d build/x64/$type/package  --sipdir build/x64/$type/sip --sip $pythonroot/sip.exe *>> $log
 
 			# BUG FIX
 			"all: ;" > .\pylupdate\Makefile
 			"install : ;" >> .\pylupdate\Makefile
 			"clean : ;" >> .\pylupdate\Makefile
 
-			nmake 2>&1 >> $log
-			nmake install 2>&1 >> $log
-			nmake clean 2>&1 >> $log
+			nmake *>> $log
+			nmake install *>> $log
+			nmake clean *>> $log
 			$env:_CL_ = ""
 			$env:_LINK_ = ""
 			Write-Host -NoNewline "-done..."
@@ -250,7 +250,7 @@ Function SetupPython
 		$env:QMAKESPEC = "win32-msvc2015"
 		$env:_LINK_= ""
 
-		& $pythonroot\$pythonexe configure.py $flags --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg  2>&1 >> $log
+		& $pythonroot\$pythonexe configure.py $flags --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg  *>> $log
 	
 		# BUG FIX
 		"all: ;" > .\pylupdate\Makefile
@@ -258,9 +258,9 @@ Function SetupPython
 		"clean : ;" >> .\pylupdate\Makefile 
 
 		Write-Host -NoNewline "building..."
-		Exec {nmake} 2>&1 >> $log
+		Exec {nmake} *>> $log
 		Write-Host -NoNewline "installing..."
-		Exec {nmake install} 2>&1 >> $log
+		Exec {nmake install} *>> $log
 		$env:Path = $oldpath
 		$env:_CL_ = ""
 		$env:_LINK_ = ""
@@ -285,13 +285,13 @@ Function SetupPython
 			$env:QMAKESPEC = "win32-msvc2015"
 			$env:_LINK_= ""
 
-			& $pythonroot\$pythonexe configure.py $flags --confirm-license --verbose --no-designer-plugin --enable QtCore --enable QtGui --enable QtOpenGL --enable QtSvg --enable QtWidgets --spec win32-msvc2015 --sip $pythonroot/sip.exe 2>&1 >> $log
+			& $pythonroot\$pythonexe configure.py $flags --confirm-license --verbose --no-designer-plugin --enable QtCore --enable QtGui --enable QtOpenGL --enable QtSvg --enable QtWidgets --spec win32-msvc2015 --sip $pythonroot/sip.exe *>> $log
 		
 		
 			Write-Host -NoNewline "building..."
-			Exec {nmake} 2>&1 >> $log
+			Exec {nmake} *>> $log
 			Write-Host -NoNewline "installing..."
-			Exec {nmake install} 2>&1 >> $log
+			Exec {nmake install} *>> $log
 			$env:Path = $oldpath
 			$env:_CL_ = ""
 			$env:_LINK_ = ""
@@ -313,9 +313,9 @@ Function SetupPython
 	if ((TryValidate "dist/Cython-$cython_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/Cython-$cython_version-py2.7-win-amd64.egg/cython.py" "$pythonroot/lib/site-packages/Cython-$cython_version-py2.7-win-amd64.egg/Cython/Compiler/Code$debugext.pyd" "$pythonroot/lib/site-packages/Cython-$cython_version-py2.7-win-amd64.egg/Cython/Distutils/build_ext.py") -eq $false) {
 		Write-Host -NoNewline "installing Cython..."
 		if ($configuration -match "Debug") { $env:_LINK_ = " /LIB:python27_d.lib " } else { $env:_LINK_="" }
-		& $pythonroot/$pythonexe setup.py build $debug install 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build $debug install *>> $log
 		Write-Host -NoNewline "creating wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel   2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel   *>> $log
 		$env:_LINK_ = ""
 		move dist/Cython-$cython_version-cp27-cp27${d}m-win_amd64.whl dist/Cython-$cython_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
 		$ErrorActionPreference = "Stop"
@@ -333,7 +333,7 @@ Function SetupPython
 	if ((TryValidate "$pythonroot/lib/site-packages/nose/core.py" "$pythonroot/lib/site-packages/nose/__main__.py") -eq $false) {
 		Write-Host -NoNewline "installing Nose using pip..."
 		$ErrorActionPreference = "Continue" # pip will "error" on debug
-		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install nose -U -t $pythonroot\lib\site-packages 2>&1 >> $log
+		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install nose -U -t $pythonroot\lib\site-packages *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "$pythonroot/lib/site-packages/nose/core.py" "$pythonroot/lib/site-packages/nose/__main__.py"
 	} else {
@@ -420,18 +420,18 @@ Function SetupPython
 		}
 		$env:VS90COMNTOOLS = $env:VS140COMNTOOLS
 		# clean doesn't really get it all...
-		del build/*.* -Recurse 2>&1 >> $log
-		& $pythonroot/$pythonexe setup.py clean  2>&1 >> $log
-		& $pythonroot/$pythonexe setup.py config --compiler=msvc2015 --fcompiler=intelvem  2>&1 >> $log
+		del build/*.* -Recurse *>> $log
+		& $pythonroot/$pythonexe setup.py clean  *>> $log
+		& $pythonroot/$pythonexe setup.py config --compiler=msvc2015 --fcompiler=intelvem  *>> $log
 		Write-Host -NoNewline "building..."
 		$env:_LINK_=" /NODEFAULTLIB:""LIBCMT.lib"" /NODEFAULTLIB:""LIBMMT.lib"" "
-		& $pythonroot/$pythonexe setup.py build $debug 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build $debug *>> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install *>> $log
 		# TODO This is a hack to move the openblas library into the right place.  We should either link statically or figure a better so install moves this for us
 		if (!($BuildNumpyWithMKL) -and ($static = $false)) { cp $root/src-stage1-dependencies/openblas/build/lib/$staticconfig/libopenblas.dll $pythonroot\lib\site-packages\numpy-$numpy_version-py2.7-win-amd64.egg\numpy\core }
 		Write-Host -NoNewline "creating wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel *>> $log
 		move dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.whl dist/numpy-$numpy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force 
 		$ErrorActionPreference = "Stop"
 		$env:_LINK_= ""
@@ -518,18 +518,18 @@ Function SetupPython
 			}
 			$env:VS90COMNTOOLS = $env:VS140COMNTOOLS
 			# clean doesn't really get it all...
-			del build/*.* -Recurse 2>&1 >> $log
-			& $pythonroot/$pythonexe setup.py clean  2>&1 >> $log
-			& $pythonroot/$pythonexe setup.py config --fcompiler=intelvem --compiler=msvc  2>&1 >> $log
+			del build/*.* -Recurse *>> $log
+			& $pythonroot/$pythonexe setup.py clean  *>> $log
+			& $pythonroot/$pythonexe setup.py config --fcompiler=intelvem --compiler=msvc  *>> $log
 			Write-Host -NoNewline "building..."
 			$env:_LINK_=" /NODEFAULTLIB:""LIBCMT.lib""  /NODEFAULTLIB:""LIBIFCOREMD.lib"" /DEFAULTLIB:""LIBIFCOREMT.lib"" /NODEFAULTLIB:""SVML_DISPMD.lib"" /DEFAULTLIB:""SVML_DISPMT.lib""  /NODEFAULTLIB:""LIBMMD.lib"" /DEFAULTLIB:""LIBMMDS.lib"" /DEFAULTLIB:""LIBMMT.lib"" /DEFAULTLIB:""libifport.lib"" /DEFAULTLIB:""legacy_stdio_definitions.lib"" /DEFAULTLIB:""libipgo.lib"" /DEFAULTLIB:""LIBIRC.lib""  "
 			# setup.py doesn't handle debug flag correctly for windows ifort, it adds a -g flag which is ambiguous so we'll do our best to emulate it manually
 			if ($configuration -match "Debug") {$env:__INTEL_POST_FFLAGS = " /debug:all "} else {$env:__INTEL_POST_FFLAGS = ""}
-			& $pythonroot/$pythonexe setup.py build --compiler=msvc --fcompiler=intelvem 2>&1 >> $log
+			& $pythonroot/$pythonexe setup.py build --compiler=msvc --fcompiler=intelvem *>> $log
 			Write-Host -NoNewline "installing..."
-			& $pythonroot/$pythonexe setup.py install  2>&1 >> $log
+			& $pythonroot/$pythonexe setup.py install  *>> $log
 			Write-Host -NoNewline "creating wheel..."
-			& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $log
+			& $pythonroot/$pythonexe setup.py bdist_wheel *>> $log
 			move dist/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.whl dist/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
 			$env:_LINK_=""
 			$env:__INTEL_POST_FFLAGS = ""
@@ -549,10 +549,10 @@ Function SetupPython
 			if ($BuildNumpyWithMKL) {
 				Write-Host -NoNewline "installing MKL scipy from wheel..."
 				Write-Host -NoNewline "Compatible Fortran compiler not available, installing scipy from custom binary wheel..."
-				& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install  --no-dependencies http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/mkl/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
+				& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install  --no-dependencies http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/mkl/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  *>> $log
 			} else {
 				Write-Host -NoNewline "installing OpenBLAS scipy from wheel..."
-				& $pythonroot/Scripts/pip.exe  --disable-pip-version-check  install --no-dependencies http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/openBLAS/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  2>&1 >> $log
+				& $pythonroot/Scripts/pip.exe  --disable-pip-version-check  install --no-dependencies http://www.gcndevelopment.com/gnuradio/downloads/libraries/scipy/openBLAS/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -U -t $pythonroot\lib\site-packages  *>> $log
 			}
 			$ErrorActionPreference = "Stop"
 			Validate "$pythonroot/lib/site-packages/scipy/linalg/_flapack.pyd"  "$pythonroot/lib/site-packages/scipy/linalg/cython_lapack.pyd"  "$pythonroot/lib/site-packages/scipy/sparse/_sparsetools.pyd"
@@ -580,26 +580,26 @@ Function SetupPython
 		# CALL "../../%1/Release/Python27/python.exe" configure.py %DEBUG% --extra-cflags=%FLAGS% %DEBUG% -I %~dp0..\qwt-5.2.3\build\include -L %~dp0..\Qt-4.8.7\lib -L %~dp0..\qwt-5.2.3\build\lib -l%QWT_LIB%
 		if ($configuration -eq "DebugDLL") {
 			$env:_LINK_ = " /FORCE /LIBPATH:""$root/src-stage1-dependencies/Qt4/build/ReleaseDLL/lib"" /LIBPATH:""$root/src-stage1-dependencies/Qt4/build/Release-AVX2/lib"" /DEFAULTLIB:user32  /DEFAULTLIB:advapi32  /DEFAULTLIB:ole32  /DEFAULTLIB:ws2_32  /DEFAULTLIB:qtcored4 " 
-			& $pythonroot/$pythonexe configure.py --debug --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\$QtVersion\lib   -l qtcored4     -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwtd" -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Debug --sip-include-dirs ..\..\PyQt4\sip 2>&1 >> $log
+			& $pythonroot/$pythonexe configure.py --debug --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\$QtVersion\lib   -l qtcored4     -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwtd" -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Debug --sip-include-dirs ..\..\PyQt4\sip *>> $log
 		} elseif ($configuration -eq "ReleaseDLL") {
-			& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL\lib -l qtcore4       -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwt"  -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release 2>&1 >> $log
+			& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL\lib -l qtcore4       -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwt"  -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release *>> $log
 		} else {
-			& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -Ox -arch:AVX2 -wd4577" -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\include  -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL-AVX2\lib -l qtcore4  -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib  -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib\qwt"   -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release-AVX2 2>&1 >> $log
+			& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -Ox -arch:AVX2 -wd4577" -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\include  -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL-AVX2\lib -l qtcore4  -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib  -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib\qwt"   -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release-AVX2 *>> $log
 		}
-		nmake clean 2>&1 >> $log
+		nmake clean *>> $log
 		Write-Host -NoNewline "building..."
-		Exec {nmake} 2>&1 >> $log
+		Exec {nmake} *>> $log
 		Write-Host -NoNewline "installing..."
-		Exec {nmake install} 2>&1 >> $log
-		#& $pythonroot/$pythonexe setup.py build 2>&1 >> $log
+		Exec {nmake install} *>> $log
+		#& $pythonroot/$pythonexe setup.py build *>> $log
 		#Write-Host -NoNewline "installing..."
-		#& $pythonroot/$pythonexe setup.py install 2>&1 >> $log
+		#& $pythonroot/$pythonexe setup.py install *>> $log
 		Write-Host -NoNewline "creating winstaller..."
 		cd ..
-		& $pythonroot/$pythonexe setup.py bdist_wininst   2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wininst   *>> $log
 		move dist/PyQwt-5.2.1.win-amd64.exe dist/PyQwt-5.2.1.win-amd64.$configuration.exe -Force
 		# TODO these move fail for lack of a wheel-compatible setup
-		# & $pythonroot/$pythonexe setup.py bdist_wheel   2>&1 >> $log
+		# & $pythonroot/$pythonexe setup.py bdist_wheel   *>> $log
 		# cd dist
 		# & $pythonroot/Scripts/wheel.exe convert PyQwt-5.2.1.win-amd64.DebugDLL.exe
 		$env:Path = $oldpath
@@ -621,9 +621,9 @@ Function SetupPython
 	if ((TryValidate "$pythonroot/lib/site-packages/OpenGL/version.py" "dist/PyOpenGL-$pyopengl_version-py2-none-any.whl") -eq $false ) {
 		Write-Host -NoNewline "installing PyOpenGL..."
 		$ErrorActionPreference = "Continue"
-		& $pythonroot/$pythonexe setup.py install --single-version-externally-managed --root=/ 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install --single-version-externally-managed --root=/ *>> $log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "$pythonroot/lib/site-packages/OpenGL/version.py" "dist/PyOpenGL-$pyopengl_version-py2-none-any.whl"
 	} else {
@@ -638,11 +638,11 @@ Function SetupPython
 	if ((TryValidate "$pythonroot/lib/site-packages/OpenGL_accelerate/wrapper$debugext.pyd" "dist/PyOpenGL_accelerate-$pyopengl_version-cp27-cp27${d}m-win_amd64.$configuration.whl") -eq $false) {
 		Write-Host -NoNewline "installing PyOpenGL-accelerate..."
 		$ErrorActionPreference = "Continue"
-		& $pythonroot/$pythonexe setup.py clean 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py clean *>> $log
 		if ($configuration -match "Debug") {$env:_LINK_=" /LIBPATH:""$root\src-stage1-dependencies\Qt4\build\$configuration\lib"" "}
-		& $pythonroot/$pythonexe setup.py build $debug install --single-version-externally-managed --root=/ 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build $debug install --single-version-externally-managed --root=/ *>> $log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel *>> $log
 		move dist/PyOpenGL_accelerate-$pyopengl_version-cp27-cp27${d}m-win_amd64.whl dist/PyOpenGL_accelerate-$pyopengl_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
 		$env:_LINK_ = ""
 		$ErrorActionPreference = "Stop"
@@ -660,15 +660,15 @@ Function SetupPython
 	if ((TryValidate "$root\bin\pkg-config.exe" "dist/pkgconfig-$pkgconfig_version-py2-none-any.whl" "$pythonroot/lib/site-packages/pkgconfig/pkgconfig.py") -eq $false) {
 		Write-Host -NoNewline "building pkg-config..."
 		$ErrorActionPreference = "Continue"
-		& $pythonroot/$pythonexe setup.py build  $debug 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build  $debug *>> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install --single-version-externally-managed --root=/ 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install --single-version-externally-managed --root=/ *>> $log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel *>> $log
 		# yes, this copies the same file three times, but since it's conceptually linked to 
 		# the python wrapper, I kept this here for ease of maintenance
-		cp $root\src-stage1-dependencies\pkg-config-lite-0.28-1\bin\pkg-config.exe $root\bin -Force  2>&1 >> $log
-		New-Item -ItemType Directory -Force $pythonroot\lib\pkgconfig 2>&1 >> $log
+		cp $root\src-stage1-dependencies\pkg-config-lite-0.28-1\bin\pkg-config.exe $root\bin -Force  *>> $log
+		New-Item -ItemType Directory -Force $pythonroot\lib\pkgconfig *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "$root\bin\pkg-config.exe" "dist/pkgconfig-$pkgconfig_version-py2-none-any.whl" "$pythonroot/lib/site-packages/pkgconfig/pkgconfig.py"
 	} else {
@@ -696,16 +696,16 @@ Function SetupPython
 		$env:LIB = "$root/src-stage1-dependencies/cairo/build/x64/Release;$root/src-stage1-dependencies/cairo/build/x64/ReleaseDLL;$pythonroot/libs;" + $oldlib 
 		$env:_CL_ = "/MD$d /I$root/src-stage1-dependencies/x64/include /I$root/src-stage1-dependencies/x64/include/cairo /DCAIRO_WIN32_STATIC_BUILD" 
 		$env:_LINK_ = "/DEFAULTLIB:cairo /DEFAULTLIB:pixman-1 /DEFAULTLIB:freetype /LIBPATH:$root/src-stage1-dependencies/x64/lib /LIBPATH:$pythonroot/libs"
-		& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  2>&1 >> $Log
+		& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  *>> $Log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install --single-version-externally-managed  --root=/ 2>&1 >> $Log
+		& $pythonroot/$pythonexe setup.py install --single-version-externally-managed  --root=/ *>> $Log
 		Write-Host -NoNewline "creating wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
+		& $pythonroot/$pythonexe setup.py bdist_wheel *>> $Log
 		$env:_LINK_ = ""
 		$env:_CL_ = ""
 		$env:LIB = $oldLib
 		$env:INCLUDE = $oldInclude 
-		cp -Recurse -Force build/x64/$configuration/lib/python2.7/site-packages/cairo $pythonroot\lib\site-packages 2>&1 >> $log
+		cp -Recurse -Force build/x64/$configuration/lib/python2.7/site-packages/cairo $pythonroot\lib\site-packages *>> $log
 		if ($configuration -match "Debug") {
 			cp -Force "$pythonroot\lib\site-packages\cairo\_cairo.pyd" "$pythonroot\lib\site-packages\cairo\_cairo_d.pyd"
 		}
@@ -742,14 +742,14 @@ Function SetupPython
 			$env:LIB = "$root/src-stage1-dependencies/x64/lib;" + $oldlib
 			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
 			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
-			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  *>> $Log
 			Write-Host -NoNewline "installing..."
-			& $pythonroot/$pythonexe setup.py install --single-version-externally-managed  --root=/ 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py install --single-version-externally-managed  --root=/ *>> $Log
 			Write-Host -NoNewline "creating exe..."
-			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py bdist_wininst *>> $Log
 			Write-Host -NoNewline "crafting wheel..."
-			& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
-			New-Item -ItemType Directory -Force -Path .\dist\gtk-3.0 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py bdist_wheel *>> $Log
+			New-Item -ItemType Directory -Force -Path .\dist\gtk-3.0 *>> $Log
 			cd dist
 			move ./pygobject-$pygobject3_version-cp27-cp27${d}m-win_amd64.whl gtk-3.0/pygobject-$pygobject3_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
 			cd ..
@@ -771,15 +771,15 @@ Function SetupPython
 			$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
 			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
 			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
-			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading  2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading  *>> $Log
 			Write-Host -NoNewline "installing..."
-			& $pythonroot/$pythonexe setup.py install  2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py install  *>> $Log
 			Write-Host -NoNewline "creating exe..."
-			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py bdist_wininst *>> $Log
 			Write-Host -NoNewline "crafting wheel from exe..."
-			New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 2>&1 >> $Log
+			New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 *>> $Log
 			cd dist
-			& $pythonroot/Scripts/wheel.exe convert pygobject-$pygobject_version.win-amd64-py2.7.exe 2>&1 >> $Log
+			& $pythonroot/Scripts/wheel.exe convert pygobject-$pygobject_version.win-amd64-py2.7.exe *>> $Log
 			move gtk-2.0/pygobject-cp27-none-win_amd64.whl gtk-2.0/pygobject-cp27-none-win_amd64.$configuration.whl -Force
 			cd ..
 			$env:_CL_ = ""
@@ -810,17 +810,17 @@ Function SetupPython
 			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
 			$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
 			$ErrorActionPreference = "Continue" 
-			& $pythonroot/$pythonexe setup.py clean 2>&1 >> $Log
-			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading 2>&1 >> $log
+			& $pythonroot/$pythonexe setup.py clean *>> $Log
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc --enable-threading *>> $log
 			Write-Host -NoNewline "installing..."
-			& $pythonroot/$pythonexe setup.py install 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py install *>> $Log
 			Write-Host -NoNewline "building exe..."
-			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
-			New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py bdist_wininst *>> $Log
+			New-Item -ItemType Directory -Force -Path .\dist\gtk-2.0 *>> $Log
 			cd dist
 			Write-Host -NoNewline "crafting wheel from exe..."
-			& $pythonroot/Scripts/wheel.exe convert pygtk-$pygtk_version.0.win-amd64-py2.7.exe 2>&1 >> $Log
-			move gtk-2.0/pygtk-cp27-none-win_amd64.whl gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl -Force 2>&1 >> $Log
+			& $pythonroot/Scripts/wheel.exe convert pygtk-$pygtk_version.0.win-amd64-py2.7.exe *>> $Log
+			move gtk-2.0/pygtk-cp27-none-win_amd64.whl gtk-2.0/pygtk-cp27-none-win_amd64.$configuration.whl -Force *>> $Log
 			cd ..
 			$env:_CL_ = ""
 			$env:_LINK_ = ""
@@ -845,13 +845,13 @@ Function SetupPython
 			$ErrorActionPreference = "Continue" 
 			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
 			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
-			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  *>> $Log
 			Write-Host -NoNewline "installing..."
-			& $pythonroot/$pythonexe setup.py install 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py install *>> $Log
 			Write-Host -NoNewline "creating exe..."
-			& $pythonroot/$pythonexe setup.py bdist_wininst 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py bdist_wininst *>> $Log
 			Write-Host -NoNewline "crafting wheel..."
-			& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $Log
+			& $pythonroot/$pythonexe setup.py bdist_wheel *>> $Log
 			cd dist
 			move ./pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.whl pyyaml-$pyyaml_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
 			cd ..
@@ -884,37 +884,37 @@ Function SetupPython
 		$env:_CL_ = "/I$root/src-stage1-dependencies/wxpython/include/msvc /I$root/src-stage1-dependencies/wxpython/lib/vc140_dll/mswu  /DWXWIN=.. /DMSLU /D_UNICODE /DUNICODE /DwxMSVC_VERSION_AUTO "
 		if ($configuration -match "AVX2") {$env:_CL_ = $env:_CL_ +  " /arch:AVX2 "}
 		$ErrorActionPreference = "Continue"
-		if (Test-Path .\build) {del -recurse .\build\*.* 2>&1 >> $Log}
-		& $pythonroot\$pythonexe build-wxpython.py --clean 2>&1 >> $Log
+		if (Test-Path .\build) {del -recurse .\build\*.* *>> $Log}
+		& $pythonroot\$pythonexe build-wxpython.py --clean *>> $Log
 		if ($wxdebug) {
 			Write-Host -NoNewline "building release..."
 			$env:_CL_ = " /D__WXMSW__  /MDd " + $env:_CL_ 
-			& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config  2>&1 >> $Log
+			& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config  *>> $Log
 			$env:_CL_ = " /I$root/src-stage1-dependencies/wxpython/lib/vc140_dll/mswud /D__WXDEBUG__ /D_DEBUG " + $env:_CL_ 
 			$wxdebugstring = "--debug"
 			Write-Host -NoNewline "building & installing..."
-		    & $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install $wxdebugstring 2>&1 >> $Log
+		    & $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install $wxdebugstring *>> $Log
 		} else {
 			Write-Host -NoNewline "building & installing..."
-			& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install 2>&1 >> $Log
+			& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install *>> $Log
 		}
 		# the above assumes the core WX dll's will be installed to the system someplace on the PATH.
 		# That's not what we want to do, so since these are gr-python-only DLLs, we'll put then in the site packages dir
 		cp "$root/src-stage1-dependencies/wxpython/lib/vc140_dll/wx*.dll" "$pythonroot/Lib/site-packages/wx-3.0-msw/wx"
 		#Write-Host -NoNewline "configing..."
-		#& $pythonroot\$pythonexe setup.py clean 2>&1 >> $Log
-		#& $pythonroot\$pythonexe setup.py config MONOLITHIC=1 2>&1 >> $Log
+		#& $pythonroot\$pythonexe setup.py clean *>> $Log
+		#& $pythonroot\$pythonexe setup.py config MONOLITHIC=1 *>> $Log
 		#Write-Host -NoNewline "building..."
-		#& $pythonroot\$pythonexe setup.py build $wxdebugstring MONOLITHIC=1 2>&1 >> $Log
+		#& $pythonroot\$pythonexe setup.py build $wxdebugstring MONOLITHIC=1 *>> $Log
 		#Write-Host -NoNewline "installing..."
-		#& $pythonroot\$pythonexe setup.py install 2>&1 >> $Log
+		#& $pythonroot\$pythonexe setup.py install *>> $Log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot\$pythonexe setup.py bdist_wininst UNICODE=1 BUILD_BASE=build 2>&1 >> $Log
+		& $pythonroot\$pythonexe setup.py bdist_wininst UNICODE=1 BUILD_BASE=build *>> $Log
 		cd dist
-		& $pythonroot/Scripts/wheel.exe convert wxpython-$wxpython_version.win-amd64-py2.7.exe 2>&1 >> $Log
+		& $pythonroot/Scripts/wheel.exe convert wxpython-$wxpython_version.win-amd64-py2.7.exe *>> $Log
 		del wxpython-$wxpython_version.win-amd64-py2.7.exe
-		move wx-3.0-cp27-none-win_amd64.whl wx-3.0-cp27-none-win_amd64.$configuration.whl -Force 2>&1 >> $Log
-		move .\wxPython-common-$wxpython_version.win-amd64.exe .\wxPython-common-$wxpython_version.win-amd64.$configuration.exe -Force 2>&1 >> $Log
+		move wx-3.0-cp27-none-win_amd64.whl wx-3.0-cp27-none-win_amd64.$configuration.whl -Force *>> $Log
+		move .\wxPython-common-$wxpython_version.win-amd64.exe .\wxPython-common-$wxpython_version.win-amd64.$configuration.exe -Force *>> $Log
 		$ErrorActionPreference = "Stop" 
 		$env:_CL_ = ""
 		$env:PATH = $oldPath
@@ -932,12 +932,12 @@ Function SetupPython
 	if ((TryValidate "dist/Cheetah-$cheetah_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/Cheetah-$cheetah_version-py2.7-win-amd64.egg/Cheetah/_namemapper.pyd" "$pythonroot/lib/site-packages/Cheetah-$cheetah_version-py2.7-win-amd64.egg/Cheetah/Compiler.py") -eq $false) {
 		Write-Host -NoNewline "building cheetah..."
 		$ErrorActionPreference = "Continue"
-		& $pythonroot/$pythonexe setup.py build  $debug 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build  $debug *>> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install *>> $log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel 2>&1 >> $log
-		move dist/Cheetah-$cheetah_version-cp27-cp27${d}m-win_amd64.whl dist/Cheetah-$cheetah_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel *>> $log
+		move dist/Cheetah-$cheetah_version-cp27-cp27${d}m-win_amd64.whl dist/Cheetah-$cheetah_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "dist/Cheetah-$cheetah_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/Cheetah-$cheetah_version-py2.7-win-amd64.egg/Cheetah/_namemapper.pyd" "$pythonroot/lib/site-packages/Cheetah-$cheetah_version-py2.7-win-amd64.egg/Cheetah/Compiler.py"
 	} else {
@@ -954,7 +954,7 @@ Function SetupPython
 	if ((TryValidate "$pythonroot/lib/site-packages/sphinx/__main__.py") -eq $false) {
 		Write-Host -NoNewline "installing sphinx using pip..."
 		$ErrorActionPreference = "Continue" # pip will "error" on debug
-		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install -U sphinx -t $pythonroot\lib\site-packages 2>&1 >> $log
+		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install -U sphinx -t $pythonroot\lib\site-packages *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "$pythonroot/lib/site-packages/sphinx/__main__.py"
 	} else {
@@ -969,7 +969,7 @@ Function SetupPython
 	if ((TryValidate "$pythonroot/lib/site-packages/pygi.py") -eq $false) {
 		Write-Host -NoNewline "installing pygi using pip..."
 		$ErrorActionPreference = "Continue" # pip will "error" on debug
-		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install -U pygi -t $pythonroot\lib\site-packages 2>&1 >> $log
+		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install -U pygi -t $pythonroot\lib\site-packages *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "$pythonroot/lib/site-packages/pygi.py"
 	} else {
@@ -987,7 +987,7 @@ Function SetupPython
 	if ((TryValidate "dist/lxml-$lxml_version-cp27-cp27${d}m-win_amd64.$xsltconfig.whl" "$pythonroot/lib/site-packages/lxml-$lxml_version-py2.7-win-amd64.egg/lxml/etree.pyd") -eq $false) {
 		Write-Host -NoNewline "configuring lxml..."
 		$ErrorActionPreference = "Continue"
-		New-Item -ItemType Directory -Force $root/src-stage1-dependencies/lxml-lxml-$lxml_version/libs/$xsltconfig 2>&1 >> $Log
+		New-Item -ItemType Directory -Force $root/src-stage1-dependencies/lxml-lxml-$lxml_version/libs/$xsltconfig *>> $Log
 		if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 "} else {$env:_CL_ = ""}
 		$env:_CL_ = $env:_CL_ + " /I$root/src-stage1-dependencies/libxml2/build/x64/$xsltconfig/include/libxml2 /I$root/src-stage1-dependencies/gettext-msvc/libiconv-1.14 /I$root/src-stage1-dependencies/libxslt-$libxslt_version/build/$xsltconfig/include "
 		$env:_LINK_ = "/LIBPATH:$root/src-stage1-dependencies/libxslt-$libxslt_version/build/$xsltconfig/lib /LIBPATH:$root/src-stage1-dependencies/zlib-1.2.8/contrib/vstudio/vc14/x64/ZlibStat$xsltconfig /LIBPATH:$root/src-stage1-dependencies/libxml2/build/x64/$xsltconfig/lib /LIBPATH:$root/src-stage1-dependencies/gettext-msvc/x64/$xsltconfig"
@@ -995,15 +995,15 @@ Function SetupPython
 		$env:INCLUDE = "$root/src-stage1-dependencies/libxml2/build/x64/$xsltconfig/include/libxml2;$root/src-stage1-dependencies/gettext-msvc/libiconv-1.14;$root/src-stage1-dependencies/libxslt-$libxslt_version/build/$xsltconfig/include;$root/src-stage1-dependencies/lxml/src/lxml/includes"
 		cp -Force $root/src-stage1-dependencies/libxml2/build/x64/$xsltconfig/lib/libxml2_a.lib $root/src-stage1-dependencies/lxml-lxml-$lxml_version/libs/$xsltconfig/libxml2_a.lib
 		cp -Force $root/src-stage1-dependencies/gettext-msvc/x64/$xsltconfig/libiconv.lib $root/src-stage1-dependencies/lxml-lxml-$lxml_version/libs/$xsltconfig/iconv_a.lib
-		& $pythonroot/$pythonexe setup.py clean 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py clean *>> $log
 		if (Test-Path build) {del -Recurse -Force build}
 		Write-Host -NoNewline "building..."
-		& $pythonroot/$pythonexe setup.py build --static $debug 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build --static $debug *>> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install --static 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install --static *>> $log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel --static 2>&1 >> $log
-		move dist/lxml-$lxml_version-cp27-cp27${d}m-win_amd64.whl dist/lxml-$lxml_version-cp27-cp27${d}m-win_amd64.$xsltconfig.whl -Force 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel --static *>> $log
+		move dist/lxml-$lxml_version-cp27-cp27${d}m-win_amd64.whl dist/lxml-$lxml_version-cp27-cp27${d}m-win_amd64.$xsltconfig.whl -Force *>> $log
 		$env:_CL_ = ""
 		$env:_LINK_ = ""
 		$env:LIBRARY = $oldlibrary
@@ -1026,41 +1026,41 @@ Function SetupPython
 		$ErrorActionPreference = "Continue"
 		# this stdint.h file prevents the import of the real stdint file and causes the build to fail
 		# TODO submit upstream patch
-		if (!(Test-Path wheels)) {mkdir wheels 2>&1 >> $log}
+		if (!(Test-Path wheels)) {mkdir wheels *>> $log}
 		if (Test-Path buildutils/include_win32/stdint.h) 
 		{
 			if (Test-Path buildutils/include_win32/stdint.old.h) {del buildutils/include_win32/stdint.old.h}
 			Rename-Item -Force buildutils/include_win32/stdint.h stdint.old.h
 		}
-		New-Item -ItemType Directory -Force libzmq 2>&1 >> $log
-		New-Item -ItemType Directory -Force libzmq/$configuration 2>&1 >> $log
-		New-Item -ItemType Directory -Force libzmq/$configuration/lib 2>&1 >> $log
-		New-Item -ItemType Directory -Force libzmq/$configuration/include 2>&1 >> $log
-		Copy-Item ..\libzmq\include/*.h libzmq/$configuration/include/ 2>&1 >> $log
-		Copy-Item ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-$libzmquv.dll libzmq/$configuration/lib/ 2>&1 >> $log
-		Copy-Item ..\libzmq\bin\$baseconfig\lib\libzmq-v140-mt$flag-$libzmquv.lib libzmq/$configuration/lib/ 2>&1 >> $log
+		New-Item -ItemType Directory -Force libzmq *>> $log
+		New-Item -ItemType Directory -Force libzmq/$configuration *>> $log
+		New-Item -ItemType Directory -Force libzmq/$configuration/lib *>> $log
+		New-Item -ItemType Directory -Force libzmq/$configuration/include *>> $log
+		Copy-Item ..\libzmq\include/*.h libzmq/$configuration/include/ *>> $log
+		Copy-Item ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-$libzmquv.dll libzmq/$configuration/lib/ *>> $log
+		Copy-Item ..\libzmq\bin\$baseconfig\lib\libzmq-v140-mt$flag-$libzmquv.lib libzmq/$configuration/lib/ *>> $log
 		if ($configuration -match "AVX2") {$env:_CL_ = " /arch:AVX2 "} else {$env:_CL_ = ""}
 		$env:_LINK_ = " /MANIFEST /LIBPATH:libzmq/$configuration/lib "
 		$env:INCLUDE = $oldinclude + ";$root/libzmq/include"
 		$env:LINK = $oldlink
 		# don't run clean because it wipes out /dist folder as well
-		& $pythonroot/$pythonexe setup.py clean 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py clean *>> $log
 		#cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-$libzmquv.dll .\zmq\libzmq.dll 
 		#if ($configuration -match "Debug") {
 		#	cp ..\libzmq\bin\$baseconfig\bin\libzmq-v140-mt$flag-$libzmquv.pdb .\zmq\libzmq.pdb 
 		#}
-		& $pythonroot/$pythonexe setup.py configure $debug --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py configure $debug --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv *>> $log
 		Write-Host -NoNewline "building..."
-		& $pythonroot/$pythonexe setup.py build_ext $debug --zmq=./libzmq/$configuration --inplace --libzmq=libzmq-v140-mt$flag-$libzmquv 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build_ext $debug --zmq=./libzmq/$configuration --inplace --libzmq=libzmq-v140-mt$flag-$libzmquv *>> $log
 		# TODO a pyzmq socket test is failing which then prompts user to debug so disable for now so we don't slow down the build process
 		# Write-Host -NoNewline "testing..."
-		# & $pythonroot/$pythonexe setup.py test 2>&1 >> $log
+		# & $pythonroot/$pythonexe setup.py test *>> $log
 		Write-Host -NoNewline "installing..."
-		& $pythonroot/$pythonexe setup.py install --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py install --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv *>> $log
 		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv  2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel --zmq=./libzmq/$configuration --libzmq=libzmq-v140-mt$flag-$libzmquv  *>> $log
 		# these can't be in dist because clean wipes out dist completely
-		move dist/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.whl wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force 2>&1 >> $log
+		move dist/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.whl wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force *>> $log
 		$env:_LINK_ = ""
 		$env:_CL_ = ""
 		$env:INCLUDE = $oldinclude
@@ -1096,7 +1096,7 @@ Function SetupPython
 			# We need to truncate the builddir or else we end up with a handful of files with paths that exceed max size and it fails.
 			if ($configuration -match "AVX2") {$env:_CL_ = " /D__SSE__ /D__SSE2__ /D__SSE3__ /D__SSE4_1__ /D__SSE4_2__ /D__FMA__ /arch:AVX2 "; $builddir = "RelAVX2"} else {$env:_CL_ = " /D__SSE__ /D__SSE2__ "; $builddir=$configuration}
 			if ($configuration -match "Release") {$buildconfig="Release"; $tfpythonexe = $pythonexe;$linkflags = "";$tests="ON"} else { $buildconfig="Debug"; $tfpythonexe = "python_d.exe";$linkflags = " /INCREMENTAL:NO /OPT:REF ";$tests="OFF"}
-			New-Item -ItemType Directory -Force $root\src-stage1-dependencies\tensorflow\tensorflow\contrib\cmake\build\$builddir 2>&1 >> $Log
+			New-Item -ItemType Directory -Force $root\src-stage1-dependencies\tensorflow\tensorflow\contrib\cmake\build\$builddir *>> $Log
 			cd $root\src-stage1-dependencies\tensorflow\tensorflow\contrib\cmake\build\$builddir
 			$env:Path = "$pythonroot;$pythonroot\bin;$pythonroot\scripts;"+ $oldPath
 			& cmake ..\.. `
@@ -1116,27 +1116,27 @@ Function SetupPython
 				-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
 				-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
 				-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
-				-DCMAKE_CXX_FLAGS="$env:_CL_" 2>&1 >> $Log 
+				-DCMAKE_CXX_FLAGS="$env:_CL_" *>> $Log 
 			Write-Host -NoNewline "building..."
 			# some specific re-ordering of projects and renaming of files is required because of flaws in the cmakelists
-			msbuild  zlib_copy_headers_to_destination.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" 2>&1 >> $Log 
+			msbuild  zlib_copy_headers_to_destination.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" *>> $Log 
 			if ($configuration -match "Debug") {
 				Copy-Item -Force "zlib/install/lib/zlibstaticd.lib" "zlib/install/lib/zlibstatic.lib"
 			}
-			msbuild  png_copy_headers_to_destination.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" 2>&1 >> $Log 
+			msbuild  png_copy_headers_to_destination.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" *>> $Log 
 			if ($configuration -match "Debug") {
 				Copy-Item -Force "png/install/lib/libpng12_staticd.lib" "png/install/lib/libpng12_static.lib"
 			}
-			msbuild  protobuf.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" 2>&1 >> $Log 
+			msbuild  protobuf.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" *>> $Log 
 			if ($configuration -match "Debug") {
 				Copy-Item -Force "protobuf/src/protobuf/Debug/libprotobufd.lib" "protobuf/src/protobuf/Debug/libprotobuf.lib"
 				Copy-Item -Force "protobuf/src/protobuf/Debug/libprotocd.lib" "protobuf/src/protobuf/Debug/libprotoc.lib"
 			}
-			msbuild  farmhash.vcxproj /t:Clean /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" 2>&1 >> $Log 
-			msbuild  farmhash_copy_headers_to_destination.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" 2>&1 >> $Log 
-			msbuild  tf_python_build_pip_package.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" 2>&1 >> $Log 
+			msbuild  farmhash.vcxproj /t:Clean /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" *>> $Log 
+			msbuild  farmhash_copy_headers_to_destination.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" *>> $Log 
+			msbuild  tf_python_build_pip_package.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64" *>> $Log 
 			Write-Host -NoNewline "installing..."
-			& $pythonroot\$pythonexe -m pip install .\tf_python\dist\tensorflow-1.1.0-cp27-cp27${d}m-win_amd64.whl --disable-pip-version-check 2>&1 >> $Log
+			& $pythonroot\$pythonexe -m pip install .\tf_python\dist\tensorflow-1.1.0-cp27-cp27${d}m-win_amd64.whl --disable-pip-version-check *>> $Log
 			# TODO this step is just for troubleshooting
 			# & $root\src-stage3\staged_install\Release-AVX2\gr-python27\$pythonexe -m pip install .\tf_python\dist\tensorflow-1.1.0rc0-cp27-cp27m-win_amd64.whl --disable-pip-version-check  --upgrade --no-deps --force-reinstall
 			# msbuild  ALL_BUILD.vcxproj /m /p:"configuration=$buildconfig;platform=x64;PreferredToolArchitecture=x64"
@@ -1169,9 +1169,9 @@ Function SetupPython
 		$env:PYTHONPATH="$pythonroot/Lib/site-packages/wx-3.0-msw;$pythonroot/Lib/site-packages;$pythonroot/Lib/site-packages/gtk-2.0;$pythonroot\Include\pygtk-2.0\"
 		$env:_LINK_ = " /DEBUG "
 		Write-Host -NoNewline "building and installing..."
-		& $pythonroot/$pythonexe setup.py build $debug install 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build $debug install *>> $log
 		Write-Host -NoNewline "creating wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel   2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel   *>> $log
 		$env:_LINK_ = ""
 		move dist/matplotlib-$matplotlib_version-cp27-cp27${d}m-win_amd64.whl dist/matplotlib-$matplotlib_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
 		$ErrorActionPreference = "Stop"
@@ -1199,13 +1199,13 @@ Function SetupPython
 		$env:PYTHONPATH="$pythonroot/Lib/site-packages/wx-3.0-msw;$pythonroot/Lib/site-packages;$pythonroot/Lib/site-packages/gtk-2.0"
 		Write-Host -NoNewline "building and installing..."
 		$ErrorActionPreference = "Continue"
-		& $pythonroot/$pythonexe setup.py build $debug install 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build $debug install *>> $log
 		Write-Host -NoNewline "creating wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wininst   2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wininst   *>> $log
 		cd dist
-		& $pythonroot/Scripts/wheel.exe convert PIL-$PIL_version.win-amd64-py2.7.exe 2>&1 >> $log
+		& $pythonroot/Scripts/wheel.exe convert PIL-$PIL_version.win-amd64-py2.7.exe *>> $log
 		$env:_LINK_ = ""
-		move PIL-$PIL_version-cp27-none-win_amd64.whl PIL-$PIL_version-cp27-none-win_amd64.$configuration.whl -Force 2>&1 >> $log
+		move PIL-$PIL_version-cp27-none-win_amd64.whl PIL-$PIL_version-cp27-none-win_amd64.$configuration.whl -Force *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "PIL-$PIL_version-cp27-none-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/PIL/_imaging$debugext.pyd"
 		$env:_CL_ = ""
@@ -1230,12 +1230,12 @@ Function SetupPython
 		$env:PYTHONPATH="$pythonroot/Lib/site-packages/wx-3.0-msw;$pythonroot/Lib/site-packages;$pythonroot/Lib/site-packages/gtk-2.0"
 		Write-Host -NoNewline "building and installing..."
 		$ErrorActionPreference = "Continue"
-		& $pythonroot/$pythonexe setup.py build $debug install 2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py build $debug install *>> $log
 		Write-Host -NoNewline "creating wheel..."
-		& $pythonroot/$pythonexe setup.py bdist_wheel   2>&1 >> $log
+		& $pythonroot/$pythonexe setup.py bdist_wheel   *>> $log
 		cd dist
 		$env:_LINK_ = ""
-		move bitarray-$bitarray_version-cp27-cp27${d}m-win_amd64.whl bitarray-$bitarray_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force 2>&1 >> $log
+		move bitarray-$bitarray_version-cp27-cp27${d}m-win_amd64.whl bitarray-$bitarray_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force *>> $log
 		$ErrorActionPreference = "Stop"
 		Validate "bitarray-$bitarray_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/bitarray-$bitarray_version-py2.7-win-amd64.egg/bitarray/_bitarray$debugext.pyd"
 		$env:_CL_ = ""

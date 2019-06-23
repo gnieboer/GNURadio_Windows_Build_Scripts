@@ -280,14 +280,14 @@ SetLog "Retrieve GNURadio"
 Write-Host -NoNewline "cloning GNURadio..."
 if (!(Test-Path $root/src-stage3/src)) {
 		cd $root/src-stage3
-		mkdir src 2>&1 >> $log 
+		mkdir src *>> $log 
 	} 
 if (!(Test-Path $root/src-stage3/src/gnuradio)) {
 	cd $root/src-stage3/src
     $ErrorActionPreference = "Continue"
     # most packages we just get the most recent commit when coming from git
     # however, since this is the one most users might want to modify, we'll get more.
-	git clone --depth=150 --no-single-branch --recursive https://github.com/gnuradio/gnuradio.git 2>&1 >> $log 
+	git clone --depth=150 --no-single-branch --recursive https://github.com/gnuradio/gnuradio.git *>> $log 
 	cd gnuradio
 	# As 3.8 is pre-release, there are no tags, so checkout master
 	# but otherwise find the tag related to the version 
