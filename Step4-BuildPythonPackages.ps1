@@ -325,19 +325,18 @@ Function SetupPython
 	}
 
 	#__________________________________________________________________________________________
-	# Nose
-	# Nose is a python-only package can be installed automatically
-	# used for testing numpy/scipy etc only, not in gnuradio directly
+	# PyTest
+	# used for testing numpy/scipy etc only (after numpy 1.15), not in gnuradio directly
 	#
-	SetLog "$configuration Nose"
-	if ((TryValidate "$pythonroot/lib/site-packages/nose/core.py" "$pythonroot/lib/site-packages/nose/__main__.py") -eq $false) {
+	SetLog "$configuration pytest"
+	if ((TryValidate "$pythonroot/lib/site-packages/pytest.py") -eq $false) {
 		Write-Host -NoNewline "installing Nose using pip..."
 		$ErrorActionPreference = "Continue" # pip will "error" on debug
-		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install nose -U -t $pythonroot\lib\site-packages *>> $log
+		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install pytest -U -t $pythonroot\lib\site-packages *>> $log
 		$ErrorActionPreference = "Stop"
-		Validate "$pythonroot/lib/site-packages/nose/core.py" "$pythonroot/lib/site-packages/nose/__main__.py"
+		Validate "$pythonroot/lib/site-packages/pytest.py" 
 	} else {
-		Write-Host "Nose already installed..."
+		Write-Host "pytest already installed..."
 	}
 
 	#__________________________________________________________________________________________
