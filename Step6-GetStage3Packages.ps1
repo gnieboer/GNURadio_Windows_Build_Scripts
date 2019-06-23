@@ -170,6 +170,7 @@ if ($mm -eq "3.8") {
 # gr-ais
 #
 # Awaiting incorporation of pull request 
+# Appears abandoned, no 3.8 efforts visible
 #
 GetPackage https://github.com/gnieboer/gr-ais.git -Stage3 -branch "msvc-fixes"
 
