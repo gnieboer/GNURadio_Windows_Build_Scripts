@@ -172,7 +172,14 @@ GetPackage https://github.com/gnieboer/gr-ais.git -Stage3 -branch "msvc-fixes"
 #
 # gr-display
 #
-GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 -branch "$grdisplay_version"
+# v3.8 is in work on master but not release tagged yet
+#
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 
+} else {
+	GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 -branch "$grdisplay_version"
+}
+
 
 # ____________________________________________________________________________________________________________
 #
