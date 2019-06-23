@@ -142,7 +142,12 @@ GetPackage https://github.com/gnuradio/gr-inspector.git -Stage3
 #
 # gr-specest
 #
-GetPackage https://github.com/gnieboer/gr-specest.git -Stage3 -branch "msvc_fixes"
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/kit-cel/gr-specest.git -Stage3 
+} else {
+	GetPackage https://github.com/gnieboer/gr-specest.git -Stage3 -branch "msvc_fixes"
+}
+
 
 # ____________________________________________________________________________________________________________
 #
