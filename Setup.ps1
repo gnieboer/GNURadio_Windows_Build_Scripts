@@ -459,23 +459,29 @@ if (!(Test-Path variable:global:oldpath))
 	}
 	popd
 	write-host "Visual Studio 2015 Command Prompt variables set." -ForegroundColor Yellow
-	# set Intel Fortran environment (if exists)... will detect 2016/2017/2018 compilers only 
-	if (Test-Path env:IFORT_COMPILER18) {
-		& $env:IFORT_COMPILER18\bin\ifortvars.bat -arch intel64 vs2015 
-		$Global:MY_IFORT = $env:IFORT_COMPILER18
+	# set Intel Fortran environment (if exists)... will detect 2016/2017/2018/2019 compilers only 
+	if (Test-Path env:IFORT_COMPILER19) {
+		& $env:IFORT_COMPILER19\bin\ifortvars.bat -arch intel64 vs2015 
+		$Global:MY_IFORT = $env:IFORT_COMPILER19
 		$Global:hasIFORT = CheckFortran
 	} else {
-		if (Test-Path env:IFORT_COMPILER17) {
-			& $env:IFORT_COMPILER17\bin\ifortvars.bat -arch intel64 -platform vs2015 
-			$Global:MY_IFORT = $env:IFORT_COMPILER17
+		if (Test-Path env:IFORT_COMPILER18) {
+			& $env:IFORT_COMPILER18\bin\ifortvars.bat -arch intel64 vs2015 
+			$Global:MY_IFORT = $env:IFORT_COMPILER18
 			$Global:hasIFORT = CheckFortran
 		} else {
-			if (Test-Path env:IFORT_COMPILER16) {
-				& $env:IFORT_COMPILER16\bin\ifortvars.bat -arch intel64 -platform vs2015 
-				$Global:MY_IFORT = $env:IFORT_COMPILER16
+			if (Test-Path env:IFORT_COMPILER17) {
+				& $env:IFORT_COMPILER17\bin\ifortvars.bat -arch intel64 -platform vs2015 
+				$Global:MY_IFORT = $env:IFORT_COMPILER17
 				$Global:hasIFORT = CheckFortran
 			} else {
-				$Global:hasIFORT = $false
+				if (Test-Path env:IFORT_COMPILER16) {
+					& $env:IFORT_COMPILER16\bin\ifortvars.bat -arch intel64 -platform vs2015 
+					$Global:MY_IFORT = $env:IFORT_COMPILER16
+					$Global:hasIFORT = CheckFortran
+				} else {
+					$Global:hasIFORT = $false
+				}
 			}
 		}
 	}
