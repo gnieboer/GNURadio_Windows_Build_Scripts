@@ -1405,12 +1405,13 @@ function BuildOOTModules
 	# glog (Google logging)
 	#
 	# Required by GNSS-SDR
+	# note use of non-standard build_folder location because repo already has a file named "BUILD"	
 	#
 	SetLog "glog $configuration"
 	$ErrorActionPreference = "Continue"
 	Write-Host -NoNewline "configuring $configuration glog..."
-	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/glog/build/$configuration  2>&1 >> $Log
-	cd $root/src-stage3/oot_code/glog/build/$configuration 
+	New-Item -ItemType Directory -Force $root/src-stage3/oot_code/glog/build_folder/$configuration  2>&1 >> $Log
+	cd $root/src-stage3/oot_code/glog/build_folder/$configuration 
 	$env:_CL_ = " $arch "
 	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
 	$env:_CL_ = $env:_CL_ + " -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
