@@ -637,7 +637,11 @@ function BuildOOTModules
 	Write-Host -NoNewline "configuring $configuration Armadillo..."
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/armadillo-7.800.1/build/$configuration  2>&1 >> $Log
 	cd $root/src-stage3/oot_code/armadillo-7.800.1/build/$configuration 
-	$linkflags= " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
+	$linkflags= "  /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
+	if ($mm -eq "3.8")
+	{
+		$linkflags = " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib " + $linkflags
+	}
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	cmake ../../ `
