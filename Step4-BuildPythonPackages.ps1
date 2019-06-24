@@ -524,12 +524,16 @@ Function SetupPython
 			$env:_LINK_=" /NODEFAULTLIB:""LIBCMT.lib""  /NODEFAULTLIB:""LIBIFCOREMD.lib"" /DEFAULTLIB:""LIBIFCOREMT.lib"" /NODEFAULTLIB:""SVML_DISPMD.lib"" /DEFAULTLIB:""SVML_DISPMT.lib""  /NODEFAULTLIB:""LIBMMD.lib"" /DEFAULTLIB:""LIBMMDS.lib"" /DEFAULTLIB:""LIBMMT.lib"" /DEFAULTLIB:""libifport.lib"" /DEFAULTLIB:""legacy_stdio_definitions.lib"" /DEFAULTLIB:""libipgo.lib"" /DEFAULTLIB:""LIBIRC.lib""  "
 			# setup.py doesn't handle debug flag correctly for windows ifort, it adds a -g flag which is ambiguous so we'll do our best to emulate it manually
 			if ($configuration -match "Debug") {$env:__INTEL_POST_FFLAGS = " /debug:all "} else {$env:__INTEL_POST_FFLAGS = ""}
+			# Scipy 1.2.2 causes an internal compiler error in _stats.c when optimization is set to /Ox.  This could be fixed by new version of either MSVC, Cython, or scipy potentially. VC 2015, 0.29.10, and 1.2.2 require this workaround.
+			# /Oi- might also work
+			If ($configuration -match "AVX") {$env:_CL_ = " /O1 /Oi /arch:AVX2 "} else {$env:_CL_ = " /O1 /Oi "}
 			& $pythonroot/$pythonexe setup.py build --compiler=msvc --fcompiler=intelvem *>> $log
 			Write-Host -NoNewline "installing..."
 			& $pythonroot/$pythonexe setup.py install  *>> $log
 			Write-Host -NoNewline "creating wheel..."
 			& $pythonroot/$pythonexe setup.py bdist_wheel *>> $log
 			move dist/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.whl dist/scipy-$scipy_version-cp27-cp27${d}m-win_amd64.$configuration.whl -Force
+			$env:_CL_=""
 			$env:_LINK_=""
 			$env:__INTEL_POST_FFLAGS = ""
 			$ErrorActionPreference = "Stop"

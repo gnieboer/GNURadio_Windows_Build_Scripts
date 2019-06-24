@@ -171,7 +171,8 @@ GetPackage https://github.com/cython/cython/archive/$cython_version.zip
 GetPackage https://github.com/numpy/numpy/archive/v$numpy_version.tar.gz
 
 # scipy 
-GetPackage https://github.com/scipy/scipy/releases/download/v$scipy_version/scipy-$scipy_version.tar.gz scipy
+# GetPackage https://github.com/scipy/scipy/releases/download/v$scipy_version/scipy-$scipy_version.tar.gz scipy
+GetPackage https://github.com/scipy/scipy.git -branch "v$scipy_version"
 
 # pyopengl 
 GetPackage https://pypi.python.org/packages/source/P/PyOpenGL/PyOpenGL-$pyopengl_version.tar.gz
