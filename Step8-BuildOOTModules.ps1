@@ -679,7 +679,11 @@ function BuildOOTModules
 		cd $root/src-stage3/oot_code/gr-specest/build/$configuration 
 		# the quotes that are likely to be in the below path make it impossible to added to the cmake config
 		$env:_LINK_ = " /LIBPATH:""${MY_IFORT}compiler/lib/intel64_win/"" "
-		$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib /NODEFAULTLIB:LIBCMT.lib /NODEFAULTLIB:LIBCMTD.lib  /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+		$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib /NODEFAULTLIB:LIBCMT.lib /NODEFAULTLIB:LIBCMTD.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+		if ($mm -eq "3.8")
+		{
+			$linkflags = " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib " + $linkflags
+		}
 		if ($configuration -match "AVX2") {$fortflags = " /QaxCORE-AVX2 /QxCORE-AVX2 /tune:haswell /arch:AVX2 "} else {$fortflags = " /arch:SSE2 "}
 		$froot = $root.Replace('\','/')
 		# set path to empty to ensure another GR install is not located
