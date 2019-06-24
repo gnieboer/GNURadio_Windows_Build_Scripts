@@ -8,7 +8,7 @@
 		openssl = '1.0.2r'
 		UHD = '3.14.1.0-rc1'
 		gqrx = '2.11.5'
-		Cython = '0.28.5'
+		Cython = '0.29.10'
 		numpy = '1.16.4'
 		scipy = '1.1.0'
 		lapack = '3.8.0'
