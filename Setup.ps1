@@ -308,10 +308,16 @@ function CheckNoAVX
 # must have already set fortran path for the below to work
 function CheckFortran 
 {
-	$iserr = $false
-	$varout = "$Global:MY_IFORT\bin\intel64\ifort.exe" 2>&1
-	$varout | foreach { if ($_ -match "error") {$iserr = $true} }
-	return $iserr
+	$detected = $true
+	pushd $root
+	"" | out-file -FilePath emptyfile.f -encoding ASCII
+	$varout = cmd.exe /c """$Global:MY_IFORT\bin\intel64\ifort.exe"" -c emptyfile.f /what"
+	$varout | foreach { if ($_ -match "error") {$detected = $false} }
+	Remove-Item emptyfile.f 
+	If (Test-Path emptyfile.obj) {Remove-Item emptyfile.obj }
+	popd
+	if (!$detected) {Write-Host "Compiler Detected but failed test script, output follows"; Write-Host $varout} 
+	return $detected
 }
 
 #load configuration variables
