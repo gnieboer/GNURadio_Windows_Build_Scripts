@@ -916,55 +916,57 @@ Function SetupPython
 	# (debug vs non-debug).  So the workaround is to build wx in release even when python is
 	# being built in debug.
 	#
-	SetLog "$configuration wxpython"
-	cd $root\src-stage1-dependencies\wxpython\wxPython
-	if ((TryValidate "$pythonroot\lib\site-packages\wx-3.0-msw\wx\_core_.pyd" "dist\wx-3.0-cp27-none-win_amd64.$configuration.whl") -eq $false) {
-		Write-Host -NoNewline "prepping wxpython..."
-		$canbuildwxdebug = $true
-		$wxdebug = ($canbuildwxdebug -and $d -eq "d")
-		$wxdebugstring = ""
-		$env:WXWIN="$root\src-stage1-dependencies\wxpython"
-		$env:PATH = "$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;$pythonroot/Scripts;$pythonroot" + $oldpath
-		$env:_CL_ = "/I$root/src-stage1-dependencies/wxpython/include/msvc /I$root/src-stage1-dependencies/wxpython/lib/vc140_dll/mswu  /DWXWIN=.. /DMSLU /D_UNICODE /DUNICODE /DwxMSVC_VERSION_AUTO "
-		if ($configuration -match "AVX2") {$env:_CL_ = $env:_CL_ +  " /arch:AVX2 "}
-		$ErrorActionPreference = "Continue"
-		if (Test-Path .\build) {del -recurse .\build\*.* *>> $Log}
-		& $pythonroot\$pythonexe build-wxpython.py --clean *>> $Log
-		if ($wxdebug) {
-			Write-Host -NoNewline "building release..."
-			$env:_CL_ = " /D__WXMSW__  /MDd " + $env:_CL_ 
-			& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config  *>> $Log
-			$env:_CL_ = " /I$root/src-stage1-dependencies/wxpython/lib/vc140_dll/mswud /D__WXDEBUG__ /D_DEBUG " + $env:_CL_ 
-			$wxdebugstring = "--debug"
-			Write-Host -NoNewline "building & installing..."
-		    & $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install $wxdebugstring *>> $Log
+	if ($mm -eq "3.7") {
+		SetLog "$configuration wxpython"
+		cd $root\src-stage1-dependencies\wxpython\wxPython
+		if ((TryValidate "$pythonroot\lib\site-packages\wx-3.0-msw\wx\_core_.pyd" "dist\wx-3.0-cp27-none-win_amd64.$configuration.whl") -eq $false) {
+			Write-Host -NoNewline "prepping wxpython..."
+			$canbuildwxdebug = $true
+			$wxdebug = ($canbuildwxdebug -and $d -eq "d")
+			$wxdebugstring = ""
+			$env:WXWIN="$root\src-stage1-dependencies\wxpython"
+			$env:PATH = "$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;$pythonroot/Scripts;$pythonroot" + $oldpath
+			$env:_CL_ = "/I$root/src-stage1-dependencies/wxpython/include/msvc /I$root/src-stage1-dependencies/wxpython/lib/vc140_dll/mswu  /DWXWIN=.. /DMSLU /D_UNICODE /DUNICODE /DwxMSVC_VERSION_AUTO "
+			if ($configuration -match "AVX2") {$env:_CL_ = $env:_CL_ +  " /arch:AVX2 "}
+			$ErrorActionPreference = "Continue"
+			if (Test-Path .\build) {del -recurse .\build\*.* *>> $Log}
+			& $pythonroot\$pythonexe build-wxpython.py --clean *>> $Log
+			if ($wxdebug) {
+				Write-Host -NoNewline "building release..."
+				$env:_CL_ = " /D__WXMSW__  /MDd " + $env:_CL_ 
+				& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config  *>> $Log
+				$env:_CL_ = " /I$root/src-stage1-dependencies/wxpython/lib/vc140_dll/mswud /D__WXDEBUG__ /D_DEBUG " + $env:_CL_ 
+				$wxdebugstring = "--debug"
+				Write-Host -NoNewline "building & installing..."
+				& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install $wxdebugstring *>> $Log
+			} else {
+				Write-Host -NoNewline "building & installing..."
+				& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install *>> $Log
+			}
+			# the above assumes the core WX dll's will be installed to the system someplace on the PATH.
+			# That's not what we want to do, so since these are gr-python-only DLLs, we'll put then in the site packages dir
+			cp "$root/src-stage1-dependencies/wxpython/lib/vc140_dll/wx*.dll" "$pythonroot/Lib/site-packages/wx-3.0-msw/wx"
+			#Write-Host -NoNewline "configing..."
+			#& $pythonroot\$pythonexe setup.py clean *>> $Log
+			#& $pythonroot\$pythonexe setup.py config MONOLITHIC=1 *>> $Log
+			#Write-Host -NoNewline "building..."
+			#& $pythonroot\$pythonexe setup.py build $wxdebugstring MONOLITHIC=1 *>> $Log
+			#Write-Host -NoNewline "installing..."
+			#& $pythonroot\$pythonexe setup.py install *>> $Log
+			Write-Host -NoNewline "crafting wheel..."
+			& $pythonroot\$pythonexe setup.py bdist_wininst UNICODE=1 BUILD_BASE=build *>> $Log
+			cd dist
+			& $pythonroot/Scripts/wheel.exe convert wxpython-$wxpython_version.win-amd64-py2.7.exe *>> $Log
+			del wxpython-$wxpython_version.win-amd64-py2.7.exe
+			move wx-3.0-cp27-none-win_amd64.whl wx-3.0-cp27-none-win_amd64.$configuration.whl -Force *>> $Log
+			move .\wxPython-common-$wxpython_version.win-amd64.exe .\wxPython-common-$wxpython_version.win-amd64.$configuration.exe -Force *>> $Log
+			$ErrorActionPreference = "Stop" 
+			$env:_CL_ = ""
+			$env:PATH = $oldPath
+			Validate "$pythonroot\lib\site-packages\wx-3.0-msw\wx\_core_.pyd" "wx-3.0-cp27-none-win_amd64.$configuration.whl"
 		} else {
-			Write-Host -NoNewline "building & installing..."
-			& $pythonroot\$pythonexe build-wxpython.py --build_dir=../build  --force_config --install *>> $Log
+			Write-Host "wxpython already built..."
 		}
-		# the above assumes the core WX dll's will be installed to the system someplace on the PATH.
-		# That's not what we want to do, so since these are gr-python-only DLLs, we'll put then in the site packages dir
-		cp "$root/src-stage1-dependencies/wxpython/lib/vc140_dll/wx*.dll" "$pythonroot/Lib/site-packages/wx-3.0-msw/wx"
-		#Write-Host -NoNewline "configing..."
-		#& $pythonroot\$pythonexe setup.py clean *>> $Log
-		#& $pythonroot\$pythonexe setup.py config MONOLITHIC=1 *>> $Log
-		#Write-Host -NoNewline "building..."
-		#& $pythonroot\$pythonexe setup.py build $wxdebugstring MONOLITHIC=1 *>> $Log
-		#Write-Host -NoNewline "installing..."
-		#& $pythonroot\$pythonexe setup.py install *>> $Log
-		Write-Host -NoNewline "crafting wheel..."
-		& $pythonroot\$pythonexe setup.py bdist_wininst UNICODE=1 BUILD_BASE=build *>> $Log
-		cd dist
-		& $pythonroot/Scripts/wheel.exe convert wxpython-$wxpython_version.win-amd64-py2.7.exe *>> $Log
-		del wxpython-$wxpython_version.win-amd64-py2.7.exe
-		move wx-3.0-cp27-none-win_amd64.whl wx-3.0-cp27-none-win_amd64.$configuration.whl -Force *>> $Log
-		move .\wxPython-common-$wxpython_version.win-amd64.exe .\wxPython-common-$wxpython_version.win-amd64.$configuration.exe -Force *>> $Log
-		$ErrorActionPreference = "Stop" 
-		$env:_CL_ = ""
-		$env:PATH = $oldPath
-		Validate "$pythonroot\lib\site-packages\wx-3.0-msw\wx\_core_.pyd" "wx-3.0-cp27-none-win_amd64.$configuration.whl"
-	} else {
-		Write-Host "wxpython already built..."
 	}
 
 	#__________________________________________________________________________________________
