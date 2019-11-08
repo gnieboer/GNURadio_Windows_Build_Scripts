@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
   <Product Id="CAD51E8A-3E3C-48B2-ABC3-DCB0D9F643C8"
-           Name="GNURadio-3.7"
+           Name="GNURadio-3.8"
            Language="1033"
            Version="1.6.0"
            Manufacturer="GCN Development"
@@ -9,7 +9,7 @@
     <Package InstallerVersion="301" Compressed="yes" InstallScope="perMachine" />
     <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
     <MediaTemplate EmbedCab="yes" />
-    <Feature Id="ProductFeature" Title="GNURadio-3.7" Level="1">
+    <Feature Id="ProductFeature" Title="GNURadio-3.8" Level="1">
       <ComponentGroupRef Id="GRGroup"/>
       <ComponentRef Id="AppShortCuts"/>
       <ComponentRef Id="ApplicationUHDSubDir"/>
@@ -52,7 +52,7 @@
   <Fragment>
     <Directory Id="TARGETDIR" Name="SourceDir">
       <Directory Id="ProgramFiles64Folder">
-        <Directory Id="INSTALLFOLDER" Name="GNURadio-3.7" >
+        <Directory Id="INSTALLFOLDER" Name="GNURadio-3.8" >
           <Directory Id="PYTHONFOLDER" Name="gr-python27" />
           <Directory Id="BINARYFILES" Name="bin" />
           <Directory Id="ETCFOLDER" Name ="etc">
@@ -73,7 +73,7 @@
         </Directory>
       </Directory>
       <Directory Id="ProgramMenuFolder">
-        <Directory Id="ApplicationProgramsFolder" Name="GNURadio 3.7">
+        <Directory Id="ApplicationProgramsFolder" Name="GNURadio 3.8">
           <Directory Id="ApplicationUHDSubFolder" Name="USRP Applications">
             <Component Id="ApplicationUHDSubDir" Guid="F20EF51E-E33F-4A07-9ACC-992B7277B235">
               <RemoveFolder Id="ApplicationUHDSubDir" On="uninstall"/>
