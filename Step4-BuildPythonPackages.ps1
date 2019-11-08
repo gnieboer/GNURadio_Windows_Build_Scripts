@@ -777,10 +777,13 @@ Function SetupPython
 		if ((TryValidate "dist/gtk-3.0/pygobject-$pygobject3_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot\lib\site-packages\gi\_gi.pyd") -eq $false) {
 			Write-Host -NoNewline "building Pygobject 3..."
 			$ErrorActionPreference = "Continue" 
-			$env:INCLUDE = "$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/glib-2.0;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/cairo;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/lib/glib-2.0/include;$root/src-stage1-dependencies/x64/include/gobject-introspection-1.0;$root/src-stage1-dependencies/x64/include/gtk-3.0" + $oldInclude 
+			$env:INCLUDE = "$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/gobject-introspection-1.0/girepository;$root/src-stage1-dependencies/x64/include/glib-2.0;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/cairo;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/lib/glib-2.0/include;$root/src-stage1-dependencies/x64/include/gobject-introspection-1.0;$root/src-stage1-dependencies/x64/include/gtk-3.0" + $oldInclude 
 			$env:PATH = "$root/bin;$root/src-stage1-dependencies/x64/bin;$root/src-stage1-dependencies/x64/lib;" + $oldpath
 			$env:PKG_CONFIG_PATH = "$root/bin;$root/src-stage1-dependencies/x64/lib/pkgconfig;$pythonroot/lib/pkgconfig"
 			$env:LIB = "$root/src-stage1-dependencies/x64/lib;" + $oldlib
+			if ((Test-Path "$root/src-stage1-dependencies/x64/lib/libffi.lib") -and !(Test-Path "$root/src-stage1-dependencies/x64/lib/ffi.lib")) {
+				Rename-Item -Path "$root/src-stage1-dependencies/x64/lib/libffi.lib" -NewName "ffi.lib"
+			}
 			if ($configuration -match "AVX2") {$env:_CL_ = "/arch:AVX2"} else {$env:_CL_ = $null}
 			if ($configuration -match "Debug") {$env:_CL_ = $env:_CL_ + " /Zi /D_DEBUG  "; $env:_LINK_ = " /DEBUG:FULL"}
 			& $pythonroot/$pythonexe setup.py build $debug --compiler=msvc  *>> $Log
