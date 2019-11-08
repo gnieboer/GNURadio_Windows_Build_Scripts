@@ -134,56 +134,57 @@ $ErrorActionPreference = "Stop"
 #
 # building libraries separate from the actual install into Python
 #
-$ErrorActionPreference = "Continue"
-SetLog "PyQt"
-cd $root\src-stage1-dependencies\PyQt4
-$env:QMAKESPEC = "win32-msvc2015"
-Write-Host -NoNewline "building PyQT..."
+if ($mm -eq "3.7") {
+	$ErrorActionPreference = "Continue"
+	SetLog "PyQt"
+	cd $root\src-stage1-dependencies\PyQt4
+	$env:QMAKESPEC = "win32-msvc2015"
+	Write-Host -NoNewline "building PyQT..."
 
-function MakePyQt 
-{
+	function MakePyQt 
+	{
 
-	$type = $args[0]
-	Write-Host -NoNewline "$type"
-	$debugext = if ($type -match "Debug") {"_d"} else {""}
-	if ((TryValidate "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/Qt$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtCore$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtGui$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtOpenGL$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtSvg$debugext.pyd") -eq $false) {
-		if ($type -match "Debug") {$thispython = $pythondebugexe} else {$thispython = $pythonexe}
-		$flags = if ($type -match "Debug") {"-u"} else {""}
-		$flags += if ($type -match "Dll") {""} else {" -k"}
-		if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 /MP " } else {$env:_CL_ = "/wd4577 /MP "}
-		$env:_LINK_= ""
-		$env:Path = "$root\src-stage1-dependencies\Qt4\build\$type\bin;" + $oldpath
+		$type = $args[0]
+		Write-Host -NoNewline "$type"
+		$debugext = if ($type -match "Debug") {"_d"} else {""}
+		if ((TryValidate "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/Qt$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtCore$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtGui$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtOpenGL$debugext.pyd" "$root/src-stage1-dependencies/PyQt4/build/x64/$type/package/PyQt4/QtSvg$debugext.pyd") -eq $false) {
+			if ($type -match "Debug") {$thispython = $pythondebugexe} else {$thispython = $pythonexe}
+			$flags = if ($type -match "Debug") {"-u"} else {""}
+			$flags += if ($type -match "Dll") {""} else {" -k"}
+			if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 /MP " } else {$env:_CL_ = "/wd4577 /MP "}
+			$env:_LINK_= ""
+			$env:Path = "$root\src-stage1-dependencies\Qt4\build\$type\bin;" + $oldpath
 
-		& $pythonroot\$thispython configure.py $flags --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg -b build/x64/$type/bin -d build/x64/$type/package -p build/x64/$type/plugins --sipdir build/x64/$type/sip *>> $log
+			& $pythonroot\$thispython configure.py $flags --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg -b build/x64/$type/bin -d build/x64/$type/package -p build/x64/$type/plugins --sipdir build/x64/$type/sip *>> $log
 
-		# BUG FIX
-		"all: ;" > .\pylupdate\Makefile
-		"install : ;" >> .\pylupdate\Makefile
-		"clean : ;" >> .\pylupdate\Makefile
+			# BUG FIX
+			"all: ;" > .\pylupdate\Makefile
+			"install : ;" >> .\pylupdate\Makefile
+			"clean : ;" >> .\pylupdate\Makefile
 
-		nmake *>> $log
-		nmake install *>> $log
-		nmake clean *>> $log
-		$env:_CL_ = ""
-		$env:_LINK_ = ""
-		Write-Host -NoNewline "-done..."
-	} else {
-		Write-Host -NoNewline "...already built..."
+			nmake *>> $log
+			nmake install *>> $log
+			nmake clean *>> $log
+			$env:_CL_ = ""
+			$env:_LINK_ = ""
+			Write-Host -NoNewline "-done..."
+		} else {
+			Write-Host -NoNewline "...already built..."
+		}
 	}
-}
 
-$pythonroot = "$root\src-stage2-python\gr-python27-debug"
-MakePyQt "DebugDLL"
-#MakePyQt "Debug"
-$pythonroot = "$root\src-stage2-python\gr-python27"
-MakePyQt "ReleaseDLL"
-#MakePyQt "Release"
-$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
-MakePyQt "ReleaseDLL-AVX2"
-#MakePyQt "Release-AVX2"
-$ErrorActionPreference = "Stop"
+	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
+	MakePyQt "DebugDLL"
+	#MakePyQt "Debug"
+	$pythonroot = "$root\src-stage2-python\gr-python27"
+	MakePyQt "ReleaseDLL"
+	#MakePyQt "Release"
+	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
+	MakePyQt "ReleaseDLL-AVX2"
+	#MakePyQt "Release-AVX2"
+	$ErrorActionPreference = "Stop"
 "complete"
-
+}
 $mm = GetMajorMinor($gnuradio_version)
 if ($mm -eq "3.8") {
 	#__________________________________________________________________________________________
@@ -196,7 +197,7 @@ if ($mm -eq "3.8") {
 	$ErrorActionPreference = "Continue"
 	SetLog "PyQt5"
 	cd $root\src-stage1-dependencies\PyQt5
-	$env:QMAKESPEC = "win32-msvc2015"
+	$env:QMAKESPEC = "win32-msvc"
 	Write-Host -NoNewline "building PyQT5..."
 
 	function MakePyQt5
@@ -206,13 +207,15 @@ if ($mm -eq "3.8") {
 		if ($type -match "Debug") {$thispython = $pythondebugexe} else {$thispython = $pythonexe}
 		$debugext = if ($type -match "Debug") {"_d"} else {""}
 		if ((TryValidate "$root/src-stage1-dependencies/PyQt5/build/x64/$type/package/PyQt5/Qt$debugext.pyd"  "$root/src-stage1-dependencies/PyQt5/build/x64/$type/package/PyQt5/QtGui$debugext.pyd" "$root/src-stage1-dependencies/PyQt5/build/x64/$type/package/PyQt5/QtOpenGL$debugext.pyd" "$root/src-stage1-dependencies/PyQt5/build/x64/$type/package/PyQt5/QtWidgets$debugext.pyd" "$root/src-stage1-dependencies/PyQt5/build/x64/$type/package/PyQt5/QtSvg$debugext.pyd" "$root/src-stage1-dependencies/PyQt5/build/x64/$type/package/PyQt5/QtCore$debugext.pyd") -eq $false) {
-			$flags = if ($type -match "Debug") {"-u"} else {""}
+			$flags = if ($type -match "Debug") {"--debug"} else {""}
 			$flags += if ($type -match "Dll") {""} else {" -k"}
 			if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 /MP "} else {$env:_CL_ = "/wd4577 /MP " }
 			$env:_LINK_= ""
-			$env:Path = "$root\src-stage1-dependencies\Qt5\build\$type\bin;" + $oldpath
-
-			& $pythonroot\$thispython configure.py $flags --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtCore --enable QtOpenGL --enable QtGui --enable QtWidgets  --enable QtSvg --spec win32-msvc2015 -b build/x64/$type/bin -d build/x64/$type/package  --sipdir build/x64/$type/sip --sip $pythonroot/sip.exe *>> $log
+			$env:Path = "$root\src-stage1-dependencies\Qt5Stage\build\$type\bin;" + $oldpath
+			$env:QTDIR = "$root\src-stage1-dependencies\Qt5Stage\build\$type"
+			# this version of PyQt5 + Sip requires enum34 to be installed as well
+			# since it's just for the build we'll install via pip 
+			& $pythonroot\$thispython configure.py $flags --qmake "$root/src-stage1-dependencies/Qt5Stage/build/$type/bin/qmake.exe" --destdir "build\x64\$type" --confirm-license --verbose --no-designer-plugin --enable QtCore --enable QtOpenGL --enable QtGui --enable QtWidgets  --enable QtSvg --spec win32-msvc -b build/x64/$type/bin -d build/x64/$type/package  --sipdir build/x64/$type/sip --sip $pythonroot/sip.exe *>> $log
 
 			# BUG FIX
 			"all: ;" > .\pylupdate\Makefile
@@ -239,6 +242,9 @@ if ($mm -eq "3.8") {
 	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
 	MakePyQt5 "DebugDLL"
 	#MakePyQt5 "Debug"
+	$env:Path = $oldpath
+	$env:QMAKESPEC = ""
+	$env:QTDIR = ""
 	$ErrorActionPreference = "Stop"
 	"complete"
 }
@@ -263,40 +269,41 @@ Function SetupPython
 		$pythonexe = "python.exe"
 	}
 
+	if ($mm -eq "3.7") {
 	#__________________________________________________________________________________________
 	# PyQt4
 	#
-	SetLog "$configuration PyQt4"
-	if ((TryValidate "$pythonroot/lib/site-packages/PyQt4/Qt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtCore$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtGui$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtOpenGL$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtSvg$debugext.pyd") -eq $false) {
-		Write-Host -NoNewline "configuring PyQt4..."
-		$ErrorActionPreference = "Continue"
-		cd $root\src-stage1-dependencies\PyQt4
-		$flags = if ($configuration -match "Debug") {"-u"} else {""}
-		if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 /MP "} else {$env:_CL_ = "/wd4577 /MP " }
-		$env:Path = "$root\src-stage1-dependencies\Qt4\build\$configuration\bin;" + $oldpath
-		$env:QMAKESPEC = "win32-msvc2015"
-		$env:_LINK_= ""
+		SetLog "$configuration PyQt4"
+		if ((TryValidate "$pythonroot/lib/site-packages/PyQt4/Qt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtCore$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtGui$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtOpenGL$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtSvg$debugext.pyd") -eq $false) {
+			Write-Host -NoNewline "configuring PyQt4..."
+			$ErrorActionPreference = "Continue"
+			cd $root\src-stage1-dependencies\PyQt4
+			$flags = if ($configuration -match "Debug") {"-u"} else {""}
+			if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 /MP "} else {$env:_CL_ = "/wd4577 /MP " }
+			$env:Path = "$root\src-stage1-dependencies\Qt4\build\$configuration\bin;" + $oldpath
+			$env:QMAKESPEC = "win32-msvc2015"
+			$env:_LINK_= ""
 
-		& $pythonroot\$pythonexe configure.py $flags --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg  *>> $log
-	
-		# BUG FIX
-		"all: ;" > .\pylupdate\Makefile
-		"install : ;" >> .\pylupdate\Makefile
-		"clean : ;" >> .\pylupdate\Makefile 
+			& $pythonroot\$pythonexe configure.py $flags --confirm-license --verbose --no-designer-plugin --enable QtOpenGL --enable QtGui --enable QtSvg  *>> $log
+		
+			# BUG FIX
+			"all: ;" > .\pylupdate\Makefile
+			"install : ;" >> .\pylupdate\Makefile
+			"clean : ;" >> .\pylupdate\Makefile 
 
-		Write-Host -NoNewline "building..."
-		Exec {nmake} *>> $log
-		Write-Host -NoNewline "installing..."
-		Exec {nmake install} *>> $log
-		$env:Path = $oldpath
-		$env:_CL_ = ""
-		$env:_LINK_ = ""
-		$ErrorActionPreference = "Stop"
-		Validate "$pythonroot/lib/site-packages/PyQt4/Qt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtCore$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtGui$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtOpenGL$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtSvg$debugext.pyd"
-	} else {
-		Write-Host "PyQt4 already built..."
+			Write-Host -NoNewline "building..."
+			Exec {nmake} *>> $log
+			Write-Host -NoNewline "installing..."
+			Exec {nmake install} *>> $log
+			$env:Path = $oldpath
+			$env:_CL_ = ""
+			$env:_LINK_ = ""
+			$ErrorActionPreference = "Stop"
+			Validate "$pythonroot/lib/site-packages/PyQt4/Qt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtCore$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtGui$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtOpenGL$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/QtSvg$debugext.pyd"
+		} else {
+			Write-Host "PyQt4 already built..."
+		}
 	}
-
 	if ($mm -eq "3.8") {
 		#__________________________________________________________________________________________
 		# PyQt5
@@ -306,13 +313,14 @@ Function SetupPython
 			Write-Host -NoNewline "configuring PyQt5..."
 			$ErrorActionPreference = "Continue"
 			cd $root\src-stage1-dependencies\PyQt5
-			$flags = if ($configuration -match "Debug") {"-u"} else {""}
+			$flags = if ($configuration -match "Debug") {"--debug"} else {""}
 			if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 /MP "} else {$env:_CL_ = "/wd4577 /MP " }
-			$env:Path = "$root\src-stage1-dependencies\Qt5\build\$configuration\bin;" + $oldpath
-			$env:QMAKESPEC = "win32-msvc2015"
+			$env:Path = "$root\src-stage1-dependencies\Qt5Stage\build\$configuration\bin;" + $oldpath
+			$env:QMAKESPEC = "win32-msvc"
+			$env:QTDIR = "$root\src-stage1-dependencies\Qt5Stage\build\$type"
 			$env:_LINK_= ""
 
-			& $pythonroot\$pythonexe configure.py $flags --confirm-license --verbose --no-designer-plugin --enable QtCore --enable QtGui --enable QtOpenGL --enable QtSvg --enable QtWidgets --spec win32-msvc2015 --sip $pythonroot/sip.exe *>> $log
+			& $pythonroot\$pythonexe configure.py $flags --qmake "$root/src-stage1-dependencies/Qt5Stage/build/$configuration/bin/qmake.exe" --confirm-license --verbose --no-designer-plugin --disable QtNfc --enable QtCore --enable QtGui --enable QtOpenGL --enable QtSvg --enable QtWidgets --spec win32-msvc --sip $pythonroot/sip.exe *>> $log
 		
 		
 			Write-Host -NoNewline "building..."
@@ -320,10 +328,14 @@ Function SetupPython
 			Write-Host -NoNewline "installing..."
 			Exec {nmake install} *>> $log
 			$env:Path = $oldpath
+			$env:QTDIR = ""
 			$env:_CL_ = ""
 			$env:_LINK_ = ""
 			$ErrorActionPreference = "Stop"
 			Validate "$pythonroot/lib/site-packages/PyQt5/Qt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt5/QtGui$debugext.pyd" "$pythonroot/lib/site-packages/PyQt5/QtCore$debugext.pyd" "$pythonroot/lib/site-packages/PyQt5/QtOpenGL$debugext.pyd" "$pythonroot/lib/site-packages/PyQt5/QtSvg$debugext.pyd"  "$pythonroot/lib/site-packages/PyQt5/QtWidgets$debugext.pyd"
+			$env:Path = $oldpath
+			$env:QMAKESPEC = ""
+			$env:QTDIR = ""
 		} else {
 			Write-Host "PyQt5 already built..."
 		}					
