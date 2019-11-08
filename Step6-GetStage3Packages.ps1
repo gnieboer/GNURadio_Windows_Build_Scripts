@@ -293,14 +293,7 @@ if (!(Test-Path $root/src-stage3/src/gnuradio)) {
     # however, since this is the one most users might want to modify, we'll get more.
 	git clone --depth=150 --no-single-branch --recursive https://github.com/gnuradio/gnuradio.git 2>&1 >> $log 
 	cd gnuradio
-	# As 3.8 is pre-release, there are no tags, so checkout master
-	# but otherwise find the tag related to the version 
-	$mm = GetMajorMinor($gnuradio_version)
-	if ($mm -eq "3.8") {
-		git checkout master
-	} else {
-		git checkout v$gnuradio_version
-	}
+	git checkout v$gnuradio_version
 	git pull --recurse-submodules=on
 	git submodule update
 	cd ..
