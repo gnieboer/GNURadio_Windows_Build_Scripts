@@ -19,7 +19,7 @@ if ($configmode -eq $null) {$configmode = "all"}
 
 SetLog "MSI Creation"
 cd $root\src-stage4-installer
-New-Item -ItemType Directory -Force build *>> $Log 
+New-Item -ItemType Directory -Force build 2>&1 >> $Log 
 Write-Host "Building MSI packages"
 
 Function BuildMSI {
@@ -32,9 +32,9 @@ Function BuildMSI {
 
 	cd $root\src-stage4-installer
 
-	New-Item -ItemType Directory -Force build\$configuration *>> $Log 
+	New-Item -ItemType Directory -Force build\$configuration 2>&1 >> $Log 
 
-	msbuild gnuradio-winstaller.wixproj /m /p:"configuration=$configuration;root=$root;platform=x64"  *>> $Log 
+	msbuild gnuradio-winstaller.wixproj /m /p:"configuration=$configuration;root=$root;platform=x64"  2>&1 >> $Log 
 
 	Validate "$root/src-stage4-installer/dist/$configuration/gnuradio_win64.msi"
 	
@@ -47,7 +47,7 @@ Function BuildMSI {
 
 Function ConsolidatePDBs {
 	$configuration = $args[0]
-	New-Item -ItemType Directory -Force $root\src-stage4-installer\symbols\$configuration *>> $Log
+	New-Item -ItemType Directory -Force $root\src-stage4-installer\symbols\$configuration 2>&1 >> $Log
 	pushd $root\src-stage1-dependencies
 	Get-ChildItem -Recurse -Filter "$configuration" -Directory | Get-ChildItem -Recurse -Directory | Get-ChildItem -Filter "*.pdb" | Copy-Item -Destination ..\src-stage4-installer\symbols\$configuration -Force
 	Get-ChildItem -Recurse -Filter "${configuration}DLL" -Directory | Get-ChildItem -Recurse -Directory | Get-ChildItem -Filter "*.pdb" | Copy-Item -Destination ..\src-stage4-installer\symbols\$configuration -Force
