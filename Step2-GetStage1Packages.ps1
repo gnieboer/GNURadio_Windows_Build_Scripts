@@ -155,10 +155,10 @@ GetPackage http://downloads.sourceforge.net/project/qwt/qwt/$qwt6_version/qwt-$q
 GetPatch qwt6_patch.7z qwt-$qwt6_version
 
 # sip
-GetPackage http://sourceforge.net/projects/pyqt/files/sip/sip-$sip_version/sip-$sip_version.zip
+GetPackage https://www.riverbankcomputing.com/static/Downloads/sip/$sip_version/sip-$sip_version.zip
 
 # PyQt
-GetPackage http://downloads.sourceforge.net/project/pyqt/PyQt4/PyQt-$PyQt_version/PyQt-win-gpl-$PyQt_version.zip PyQt4
+GetPackage http://sourceforge.net/projects/pyqt/files/PyQt4/PyQt-$PyQt_version/PyQt4_gpl_win-$PyQt_version.zip
 
 # PyQwt
 GetPackage https://github.com/PyQwt/PyQwt5/archive/master.zip
@@ -276,7 +276,7 @@ if ($mm -eq "3.8") {
 	GetPatch log4cpp_msvc14.7z log4cpp
 
 	# PyQt5
-	GetPackage http://downloads.sourceforge.net/project/pyqt/PyQt5/PyQt-$PyQt5_version/PyQt5_gpl-$PyQt5_version.tar.gz PyQt5
+	GetPackage https://www.riverbankcomputing.com/static/Downloads/PyQt5/$PyQt5_version/PyQt5_gpl-$PyQt5_version.tar.gz PyQt5
 	
 	# MPIR
 	GetPackage http://mpir.org/mpir-$MPIR_version.zip mpir
