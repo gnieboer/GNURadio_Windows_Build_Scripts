@@ -61,7 +61,11 @@ GetPackage https://github.com/osmocom/osmo-sdr.git -Stage3
 # gr-iqbal
 #
 # upstream: https://github.com/osmocom/gr-iqbal.git 
-GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gr-iqbal.7z -Stage3
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/gnieboer/gr-iqbal.git -Stage3 -branch "gr3.8"
+} else {
+	GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gr-iqbal.7z -Stage3
+}
 
 # ____________________________________________________________________________________________________________
 #
@@ -75,21 +79,31 @@ GetPackage https://github.com/osh/gr-benchmark.git -Stage3
 #
 # use this version instead of the original repo at antoinet unlike the fix gets merged
 #
-GetPackage https://github.com/gnieboer/gr-acars2.git -Stage3
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/gnieboer/gr-acars2.git -Stage3
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-adsb
 #
-GetPackage https://github.com/wnagele/gr-adsb.git -Stage3
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/mhostetter/gr-adsb.git -Stage3 -branch "maint-3.8"
+} else {
+	GetPackage https://github.com/mhostetter/gr-adsb.git -Stage3 -branch "maint-3.7"
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-air-modes
 #
-# using a fork until some cmake updates are included (push request sent)
-# GetPackage https://github.com/bistromath/gr-air-modes.git -Stage3
-GetPackage https://github.com/gnieboer/gr-air-modes.git -Stage3
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/bistromath/gr-air-modes.git -Stage3 
+} else {
+	GetPackage https://github.com/gnieboer/gr-air-modes.git -Stage3
+}
 
 
 # ____________________________________________________________________________________________________________
@@ -98,7 +112,11 @@ GetPackage https://github.com/gnieboer/gr-air-modes.git -Stage3
 #
 # awaiting merge requests to go back to upstream repo instead of my fork
 #
-GetPackage https://github.com/gnieboer/gr-fosphor.git -Stage3 
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/osmocom/gr-fosphor.git -Stage3 -branch "gr38-qt5"
+} else {
+	GetPackage https://github.com/gnieboer/gr-fosphor.git -Stage3 
+}
 GetPackage https://github.com/glfw/glfw.git -Stage3
 
 # ____________________________________________________________________________________________________________
@@ -140,24 +158,31 @@ GetPackage ftp://ftp.gnutls.org/gcrypt/gnutls/w32/gnutls-3.5.8-w64.zip gnutls -S
 #
 # gr-inspector
 #
-GetPackage https://github.com/gnuradio/gr-inspector.git -Stage3
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/gnuradio/gr-inspector.git -Stage3
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-specest
 #
 if ($mm -eq "3.8") {
-	GetPackage https://github.com/kit-cel/gr-specest.git -Stage3 
+	GetPackage https://github.com/gnieboer/gr-specest.git -Stage3 -branch "gr-3.8"
 } else {
 	GetPackage https://github.com/gnieboer/gr-specest.git -Stage3 -branch "msvc_fixes"
 }
-
 
 # ____________________________________________________________________________________________________________
 #
 # gr-cdma
 #
-GetPackage https://github.com/anastas/gr-cdma.git -Stage3 
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/anastas/gr-cdma.git -Stage3 
+}
 
 # ____________________________________________________________________________________________________________
 #
@@ -174,42 +199,55 @@ if ($mm -eq "3.8") {
 # gr-ais
 #
 # Awaiting incorporation of pull request 
-# Appears abandoned, no 3.8 efforts visible
 #
-GetPackage https://github.com/gnieboer/gr-ais.git -Stage3 -branch "msvc-fixes"
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/gnieboer/gr-ais.git -Stage3 -branch "msvc-fixes"
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-display
 #
-# v3.8 is in work on master but not release tagged yet
+# v3.8 support doesn't have a tagged release yet, just use master
 #
 if ($mm -eq "3.8") {
-	GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 
+	GetPackage https://github.com/dl1ksv/gr-display.git -Stage3
 } else {
 	GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 -branch "$grdisplay_version"
 }
-
 
 # ____________________________________________________________________________________________________________
 #
 # gr-ax25
 #
-GetPackage https://github.com/dl1ksv/gr-ax25.git -Stage3
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/dl1ksv/gr-ax25.git -Stage3
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-radar
 #
-# Awaiting incorporation of pull request 
 #
-GetPackage https://github.com/gnieboer/gr-radar.git -Stage3 -branch "msvc_fixes"
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/gnieboer/gr-radar.git -Stage3 -branch "gr-3.8"
+} else {
+	GetPackage https://github.com/gnieboer/gr-radar.git -Stage3 -branch "msvc_fixes"
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-paint
 #
-GetPackage https://github.com/drmpeg/gr-paint.git -Stage3 
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/drmpeg/gr-paint38.git -Stage3 
+} else {
+	GetPackage https://github.com/drmpeg/gr-paint.git -Stage3 
+}
 
 # ____________________________________________________________________________________________________________
 #
@@ -217,20 +255,33 @@ GetPackage https://github.com/drmpeg/gr-paint.git -Stage3
 #
 # Awaiting incorporation of pull request 
 #
-GetPackage https://github.com/gnieboer/gr-mapper.git -Stage3 -branch "msvc_fixes"
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/gnieboer/gr-mapper.git -Stage3 -branch "gr-3.8"
+} else {
+	GetPackage https://github.com/gnieboer/gr-mapper.git -Stage3 -branch "msvc_fixes"
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-nacl
 #
-GetPackage https://github.com/stwunsch/gr-nacl -Stage3 
+#
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/stwunsch/gr-nacl.git -Stage3 
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-eventstream
 #
 #
-GetPackage https://github.com/osh/gr-eventstream.git -Stage3
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/osh/gr-eventstream.git -Stage3
+}
 
 # ____________________________________________________________________________________________________________
 #
@@ -238,13 +289,21 @@ GetPackage https://github.com/osh/gr-eventstream.git -Stage3
 #
 # Minor change from main repo
 #
-GetPackage https://github.com/gnieboer/gr-burst.git -Stage3 -branch "msvc_fixes"
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/gnieboer/gr-burst.git -Stage3 -branch "gr-3.8"
+} else {
+	GetPackage https://github.com/gnieboer/gr-burst.git -Stage3 -branch "msvc_fixes"
+}
 
 # ____________________________________________________________________________________________________________
 #
 # gr-lte
 #
-GetPackage https://github.com/gnieboer/gr-lte.git -Stage3 -branch "msvc_fixes"
+if ($mm -eq "3.8") {
+	# not yet 3.8 compatible
+} else {
+	GetPackage https://github.com/gnieboer/gr-lte.git -Stage3 -branch "msvc_fixes"
+}
 
 # ____________________________________________________________________________________________________________
 #
@@ -256,7 +315,11 @@ GetPackage https://downloads.sourceforge.net/project/openlte/openlte_v$openlte_v
 #
 # gr-gsm
 #
-GetPackage https://github.com/ptrkrysik/gr-gsm.git -Stage3
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/velichkov/gsm.git -Stage3 -branch "maint-3.8"
+} else {
+	GetPackage https://github.com/ptrkrysik/gr-gsm.git -Stage3
+}
 
 # The below are all packages that will not currently build but are 'in work' for inclusion at a later date
 # please feel free to give them a shot.
