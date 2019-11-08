@@ -596,49 +596,51 @@ Function SetupPython
 	# PyQwt5
 	# requires Python, Qwt, Qt, PyQt, and Numpy
 	#
-	SetLog "$configuration PyQwt5"
-	cd $root\src-stage1-dependencies\PyQwt5-master
-	if ((TryValidate "dist/PyQwt-5.2.1.win-amd64.$configuration.exe" "$pythonroot/lib/site-packages/PyQt4/Qwt5/Qwt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/_iqt.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/qplt.py") -eq $false) {
-		Write-Host -NoNewline "configuring PyQwt5..."
-		$ErrorActionPreference = "Continue" 
-		# qwt_version_info will look for QtCore4.dll, never Qt4Core4d.dll so point it to the ReleaseDLL regardless of the desired config
-		if ($configuration -eq "DebugDLL") {$QtVersion = "ReleaseDLL"} else {$QtVersion = $configuration}
-		$env:Path = "$root\src-stage1-dependencies\Qt4\build\$QtVersion\bin;$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib;" + $oldpath
-		$envLib = $oldlib
-		if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 " } else {$env:_CL_ = "/wd4577 " }
-		cd configure
-		# CALL "../../%1/Release/Python27/python.exe" configure.py %DEBUG% --extra-cflags=%FLAGS% %DEBUG% -I %~dp0..\qwt-5.2.3\build\include -L %~dp0..\Qt-4.8.7\lib -L %~dp0..\qwt-5.2.3\build\lib -l%QWT_LIB%
-		if ($configuration -eq "DebugDLL") {
-			$env:_LINK_ = " /FORCE /LIBPATH:""$root/src-stage1-dependencies/Qt4/build/ReleaseDLL/lib"" /LIBPATH:""$root/src-stage1-dependencies/Qt4/build/Release-AVX2/lib"" /DEFAULTLIB:user32  /DEFAULTLIB:advapi32  /DEFAULTLIB:ole32  /DEFAULTLIB:ws2_32  /DEFAULTLIB:qtcored4 " 
-			& $pythonroot/$pythonexe configure.py --debug --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\$QtVersion\lib   -l qtcored4     -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwtd" -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Debug --sip-include-dirs ..\..\PyQt4\sip *>> $log
-		} elseif ($configuration -eq "ReleaseDLL") {
-			& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL\lib -l qtcore4       -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwt"  -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release *>> $log
+	if ($mm -eq "3.7") {
+		SetLog "$configuration PyQwt5"
+		cd $root\src-stage1-dependencies\PyQwt5-master
+		if ((TryValidate "dist/PyQwt-5.2.1.win-amd64.$configuration.exe" "$pythonroot/lib/site-packages/PyQt4/Qwt5/Qwt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/_iqt.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/qplt.py") -eq $false) {
+			Write-Host -NoNewline "configuring PyQwt5..."
+			$ErrorActionPreference = "Continue" 
+			# qwt_version_info will look for QtCore4.dll, never Qt4Core4d.dll so point it to the ReleaseDLL regardless of the desired config
+			if ($configuration -eq "DebugDLL") {$QtVersion = "ReleaseDLL"} else {$QtVersion = $configuration}
+			$env:Path = "$root\src-stage1-dependencies\Qt4\build\$QtVersion\bin;$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib;" + $oldpath
+			$envLib = $oldlib
+			if ($type -match "AVX2") {$env:_CL_ = "/Ox /arch:AVX2 /wd4577 " } else {$env:_CL_ = "/wd4577 " }
+			cd configure
+			# CALL "../../%1/Release/Python27/python.exe" configure.py %DEBUG% --extra-cflags=%FLAGS% %DEBUG% -I %~dp0..\qwt-5.2.3\build\include -L %~dp0..\Qt-4.8.7\lib -L %~dp0..\qwt-5.2.3\build\lib -l%QWT_LIB%
+			if ($configuration -eq "DebugDLL") {
+				$env:_LINK_ = " /FORCE /LIBPATH:""$root/src-stage1-dependencies/Qt4/build/ReleaseDLL/lib"" /LIBPATH:""$root/src-stage1-dependencies/Qt4/build/Release-AVX2/lib"" /DEFAULTLIB:user32  /DEFAULTLIB:advapi32  /DEFAULTLIB:ole32  /DEFAULTLIB:ws2_32  /DEFAULTLIB:qtcored4 " 
+				& $pythonroot/$pythonexe configure.py --debug --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\$QtVersion\lib   -l qtcored4     -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwtd" -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Debug --sip-include-dirs ..\..\PyQt4\sip *>> $log
+			} elseif ($configuration -eq "ReleaseDLL") {
+				& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -wd4577"                -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\include -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL\lib -l qtcore4       -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Debug-Release\lib\qwt"  -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release *>> $log
+			} else {
+				& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -Ox -arch:AVX2 -wd4577" -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\include  -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL-AVX2\lib -l qtcore4  -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib  -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib\qwt"   -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release-AVX2 *>> $log
+			}
+			nmake clean *>> $log
+			Write-Host -NoNewline "building..."
+			Exec {nmake} *>> $log
+			Write-Host -NoNewline "installing..."
+			Exec {nmake install} *>> $log
+			#& $pythonroot/$pythonexe setup.py build *>> $log
+			#Write-Host -NoNewline "installing..."
+			#& $pythonroot/$pythonexe setup.py install *>> $log
+			Write-Host -NoNewline "creating winstaller..."
+			cd ..
+			& $pythonroot/$pythonexe setup.py bdist_wininst   *>> $log
+			move dist/PyQwt-5.2.1.win-amd64.exe dist/PyQwt-5.2.1.win-amd64.$configuration.exe -Force
+			# TODO these move fail for lack of a wheel-compatible setup
+			# & $pythonroot/$pythonexe setup.py bdist_wheel   *>> $log
+			# cd dist
+			# & $pythonroot/Scripts/wheel.exe convert PyQwt-5.2.1.win-amd64.DebugDLL.exe
+			$env:Path = $oldpath
+			$env:_CL_ = ""
+			$env:_LINK_ = ""
+			$ErrorActionPreference = "Stop"
+			Validate "dist/PyQwt-5.2.1.win-amd64.$configuration.exe" "$pythonroot/lib/site-packages/PyQt4/Qwt5/Qwt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/_iqt.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/qplt.py"
 		} else {
-			& $pythonroot/$pythonexe configure.py         --extra-cflags="-Zi -Ox -arch:AVX2 -wd4577" -I $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\include  -L $root\src-stage1-dependencies\Qt4\build\ReleaseDLL-AVX2\lib -l qtcore4  -L $root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib  -l"$root\src-stage1-dependencies\Qwt-$qwt_version\build\x64\Release-AVX2\lib\qwt"   -j4 --sip-include-dirs ..\..\sip-$sip_version\build\x64\Release-AVX2 *>> $log
+			Write-Host "PyQwt5 already built..."
 		}
-		nmake clean *>> $log
-		Write-Host -NoNewline "building..."
-		Exec {nmake} *>> $log
-		Write-Host -NoNewline "installing..."
-		Exec {nmake install} *>> $log
-		#& $pythonroot/$pythonexe setup.py build *>> $log
-		#Write-Host -NoNewline "installing..."
-		#& $pythonroot/$pythonexe setup.py install *>> $log
-		Write-Host -NoNewline "creating winstaller..."
-		cd ..
-		& $pythonroot/$pythonexe setup.py bdist_wininst   *>> $log
-		move dist/PyQwt-5.2.1.win-amd64.exe dist/PyQwt-5.2.1.win-amd64.$configuration.exe -Force
-		# TODO these move fail for lack of a wheel-compatible setup
-		# & $pythonroot/$pythonexe setup.py bdist_wheel   *>> $log
-		# cd dist
-		# & $pythonroot/Scripts/wheel.exe convert PyQwt-5.2.1.win-amd64.DebugDLL.exe
-		$env:Path = $oldpath
-		$env:_CL_ = ""
-		$env:_LINK_ = ""
-		$ErrorActionPreference = "Stop"
-		Validate "dist/PyQwt-5.2.1.win-amd64.$configuration.exe" "$pythonroot/lib/site-packages/PyQt4/Qwt5/Qwt$debugext.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/_iqt.pyd" "$pythonroot/lib/site-packages/PyQt4/Qwt5/qplt.py"
-	} else {
-		Write-Host "PyQwt5 already built..."
 	}
 
 	#__________________________________________________________________________________________
