@@ -37,7 +37,7 @@ GetPackage https://github.com/Nuand/bladeRF.git -Stage3 -branch "$bladerf_versio
 #
 # rtl-sdr
 #
-GetPackage git://git.osmocom.org/rtl-sdr.git -Stage3 -branch "$rtlsdr_version"
+GetPackage https://github.com/osmocom/rtl-sdr.git -Stage3 -branch "$rtlsdr_version"
 
 # ____________________________________________________________________________________________________________
 #
@@ -49,8 +49,12 @@ GetPackage https://github.com/mossmann/hackrf.git -Stage3 -branch "$hackrf_versi
 #
 # osmosdr
 #
-GetPackage git://git.osmocom.org/gr-osmosdr -Stage3
-GetPackage git://git.osmocom.org/osmo-sdr -Stage3
+if ($mm -eq "3.8") {
+	GetPackage https://github.com/gnieboer/gr-osmosdr.git -Stage3 -branch "gr3.8-fmdx"
+} else {
+	GetPackage https://github.com/osmocom/gr-osmosdr.git -Stage3
+}
+GetPackage https://github.com/osmocom/osmo-sdr.git -Stage3
 
 # ____________________________________________________________________________________________________________
 #
