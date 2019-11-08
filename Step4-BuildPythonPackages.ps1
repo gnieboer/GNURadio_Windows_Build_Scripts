@@ -1023,6 +1023,21 @@ Function SetupPython
 	}
 	
 	#__________________________________________________________________________________________
+	# click
+	#
+	# python only packages
+	SetLog "$configuration click"
+	if ((TryValidate "$pythonroot/lib/site-packages/click/__init__.py" "$pythonroot/lib/site-packages/click_plugins/__init__.py") -eq $false) {
+		Write-Host -NoNewline "installing click using pip..."
+		$ErrorActionPreference = "Continue" # pip will "error" on debug
+		& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install -U click click-plugins -t $pythonroot\lib\site-packages *>> $log
+		$ErrorActionPreference = "Stop"
+		Validate "$pythonroot/lib/site-packages/click/__init__.py" "$pythonroot/lib/site-packages/click_plugins/__init__.py"
+	} else {
+		Write-Host "click already installed..."
+	}
+	
+	#__________________________________________________________________________________________
 	# lxml
 	#
 	# this was a royal pain to get to statically link the dependent libraries
