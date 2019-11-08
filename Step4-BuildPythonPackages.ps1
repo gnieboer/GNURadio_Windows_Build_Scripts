@@ -102,6 +102,33 @@ $pythonroot = "$root\src-stage2-python\gr-python27-avx2"
 MakeSip "ReleaseDLL-AVX2"
 $ErrorActionPreference = "Stop"
 
+#_________________________________________________________________________________________
+# Enum34
+#
+# Required by newest SIP 4.19.x
+#
+# TODO add validation
+#
+$ErrorActionPreference = "Continue"
+SetLog "Enum34"
+Write-Host -NoNewline "Installing Enum34"
+function InstallEnum34
+{
+	$type = $args[0]
+	Write-Host -NoNewline "...$type"
+	& $pythonroot/Scripts/pip.exe --disable-pip-version-check  install enum34 -U -t $pythonroot\lib\site-packages *>> $log
+	Write-Host -NoNewline "...done"
+}
+
+$pythonroot = "$root\src-stage2-python\gr-python27-debug"
+InstallEnum34 "Debug"
+$pythonroot = "$root\src-stage2-python\gr-python27"
+InstallEnum34 "Release"
+$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
+InstallEnum34 "Release-AVX2"
+$ErrorActionPreference = "Stop"
+"...complete"
+
 #__________________________________________________________________________________________
 # PyQt
 #
