@@ -1225,8 +1225,8 @@ Function SetupPython
 		Write-Host -NoNewline "configuring $configuration matplotlib..."
 		if ($configuration -match "Release") {$buildlibdir = "Release"} else {$buildlibdir = "Debug"}
 		if ($configuration -match "AVX2") {$env:_CL_ = " /arch:AVX2 /EHsc "; $buildlibdir = "Release-AVX2"} else {$env:_CL_ = " /EHsc "}
-		$env:INCLUDE = "$pythonroot\Include\pygtk-2.0;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/cairo;$root/src-stage1-dependencies/x64/lib/gtk-2.0/include;" + $oldInclude
-		$env:Path = "$root/build/$buildlibdir/lib;$pythonroot;$pythonroot/Dlls;$pythonroot\scripts;$root/src-stage1-dependencies/x64/include;$pythonroot\Include\pygtk-2.0\;$pythonroot/include;$pythonroot/Lib/site-packages/wx-3.0-msw;$root\src-stage1-dependencies\x64\bin;$root\src-stage1-dependencies\Qt5\build\$configuration\bin;$root\src-stage1-dependencies\Qt4\build\$configuration\bin;"+ $oldPath
+		$env:INCLUDE = "$pythonroot\Include\pygtk-2.0;$root/src-stage1-dependencies/x64/include;$root/src-stage1-dependencies/x64/include/freetype2;$root/src-stage1-dependencies/x64/include/cairo;$root/src-stage1-dependencies/x64/lib/gtk-2.0/include;" + $oldInclude
+		$env:Path = "$root/build/$buildlibdir/lib;$pythonroot;$pythonroot/Dlls;$pythonroot\scripts;$root/src-stage1-dependencies/x64/include;$pythonroot\Include\pygtk-2.0\;$pythonroot/include;$pythonroot/Lib/site-packages/wx-3.0-msw;$root\src-stage1-dependencies\x64\bin;$root\src-stage1-dependencies\Qt5\build\$configuration\bin;$root\src-stage1-dependencies\Qt5Stage\build\$configuration\bin;"+ $oldPath
 		$env:PYTHONPATH="$pythonroot/Lib/site-packages/wx-3.0-msw;$pythonroot/Lib/site-packages;$pythonroot/Lib/site-packages/gtk-2.0;$pythonroot\Include\pygtk-2.0\"
 		$env:_LINK_ = " /DEBUG "
 		Write-Host -NoNewline "building and installing..."
