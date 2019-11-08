@@ -332,55 +332,59 @@ function BuildOOTModules
 	# TODO update CMake to include m only with not win32
 	# fails on debug as the include/swig directory is not created during the Debug build
 	#
-	SetLog "gr-acars2 $configuration"
-	$ErrorActionPreference = "Continue"
-	Write-Host -NoNewline "configuring $configuration gr-acars2..."
-	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-acars2/build/$configuration  2>&1 >> $Log
-	Copy-Item -Force $root\src-stage3\staged_install\$configuration\include\gnuradio\swig\gnuradio.i $root/bin/Lib
-	cd $root/src-stage3/oot_code/gr-acars2/build/$configuration 
-	$linkflags = " /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
-	if ($mm -eq '3.8') {$linkflags = $linkflags  + " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib "}
-	$env:_LINK_= ""
-	$env:_CL_ = ""
-	$env:Path="" 
-	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
-		-DCMAKE_C_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
-		-DCMAKE_CXX_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-acars2..."
-	msbuild .\gr-acars2.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# the cmake files don't install the samples or examples or docs so let's see what we can do here
-	# TODO update the CMAKE file to move these over
-	New-Item -ItemType Directory -Force $root/src-stage3/staged_install/$configuration/share/acars2/examples 2>&1 >> $Log
-	Copy-Item $root/src-stage3/oot_code/gr-acars2/examples/simple.grc $root/src-stage3/staged_install/$configuration/share/acars2/examples
-	Copy-Item $root/src-stage3/oot_code/gr-acars2/samples/*.grc $root/src-stage3/staged_install/$configuration/share/acars2/examples
-	Copy-Item $root/src-stage3/oot_code/gr-acars2/samples/*.wav $root/src-stage3/staged_install/$configuration/share/acars2/examples
-	Copy-Item $root/src-stage3/oot_code/gr-acars2/samples/*.py $root/src-stage3/staged_install/$configuration/share/acars2/examples
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	$ErrorActionPreference = "Stop"
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-acars2.dll" "$root/src-stage3/staged_install/$configuration/lib/site-packages/acars2/_acars2_swig.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-acars2 not gr3.8 compatible"
+	} else {
+		SetLog "gr-acars2 $configuration"
+		$ErrorActionPreference = "Continue"
+		Write-Host -NoNewline "configuring $configuration gr-acars2..."
+		New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-acars2/build/$configuration  *>> $Log
+		Copy-Item -Force $root\src-stage3\staged_install\$configuration\include\gnuradio\swig\gnuradio.i $root/bin/Lib
+		cd $root/src-stage3/oot_code/gr-acars2/build/$configuration 
+		$linkflags = " /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
+		if ($mm -eq '3.8') {$linkflags = $linkflags  + " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib "}
+		$env:_LINK_= ""
+		$env:_CL_ = ""
+		$env:Path="" 
+		cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
+			-DCMAKE_C_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+			-DCMAKE_CXX_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-acars2..."
+		msbuild .\gr-acars2.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# the cmake files don't install the samples or examples or docs so let's see what we can do here
+		# TODO update the CMAKE file to move these over
+		New-Item -ItemType Directory -Force $root/src-stage3/staged_install/$configuration/share/acars2/examples *>> $Log
+		Copy-Item $root/src-stage3/oot_code/gr-acars2/examples/simple.grc $root/src-stage3/staged_install/$configuration/share/acars2/examples
+		Copy-Item $root/src-stage3/oot_code/gr-acars2/samples/*.grc $root/src-stage3/staged_install/$configuration/share/acars2/examples
+		Copy-Item $root/src-stage3/oot_code/gr-acars2/samples/*.wav $root/src-stage3/staged_install/$configuration/share/acars2/examples
+		Copy-Item $root/src-stage3/oot_code/gr-acars2/samples/*.py $root/src-stage3/staged_install/$configuration/share/acars2/examples
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		$ErrorActionPreference = "Stop"
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-acars2.dll" "$root/src-stage3/staged_install/$configuration/lib/site-packages/acars2/_acars2_swig.pyd"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
@@ -637,11 +641,7 @@ function BuildOOTModules
 	Write-Host -NoNewline "configuring $configuration Armadillo..."
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/armadillo-7.800.1/build/$configuration  *>> $Log
 	cd $root/src-stage3/oot_code/armadillo-7.800.1/build/$configuration 
-	$linkflags= "  /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
-	if ($mm -eq "3.8")
-	{
-		$linkflags = " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib " + $linkflags
-	}
+	$linkflags= " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	cmake ../../ `
@@ -679,11 +679,7 @@ function BuildOOTModules
 		cd $root/src-stage3/oot_code/gr-specest/build/$configuration 
 		# the quotes that are likely to be in the below path make it impossible to added to the cmake config
 		$env:_LINK_ = " /LIBPATH:""${MY_IFORT}compiler/lib/intel64_win/"" "
-		$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib /NODEFAULTLIB:LIBCMT.lib /NODEFAULTLIB:LIBCMTD.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
-		if ($mm -eq "3.8")
-		{
-			$linkflags = " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib " + $linkflags
-		}
+		$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib /NODEFAULTLIB:LIBCMT.lib /NODEFAULTLIB:LIBCMTD.lib  /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
 		if ($configuration -match "AVX2") {$fortflags = " /QaxCORE-AVX2 /QxCORE-AVX2 /tune:haswell /arch:AVX2 "} else {$fortflags = " /arch:SSE2 "}
 		$froot = $root.Replace('\','/')
 		# set path to empty to ensure another GR install is not located
@@ -732,105 +728,114 @@ function BuildOOTModules
 	# gr-inspector
 	#
 	#
-	SetLog "gr-inspector $configuration"
-	if ($configuration -match "Debug") {
-		Write-Host "skipping gr-inspector in debug" | Tee-Object -FilePath $Log
+	if ($mm -eq "3.8") {
+		Write-Host "gr-inspector not gr3.8 compatible"
 	} else {
-		if ($mm -eq "3.8") {
-			Write-Host "skipping gr-inspector in v3.8 as requires Qt4" | Tee-Object -FilePath $Log
+		SetLog "gr-inspector $configuration"
+		if ($configuration -match "Debug") {
+			Write-Host "skipping gr-inspector in debug" | Tee-Object -FilePath $Log
 		} else {
-			Write-Host -NoNewline "configuring $configuration gr-inspector..."
-			New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-inspector/build/$configuration 2>&1 >> $Log
-			cd $root/src-stage3/oot_code/gr-inspector/build/$configuration
-			$env:_CL_=""
-			$env:_LINK_= " /DEBUG:FULL "
-			$ErrorActionPreference = "Continue"
-			$env:Path="" 
-			& cmake ../../ `
-				-G "Visual Studio 14 2015 Win64" `
-				-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-				-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-				-DCMAKE_C_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
-				-DCMAKE_CXX_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
-				-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-				-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-				-DBOOST_ROOT="$root/build/$configuration/" `
-				-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-				-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-				-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-				-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-				-DQT_QWTPLOT3D_LIBRARY="$root\build\$configuration\lib\qwtplot3d.lib" `
-				-DQT_QWTPLOT3D_INCLUDE_DIR="$root\build\$configuration\include\qwt3d" `
-				-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
-				-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
-				-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-				-DQWT_INCLUDE_DIRS="$root\build\$configuration\include\qwt6" `
-				-DQWT_LIBRARIES="$root\build\$configuration\lib\qwt${debugext}6.lib" `
-				-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-				-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi " `
-				-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /Zi " `
-				-Wno-dev 2>&1 >> $Log
-			$env:Path = $oldPath
-			Write-Host -NoNewline "building gr-inspector..."
-			msbuild .\gr-inspector.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-			Write-Host -NoNewline "installing..."
-			msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-			# copy the examples across
-			New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector 2>&1 >> $Log
-			cp -Recurse -Force $root/src-stage3/oot_code/gr-inspector/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector 2>&1 >> $Log
-			$env:_CL_ = ""
-			$env:_LINK_ = ""
-			Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-inspector.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\inspector\_inspector_swig.pyd"
+			if ($mm -eq "3.8") {
+				Write-Host "skipping gr-inspector in v3.8 as requires Qt4" | Tee-Object -FilePath $Log
+			} else {
+				Write-Host -NoNewline "configuring $configuration gr-inspector..."
+				New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-inspector/build/$configuration *>> $Log
+				cd $root/src-stage3/oot_code/gr-inspector/build/$configuration
+				$env:_CL_=""
+				$env:_LINK_= " /DEBUG:FULL "
+				$ErrorActionPreference = "Continue"
+				$env:Path="" 
+				& cmake ../../ `
+					-G "Visual Studio 14 2015 Win64" `
+					-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+					-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+					-DCMAKE_C_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
+					-DCMAKE_CXX_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
+					-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+					-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+					-DBOOST_ROOT="$root/build/$configuration/" `
+					-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+					-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+					-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+					-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+					-DQT_QWTPLOT3D_LIBRARY="$root\build\$configuration\lib\qwtplot3d.lib" `
+					-DQT_QWTPLOT3D_INCLUDE_DIR="$root\build\$configuration\include\qwt3d" `
+					-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
+					-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
+					-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
+					-DQWT_INCLUDE_DIRS="$root\build\$configuration\include\qwt6" `
+					-DQWT_LIBRARIES="$root\build\$configuration\lib\qwt${debugext}6.lib" `
+					-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+					-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi " `
+					-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /Zi " `
+					-Wno-dev *>> $Log
+				$env:Path = $oldPath
+				Write-Host -NoNewline "building gr-inspector..."
+				msbuild .\gr-inspector.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+				Write-Host -NoNewline "installing..."
+				msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+				# copy the examples across
+				New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector *>> $Log
+				cp -Recurse -Force $root/src-stage3/oot_code/gr-inspector/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-inspector *>> $Log
+				$env:_CL_ = ""
+				$env:_LINK_ = ""
+				Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-inspector.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\inspector\_inspector_swig.pyd"
+			}
 		}
 	}
+
 	# ____________________________________________________________________________________________________________
 	#
 	# gr-cdma
 	#
 	# TODO: need to manually change the cdma_parameters.py to alter the fixed path it is looking for
 	#
-	SetLog "gr-cdma $configuration"
-	Write-Host -NoNewline "configuring $configuration gr-cdma..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-cdma/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-cdma/build/$configuration
-	$env:_CL_=" $arch /DNOMINMAX  /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi "
-	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
-	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
-	(Get-Content "../../python/cdma_parameters.py").replace('/home/anastas/gr-cdma/', '../lib/site-packages/cdma') | Set-Content "../../python/cdma_parameters.py"
-	$ErrorActionPreference = "Continue"
-	$env:Path="" 
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-cdma..."
-	msbuild .\gr-cdma.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-cdma 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-cdma/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-cdma 2>&1 >> $Log
-	# copy the fsm files across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/lib/site-packages/cdma/python/fsm_files 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-cdma/python/fsm_files/*.fsm $root/src-stage3/staged_install/$configuration/lib/site-packages/cdma/python/fsm_files 2>&1 >> $Log
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-cdma.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\cdma\_cdma_swig.pyd"
-	
+	if ($mm -eq "3.8") {
+		Write-Host "gr-cdma not gr3.8 compatible"
+	} else {
+		SetLog "gr-cdma $configuration"
+		Write-Host -NoNewline "configuring $configuration gr-cdma..."
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-cdma/build/$configuration *>> $Log
+		cd $root/src-stage3/oot_code/gr-cdma/build/$configuration
+		$env:_CL_=" $arch /DNOMINMAX  /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi "
+		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+		if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
+		(Get-Content "../../python/cdma_parameters.py").replace('/home/anastas/gr-cdma/', '../lib/site-packages/cdma') | Set-Content "../../python/cdma_parameters.py"
+		$ErrorActionPreference = "Continue"
+		$env:Path="" 
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-cdma..."
+		msbuild .\gr-cdma.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-cdma *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-cdma/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-cdma *>> $Log
+		# copy the fsm files across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/lib/site-packages/cdma/python/fsm_files *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-cdma/python/fsm_files/*.fsm $root/src-stage3/staged_install/$configuration/lib/site-packages/cdma/python/fsm_files *>> $Log
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-cdma.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\cdma\_cdma_swig.pyd"
+	}
+
 	# ____________________________________________________________________________________________________________
 	#
 	# gr-rds
@@ -879,42 +884,46 @@ function BuildOOTModules
 	# gr-ais
 	#
 	#
-	SetLog "gr-ais $configuration"
-	Write-Host -NoNewline "configuring $configuration gr-ais..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-ais/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-ais/build/$configuration
-	$env:_CL_ = " $arch ";
-	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/volk.lib "
-	$ErrorActionPreference = "Continue"
-	$env:Path="" 
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-ais..."
-	msbuild .\gr-ais.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ais 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-ais/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ais 2>&1 >> $Log
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-ais.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\ais\_ais_swig.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-ais not gr3.8 compatible"
+	} else {
+		SetLog "gr-ais $configuration"
+		Write-Host -NoNewline "configuring $configuration gr-ais..."
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-ais/build/$configuration *>> $Log
+		cd $root/src-stage3/oot_code/gr-ais/build/$configuration
+		$env:_CL_ = " $arch ";
+		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/volk.lib "
+		$ErrorActionPreference = "Continue"
+		$env:Path="" 
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-ais..."
+		msbuild .\gr-ais.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ais *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-ais/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ais *>> $Log
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-ais.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\ais\_ais_swig.pyd"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
@@ -923,7 +932,7 @@ function BuildOOTModules
 	#
 	SetLog "gr-display $configuration"
 	Write-Host -NoNewline "configuring $configuration gr-display..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-display/build/$configuration 2>&1 >> $Log
+	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-display/build/$configuration *>> $Log
 	cd $root/src-stage3/oot_code/gr-display/build/$configuration
 	$env:_CL_ = " $arch ";
 	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  "
@@ -948,15 +957,15 @@ function BuildOOTModules
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
+		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-display..."
-	msbuild .\gr-display.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\gr-display.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-display 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-display/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-display 2>&1 >> $Log
+	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-display *>> $Log
+	cp -Recurse -Force $root/src-stage3/oot_code/gr-display/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-display *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-display.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\display\_display_swig.pyd"
@@ -966,95 +975,103 @@ function BuildOOTModules
 	# gr-ax25
 	#
 	#
-	SetLog "gr-ax25 $configuration"
-	Write-Host -NoNewline "configuring $configuration gr-ax25..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-ax25/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-ax25/build/$configuration
-	$env:_CL_ = " $arch ";
-	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  "
-	$ErrorActionPreference = "Continue"
-	$env:Path="" 
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-ax25..."
-	msbuild .\gr-afsk.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ax25 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-ax25/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ax25 2>&1 >> $Log
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-afsk.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\afsk\_afsk_swig.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-ax25 not gr3.8 compatible"
+	} else {
+		SetLog "gr-ax25 $configuration"
+		Write-Host -NoNewline "configuring $configuration gr-ax25..."
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-ax25/build/$configuration *>> $Log
+		cd $root/src-stage3/oot_code/gr-ax25/build/$configuration
+		$env:_CL_ = " $arch ";
+		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  "
+		$ErrorActionPreference = "Continue"
+		$env:Path="" 
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-ax25..."
+		msbuild .\gr-afsk.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ax25 *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-ax25/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-ax25 *>> $Log
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-afsk.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\afsk\_afsk_swig.pyd"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
 	# gr-radar
 	#
 	#
-	SetLog "gr-radar $configuration"
-	Write-Host -NoNewline "configuring $configuration gr-radar..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-radar/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-radar/build/$configuration
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib  /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/volk.lib "
-	$ErrorActionPreference = "Continue"
-	$env:Path="" 
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
-		-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
-		-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-		-DQWT_INCLUDE_DIRS="$root\build\$configuration\include\qwt6" `
-		-DQWT_LIBRARIES="$root\build\$configuration\lib\qwt${debugext}6.lib" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-radar..."
-	msbuild .\gr-radar.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-radar 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-radar/examples/* $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-radar 2>&1 >> $Log
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-radar.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\radar\_radar_swig.pyd"
-
+	if ($mm -eq "3.8") {
+		Write-Host "gr-radar not gr3.8 compatible"
+	} else {
+		SetLog "gr-radar $configuration"
+		Write-Host -NoNewline "configuring $configuration gr-radar..."
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-radar/build/$configuration *>> $Log
+		cd $root/src-stage3/oot_code/gr-radar/build/$configuration
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		$linkflags= " /DEBUG  /NODEFAULTLIB:m.lib  /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/volk.lib "
+		$ErrorActionPreference = "Continue"
+		$env:Path="" 
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
+			-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
+			-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
+			-DQWT_INCLUDE_DIRS="$root\build\$configuration\include\qwt6" `
+			-DQWT_LIBRARIES="$root\build\$configuration\lib\qwt${debugext}6.lib" `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-radar..."
+		msbuild .\gr-radar.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-radar *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-radar/examples/* $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-radar *>> $Log
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-radar.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\radar\_radar_swig.pyd"
+	}
+	
 	# ____________________________________________________________________________________________________________
 	#
 	# gr-paint
@@ -1062,8 +1079,13 @@ function BuildOOTModules
 	#
 	SetLog "gr-paint $configuration"
 	Write-Host -NoNewline "configuring $configuration gr-paint..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-paint/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-paint/build/$configuration
+	if ($mm -eq "3.8") {
+		$grpaint = "gr-paint38"
+	} else {
+		$grpaint = "gr-paint"
+	}
+	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/$grpaint/build/$configuration *>> $Log
+	cd $root/src-stage3/oot_code/$grpaint/build/$configuration
 	$env:_CL_ = " $arch ";
 	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  $root/src-stage3/staged_install/$configuration/lib/volk.lib "
 	$ErrorActionPreference = "Continue"
@@ -1084,17 +1106,17 @@ function BuildOOTModules
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
+		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-paint..."
-	msbuild .\gr-paint.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\gr-paint.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-paint/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-paint/apps/*.png $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-paint/apps/*.bin $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint 2>&1 >> $Log
+	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint *>> $Log
+	cp -Recurse -Force $root/src-stage3/oot_code/$grpaint/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint *>> $Log
+	cp -Recurse -Force $root/src-stage3/oot_code/$grpaint/apps/*.png $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint *>> $Log
+	cp -Recurse -Force $root/src-stage3/oot_code/$grpaint/apps/*.bin $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-paint *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-paint.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\paint\_paint_swig.pyd"
@@ -1106,7 +1128,7 @@ function BuildOOTModules
 	#
 	SetLog "gr-mapper $configuration"
 	Write-Host -NoNewline "configuring $configuration gr-mapper..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-mapper/build/$configuration 2>&1 >> $Log
+	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-mapper/build/$configuration *>> $Log
 	cd $root/src-stage3/oot_code/gr-mapper/build/$configuration
 	$env:_CL_ = " $arch ";
 	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  $root/src-stage3/staged_install/$configuration/lib/volk.lib "
@@ -1128,16 +1150,16 @@ function BuildOOTModules
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
+		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-mapper..."
-	msbuild .\gr-mapper.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\gr-mapper.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-mapper 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-mapper/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-mapper 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-paint/examples/*.py $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-mapper 2>&1 >> $Log
+	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-mapper *>> $Log
+	cp -Recurse -Force $root/src-stage3/oot_code/gr-mapper/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-mapper *>> $Log
+	cp -Recurse -Force $root/src-stage3/oot_code/gr-paint/examples/*.py $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-mapper *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-mapper.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\mapper\_mapper_swig.pyd"
@@ -1147,99 +1169,107 @@ function BuildOOTModules
 	# gr-nacl
 	#
 	#
-	SetLog "gr-nacl $configuration"
-	Write-Host -NoNewline "configuring $configuration gr-nacl..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-nacl/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-nacl/build/$configuration
-	$env:_CL_ = " $arch ";
-	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
-	$ErrorActionPreference = "Continue"
-	$env:Path="" 
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DSODIUM_LIBRARIES="$root/build/$configuration/lib/libsodium.lib" `
-		-DSODIUM_INCLUDE_DIRS="$root/build/$configuration/include" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-nacl..."
-	msbuild .\gr-nacl.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.file $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl 2>&1 >> $Log
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-nacl.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\nacl\_nacl_swig.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-nacl not gr3.8 compatible"
+	} else {
+		SetLog "gr-nacl $configuration"
+		Write-Host -NoNewline "configuring $configuration gr-nacl..."
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-nacl/build/$configuration *>> $Log
+		cd $root/src-stage3/oot_code/gr-nacl/build/$configuration
+		$env:_CL_ = " $arch ";
+		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+		$ErrorActionPreference = "Continue"
+		$env:Path="" 
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DSODIUM_LIBRARIES="$root/build/$configuration/lib/libsodium.lib" `
+			-DSODIUM_INCLUDE_DIRS="$root/build/$configuration/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-nacl..."
+		msbuild .\gr-nacl.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.file $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl *>> $Log
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-nacl.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\nacl\_nacl_swig.pyd"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
 	# gr-eventstream
 	#
 	#
-	SetLog "gr-eventstream $configuration"
-	Write-Host -NoNewline "configuring $configuration gr-eventstream..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-eventstream/build/$configuration 2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-eventstream/build/$configuration
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	$linkflags = " /DEBUG /DEFAULTLIB:$root\src-stage3\build\$configuration\gnuradio-runtime\swig\$buildconfig\_runtime_swig.lib " 
-	$ErrorActionPreference = "Continue"
-	$env:Path= ""
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DCMAKE_LIBRARY_PATH="$root/build/$configuration/lib" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_INCLUDE_DIRS="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime  " `
-		-DCMAKE_C_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime " `
-		-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
-		-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
-		-DENABLE_STATIC_LIBS="True" `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-eventstream..."
-	# test_eventstream build will fail because dependency is set incorrectly
-	msbuild .\lib\eventstream_static.vcxproj /m /p:"configuration=$buildconfig;platform=x64"  2>&1 >> $Log
-	msbuild .\eventstream.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-eventstream/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-eventstream/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-eventstream/apps/*.py $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream 2>&1 >> $Log
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	Validate "$root/src-stage3/staged_install/$configuration/bin/eventstream.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\es\_es_swig.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-eventstream not gr3.8 compatible"
+	} else {
+		SetLog "gr-eventstream $configuration"
+		Write-Host -NoNewline "configuring $configuration gr-eventstream..."
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-eventstream/build/$configuration *>> $Log
+		cd $root/src-stage3/oot_code/gr-eventstream/build/$configuration
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		$linkflags = " /DEBUG /DEFAULTLIB:$root\src-stage3\build\$configuration\gnuradio-runtime\swig\$buildconfig\_runtime_swig.lib " 
+		$ErrorActionPreference = "Continue"
+		$env:Path= ""
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DCMAKE_LIBRARY_PATH="$root/build/$configuration/lib" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_INCLUDE_DIRS="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DCMAKE_CXX_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime  " `
+			-DCMAKE_C_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime " `
+			-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
+			-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
+			-DENABLE_STATIC_LIBS="True" `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-eventstream..."
+		# test_eventstream build will fail because dependency is set incorrectly
+		msbuild .\lib\eventstream_static.vcxproj /m /p:"configuration=$buildconfig;platform=x64"  *>> $Log
+		msbuild .\eventstream.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-eventstream/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-eventstream/apps/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-eventstream/apps/*.py $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-eventstream *>> $Log
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		Validate "$root/src-stage3/staged_install/$configuration/bin/eventstream.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\es\_es_swig.pyd"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
@@ -1248,7 +1278,7 @@ function BuildOOTModules
 	#
 	SetLog "gr-burst $configuration"
 	Write-Host -NoNewline "configuring $configuration gr-burst..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-burst/build/$configuration 2>&1 >> $Log
+	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-burst/build/$configuration *>> $Log
 	cd $root/src-stage3/oot_code/gr-burst/build/$configuration
 	$env:_CL_ = " $arch ";
 	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/gnuradio-fft.lib "
@@ -1270,15 +1300,15 @@ function BuildOOTModules
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev 2>&1 >> $Log
+		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-burst..."
-	msbuild .\gr-burst.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\gr-burst.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-burst/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst 2>&1 >> $Log
+	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst *>> $Log
+	cp -Recurse -Force $root/src-stage3/oot_code/gr-burst/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-burst.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\burst\_burst_swig.pyd"
@@ -1288,49 +1318,53 @@ function BuildOOTModules
 	# gr-lte
 	#
 	#
-	SetLog "gr-lte $configuration"
-	$ErrorActionPreference = "Continue"
-	Write-Host -NoNewline "configuring $configuration gr-lte..."
-	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-lte/build/$configuration  2>&1 >> $Log
-	cd $root/src-stage3/oot_code/gr-lte/build/$configuration 
-	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/volk.lib /DEBUG /NODEFAULTLIB:m.lib "
-	$env:_CL_ = " $arch -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
-	$env:Path="" 
-	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /DNOMINMAX $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DFFTW3F_LIBRARIES="$root/build/Release/lib/libfftw3f.lib" `
-		-DFFTW3F_INCLUDE_DIRS="$root/build/Release/include/" `
-		-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
-		-DCPPUNIT_INCLUDE_DIRS="$root/build/$configuration/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-Wno-dev 2>&1 >> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-lte..."
-	msbuild .\gr-lte.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-lte/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-lte/examples/*.py $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte 2>&1 >> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-lte/examples/hier_blocks $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte 2>&1 >> $Log
-	# TODO we could call the routine in the examples folder to automatically build the hier blocks.
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	$ErrorActionPreference = "Stop"
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-lte.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\lte\_lte_swig.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-lte not gr3.8 compatible"
+	} else {
+		SetLog "gr-lte $configuration"
+		$ErrorActionPreference = "Continue"
+		Write-Host -NoNewline "configuring $configuration gr-lte..."
+		New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-lte/build/$configuration  *>> $Log
+		cd $root/src-stage3/oot_code/gr-lte/build/$configuration 
+		$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/volk.lib /DEBUG /NODEFAULTLIB:m.lib "
+		$env:_CL_ = " $arch -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
+		$env:Path="" 
+		cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /DNOMINMAX $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DFFTW3F_LIBRARIES="$root/build/Release/lib/libfftw3f.lib" `
+			-DFFTW3F_INCLUDE_DIRS="$root/build/Release/include/" `
+			-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
+			-DCPPUNIT_INCLUDE_DIRS="$root/build/$configuration/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-lte..."
+		msbuild .\gr-lte.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-lte/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-lte/examples/*.py $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-lte/examples/hier_blocks $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-lte *>> $Log
+		# TODO we could call the routine in the examples folder to automatically build the hier blocks.
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		$ErrorActionPreference = "Stop"
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-lte.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\lte\_lte_swig.pyd"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
@@ -1339,7 +1373,7 @@ function BuildOOTModules
 	SetLog "gr-gsm $configuration"
 	$ErrorActionPreference = "Continue"
 	Write-Host -NoNewline "configuring $configuration gr-gsm..."
-	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-gsm/build/$configuration  2>&1 >> $Log
+	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-gsm/build/$configuration  *>> $Log
 	cd $root/src-stage3/oot_code/gr-gsm/build/$configuration 
 	$env:_CL_ = " $arch "
 	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
@@ -1362,12 +1396,12 @@ function BuildOOTModules
 		-DBOOST_ROOT="$root/build/$configuration/" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-Wno-dev 2>&1 >> $Log
+		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-gsm..."
-	msbuild .\gr-gsm.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\gr-gsm.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	$ErrorActionPreference = "Stop"
@@ -1388,7 +1422,7 @@ function BuildOOTModules
 	SetLog "gflags $configuration"
 	$ErrorActionPreference = "Continue"
 	Write-Host -NoNewline "configuring $configuration gflags..."
-	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gflags/build_folder/$configuration  2>&1 >> $Log
+	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gflags/build_folder/$configuration  *>> $Log
 	cd $root/src-stage3/oot_code/gflags/build_folder/$configuration 
 	$env:_CL_ = $arch + " -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
 	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
@@ -1398,11 +1432,11 @@ function BuildOOTModules
 		-DCMAKE_INSTALL_PREFIX="$root\build\$configuration" `
 		-DCMAKE_SYSTEM_LIBRARY_PATH="$root\build\$configuration\lib" `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
-		-Wno-dev 2>&1 >> $Log
+		-Wno-dev *>> $Log
 	Write-Host -NoNewline "building gflags..."
-	msbuild .\gflags.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\gflags.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	$ErrorActionPreference = "Stop"
@@ -1413,13 +1447,12 @@ function BuildOOTModules
 	# glog (Google logging)
 	#
 	# Required by GNSS-SDR
-	# note use of non-standard build_folder location because repo already has a file named "BUILD"	
 	#
 	SetLog "glog $configuration"
 	$ErrorActionPreference = "Continue"
 	Write-Host -NoNewline "configuring $configuration glog..."
-	New-Item -ItemType Directory -Force $root/src-stage3/oot_code/glog/build_folder/$configuration  2>&1 >> $Log
-	cd $root/src-stage3/oot_code/glog/build_folder/$configuration 
+	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/glog/build/$configuration  *>> $Log
+	cd $root/src-stage3/oot_code/glog/build/$configuration 
 	$env:_CL_ = " $arch "
 	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
 	$env:_CL_ = $env:_CL_ + " -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
@@ -1429,11 +1462,11 @@ function BuildOOTModules
 		-DCMAKE_INSTALL_PREFIX="$root\build\$configuration" `
 		-DCMAKE_SYSTEM_LIBRARY_PATH="$root\build\$configuration\lib" `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
-		-Wno-dev 2>&1 >> $Log
+		-Wno-dev *>> $Log
 	Write-Host -NoNewline "building glog..."
-	msbuild .\google-glog.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	msbuild .\google-glog.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	$ErrorActionPreference = "Stop"
@@ -1455,7 +1488,7 @@ function BuildOOTModules
 		#
 		SetLog "OpenLTE $configuration"
 		Write-Host -NoNewline "configuring $configuration OpenLTE..."
-		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/OpenLTE_v$openLTE_version/build/$configuration 2>&1 >> $Log
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/OpenLTE_v$openLTE_version/build/$configuration *>> $Log
 		cd $root/src-stage3/oot_code/OpenLTE_v$openLTE_version/build/$configuration
 		$env:_CL_ = " $arch ";
 		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
@@ -1479,16 +1512,16 @@ function BuildOOTModules
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime  " `
 			-DFFTW3F_LIBRARIES="$root/build/$configuration/lib/libfftw3f.lib" `
 			-DFFTW3F_INCLUDE_DIRS="$root/build/$configuration/include/" `
-			-Wno-dev 2>&1 >> $Log
+			-Wno-dev *>> $Log
 		$env:Path = $oldPath
 		Write-Host -NoNewline "building OpenLTE..."
-		msbuild .\openLTE.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+		msbuild .\openLTE.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 		Write-Host -NoNewline "installing..."
-		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 		# copy the examples across
-		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl 2>&1 >> $Log
-		cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl 2>&1 >> $Log
-		cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.file $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl 2>&1 >> $Log
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-nacl/examples/*.file $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-nacl *>> $Log
 		$env:_CL_ = ""
 		$env:_LINK_ = ""
 		$env:FFTW3_DIR = ""
@@ -1503,7 +1536,7 @@ function BuildOOTModules
 	    #
 	    SetLog "gnss-sdr $configuration"
 	    Write-Host -NoNewline "configuring $configuration gnss-sdr..."
-	    New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gnss-sdr/build/$configuration 2>&1 >> $Log
+	    New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gnss-sdr/build/$configuration *>> $Log
 	    cd $root/src-stage3/oot_code/gnss-sdr/build/$configuration
 	    $ErrorActionPreference = "Continue"
 		$env:_CL_ = " -DGLOG_NO_ABBREVIATED_SEVERITIES "
@@ -1524,11 +1557,11 @@ function BuildOOTModules
 			-DCMAKE_CXX_FLAGS=" /DGLOG_NO_ABBREVIATED_SEVERITIES /DNOMINMAX" `
 		    -DLAPACK="ON" `
 			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-Wno-dev 2>&1 >> $Log
+			-Wno-dev *>> $Log
 	    Write-Host -NoNewline "building..."
-	    msbuild .\gnss-sdr.sln /m /p:"configuration=$buildconfig;platform=x64" 2>&1 >> $Log
+	    msbuild .\gnss-sdr.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	    Write-Host -NoNewline "installing..."
-	    msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" 2>&1 >> $Log
+	    msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 		$env:_CL_ = ""
 	    "complete"
     }
@@ -1548,17 +1581,9 @@ function BuildOOTModules
 }
 
 # build options
-# Note that as of the current build, OOT modules are not supported in 3.8
-if ($mm -eq '3.8') {
-	if ($configmode -eq "1" -or $configmode -eq "all") {BuildDrivers "Release"}
-	if ($configmode -eq "2" -or $configmode -eq "all") {BuildDrivers "Release-AVX2"}
-	if ($configmode -eq "3" -or $configmode -eq "all") {BuildDrivers "Debug"}
-} else {
-	if ($configmode -eq "1" -or $configmode -eq "all") {BuildDrivers "Release"; BuildOOTModules "Release"}
-	if ($configmode -eq "2" -or $configmode -eq "all") {BuildDrivers "Release-AVX2"; BuildOOTModules "Release-AVX2"}
-	if ($configmode -eq "3" -or $configmode -eq "all") {BuildDrivers "Debug"; BuildOOTModules "Debug"}
-}
-
+if ($configmode -eq "1" -or $configmode -eq "all") {BuildDrivers "Release"; BuildOOTModules "Release"}
+if ($configmode -eq "2" -or $configmode -eq "all") {BuildDrivers "Release-AVX2"; BuildOOTModules "Release-AVX2"}
+if ($configmode -eq "3" -or $configmode -eq "all") {BuildDrivers "Debug"; BuildOOTModules "Debug"}
 
 cd $root/scripts 
 
