@@ -125,7 +125,7 @@ Function Consolidate {
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin $root/build/$configuration/ *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/cmake $root/build/$configuration/lib/ *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/mkspecs $root/build/$configuration/ *>> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Build/build/$configDLL/plugins $root/build/$configuration/ *>> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/plugins $root/build/$configuration/ *>> $log
 		robocopy "$root/src-stage1-dependencies/Qt5Stage/build/$configDLL/qtbase/src/" "$root/build/$configuration/src/" "*.h" /s /xd ".moc" ".tracegen" *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Core$q5d.dll $root/build/$configuration/bin/ *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Gui$q5d.dll $root/build/$configuration/bin/ *>> $log
@@ -146,7 +146,7 @@ Function Consolidate {
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtSvg* $root/build/$configuration/include/ *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/include/QtWidgets* $root/build/$configuration/include/ *>> $log
 		#needed by gqrx but not gnuradio itself 
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/qtbase/lib/qtmain$q5d.lib $root/build/$configuration/lib/ *>> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Build/build/$configDLL/qtbase/lib/qtmain$q5d.lib $root/build/$configuration/lib/ *>> $log
 		# Fix a hardcoded mkspec file location
 		((Get-Content -path $root/build/$configuration/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake -Raw) -Replace '\${_qt5Core_install_prefix}/../../../qtbase//mkspecs/win32-msvc',"$root/build/$configuration/mkspecs/win32-msvc") | % {$_ -Replace "\\", "/"} | Set-Content -Path $root/build/$configuration/lib/cmake/Qt5Core/Qt5CoreConfigExtrasMkspecDir.cmake
 		# this will override the hardcoded install paths in qmake.exe and allow CMake to find it all when not building all deps from source
