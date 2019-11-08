@@ -272,7 +272,7 @@ GetPackage https://github.com/ARMmbed/mbedtls/archive/mbedtls-$mbedtls_version.t
 if ($mm -eq "3.8") {
 	# log4cpp
 	$lmm = GetMajorMinor($log4cpp_version)
-	GetPackage https://downloads.sourceforge.net/project/log4cpp/log4cpp-$lmm.x%20%28new%29/log4cpp-$lmm/log4cpp-$log4cpp_version.tar.gz log4cpp
+	GetPackage https://downloads.sourceforge.net/project/log4cpp/log4cpp-$lmm.x%20%28new%29/log4cpp-$lmm/log4cpp-$log4cpp_version.tar.gz 
 	GetPatch log4cpp_msvc14.7z log4cpp
 
 	# PyQt5
