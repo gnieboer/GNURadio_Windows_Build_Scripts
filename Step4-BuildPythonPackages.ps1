@@ -1081,9 +1081,9 @@ Function SetupPython
 	SetLog "$configuration pyzmq"
 	cd $root\src-stage1-dependencies\pyzmq-$pyzmq_version
 	$libzmquv = $libzmq_version -Replace '\.','_'
+	if ($configuration -match "Debug") {$baseconfig="Debug"; $flag="-gd"} else {$baseconfig="Release"; $flag=""}
 	if ((TryValidate "wheels/pyzmq-$pyzmq_version-cp27-cp27${d}m-win_amd64.$configuration.whl" "$pythonroot/lib/site-packages/zmq/libzmq-v140-mt$flag-$libzmquv.dll" "$pythonroot/lib/site-packages/zmq/devices/monitoredqueue.pyd" "$pythonroot/lib/site-packages/zmq/error.py") -eq $false) {
 		Write-Host -NoNewline "configuring pyzmq..."
-		if ($configuration -match "Debug") {$baseconfig="Debug"; $flag="-gd"} else {$baseconfig="Release"; $flag=""}
 		$ErrorActionPreference = "Continue"
 		# this stdint.h file prevents the import of the real stdint file and causes the build to fail
 		# TODO submit upstream patch
