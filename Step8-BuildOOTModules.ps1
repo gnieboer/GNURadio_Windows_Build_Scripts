@@ -1441,42 +1441,46 @@ function BuildOOTModules
 	# gr-burst
 	#
 	#
-	SetLog "gr-burst $configuration"
-	Write-Host -NoNewline "configuring $configuration gr-burst..."
-	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-burst/build/$configuration *>> $Log
-	cd $root/src-stage3/oot_code/gr-burst/build/$configuration
-	$env:_CL_ = " $arch ";
-	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/gnuradio-fft.lib "
-	$ErrorActionPreference = "Continue"
-	$env:Path="" 
-	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
-		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
-		-Wno-dev *>> $Log
-	$env:Path = $oldPath
-	Write-Host -NoNewline "building gr-burst..."
-	msbuild .\gr-burst.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
-	# copy the examples across
-	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst *>> $Log
-	cp -Recurse -Force $root/src-stage3/oot_code/gr-burst/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst *>> $Log
-	$env:_CL_ = ""
-	$env:_LINK_ = ""
-	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-burst.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\burst\_burst_swig.pyd"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-burst not gr3.8 compatible"
+	} else {
+		SetLog "gr-burst $configuration"
+		Write-Host -NoNewline "configuring $configuration gr-burst..."
+		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-burst/build/$configuration *>> $Log
+		cd $root/src-stage3/oot_code/gr-burst/build/$configuration
+		$env:_CL_ = " $arch ";
+		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/gnuradio-fft.lib "
+		$ErrorActionPreference = "Continue"
+		$env:Path="" 
+		& cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
+			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+			-Wno-dev *>> $Log
+		$env:Path = $oldPath
+		Write-Host -NoNewline "building gr-burst..."
+		msbuild .\gr-burst.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		# copy the examples across
+		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst *>> $Log
+		cp -Recurse -Force $root/src-stage3/oot_code/gr-burst/examples/*.grc $root/src-stage3/staged_install/$configuration/share/gnuradio/examples/gr-burst *>> $Log
+		$env:_CL_ = ""
+		$env:_LINK_ = ""
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-burst.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\burst\_burst_swig.pyd"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
