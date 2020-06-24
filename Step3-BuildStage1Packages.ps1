@@ -319,6 +319,8 @@ if ((TryValidate "x64/Release/libfftwf-3.3.lib" "x64/Release-AVX2/libfftwf-3.3.l
 	msbuild .\fftw-3.3-libs.sln /m /p:"configuration=Release DLL-AVX2;platform=x64" >> $Log
 	Validate "x64/Release/libfftwf-3.3.lib" "x64/Release-AVX2/libfftwf-3.3.lib" "x64/Debug/libfftwf-3.3.lib" `
 		"x64/Release DLL/libfftwf-3.3.DLL" "x64/Release DLL-AVX2/libfftwf-3.3.DLL" "x64/Debug DLL/libfftwf-3.3.DLL" 
+	CheckNoAVX "$root/src-stage1-dependencies/fftw-$fftw_version/msvc/x64/Debug"
+	CheckNoAVX "$root/src-stage1-dependencies/fftw-$fftw_version/msvc/x64/Debug DLL"
 	CheckNoAVX "$root/src-stage1-dependencies/fftw-$fftw_version/msvc/x64/Release"
 	CheckNoAVX "$root/src-stage1-dependencies/fftw-$fftw_version/msvc/x64/Release DLL"
 } else {
@@ -859,7 +861,7 @@ if ((TryValidate "build/x64/DebugDLL/lib/qwtd6.dll" "build/x64/ReleaseDLL/lib/qw
 	cd $root\src-stage1-dependencies\qwt-$qwt6_version
 	Validate "build/x64/DebugDLL/lib/qwtd6.dll" "build/x64/ReleaseDLL/lib/qwt6.dll"  `
 		"build/x64/ReleaseDLL-AVX2/lib/qwt6.dll" "build/x64/ReleaseDLL-AVX2/lib/qwt6.lib"
-	CheckNoAVX "$root\src-stage1-dependencies\qwt-$qwt6_version/build/x64/Release/lib"
+	CheckNoAVX "$root\src-stage1-dependencies\qwt-$qwt6_version/build/x64/ReleaseDLL/lib"
 } else {
 	Write-Host "already built"
 }

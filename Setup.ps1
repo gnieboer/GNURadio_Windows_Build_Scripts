@@ -289,8 +289,10 @@ function CheckNoAVX
 	$avxfound = $false
 	$dirs = $thisroot 
 	$Include=@("*.lib","*.pyd","*.dll", "*.exe")
-
-	$libs = $dirs | Get-ChildItem -Recurse -File -Include "$Include"
+	
+	$libs = $dirs | Get-ChildItem -Recurse -File -Include $Include
+	$cnt = $libs.Count
+	Write-Host -NoNewLine "Checking $cnt libraries for errant AVX instructions..."
 	foreach ($lib in $libs) {
 		$result = & dumpbin $lib.FullName /DISASM:nobytes /NOLOGO | select-string -pattern "ymm[0-9]"
 		if ($result.length -gt 0) {
@@ -303,6 +305,7 @@ function CheckNoAVX
 		}
 	}
 	if ($avxfound -eq $true) {throw ""  2>&1 >> $null}
+	Write-Host ""
 }
 
 # must have already set fortran path for the below to work
@@ -381,9 +384,14 @@ $grdisplay_version = $Config.VersionInfo.grdisplay
 # whether in the code itself or because the intel fortran compiler added them
 # or it's a known false alarm
 $AVX_Whitelist = @(
-	"boost_log-vc140-mt-1_60.dll",  # specifically built with guards (dump.cpp)
-	"Qt5Gui.dll",                   # specifically built with guards
-	"Qt5Multimedia.dll",            # specifically built with guards
+	"boost_log-vc140-mt-$boostbase.dll",  # specifically built with guards (dump.cpp)
+	"boost_log-vc140-mt-x64-$boostbase.dll",  # specifically built with guards 
+	"libboost_log_setup-vc140-mt-x64-$boostbase.lib",  # specifically built with guards 
+	"libboost_log-vc140-mt-x64-$boostbase.lib",  # specifically built with guards 
+	"boost_log-vc140-mt-gd-$boostbase.dll",  # specifically built with guards (dump.cpp)
+	"boost_log-vc140-mt-gd-x64-$boostbase.dll",  # specifically built with guards 
+	"libboost_log_setup-vc140-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
+	"libboost_log-vc140-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
 	"volk.dll",                     # specifically built with guards
 	"sqlite3.dll",
 	"sqlite3_d.dll",
@@ -396,11 +404,26 @@ $AVX_Whitelist = @(
 	"_ssl.pyd",                     # includes openssl
 	"_hashlib_d.pyd",               # includes openssl 
 	"_ssl_d.pyd",                   # includes openssl
-	
+	"libfftw-3.3.lib",				# fft built with guards
+	"libfftw3f.lib",				# fft built with guards
+	"libfftw-3.3.dll",				# fft built with guards
+	"libfftw3f.dll",				# fft built with guards
 	"_vq.pyd",                      # scipy begin
 	"lsoda.pyd",
 	"vode.pyd",
 	"_odepack.pyd",
+	"_dop.pyd",
+	"_quadpack.pyd",
+	"dfitpack.pyd",
+	"_fitpack.pyd",
+	"_test_fortran.pyd",
+	"_trlib.pyd",
+	"minpack2.pyd",
+	"_cobyla.pyd",
+	"_nnls.pyd",
+	"_superlu.pyd",
+	"cython_special.pyd",
+	"_ufuncs_cxx.pyd",
 	"_test_odeint_banded.pyd",
 	"_ppoly.pyd",
 	"cython_blas.pyd",
@@ -419,7 +442,19 @@ $AVX_Whitelist = @(
 	"specfun.pyd",
 	"_ellip_harm_2.pyd",
 	"_ufuncs.pyd",
-	"_funcs_cxx.pyd"                # scipy end
+	"_funcs_cxx.pyd",                # scipy end
+	"pangoft2-1.0-0.dll",            # ?
+	"epoxy-0.dll",                   # ?
+	"mpir.lib",	                     # specifically built with guards
+	"gnuradio-runtime.dll"			 # statically links in from mpir 
+	"Qt5Core.dll",					 # specifically built with guards
+	"Qt5Multimedia.dll",    		 # specifically built with guards
+	"Qt5Gui.dll",                    # specifically built with guards
+	"Qt5Cored.dll",                  # specifically built with guards
+	"Qt5Multimediad.dll",            # specifically built with guards
+	"Qt5Guid.dll",                   # specifically built with guards 
+	"qwtd6.dll",					 # inherits from Qt5 
+	"qmake.exe"                      # specifically built with guards
 )
 
 # setup paths

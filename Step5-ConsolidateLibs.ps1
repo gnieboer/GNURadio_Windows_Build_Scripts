@@ -384,7 +384,6 @@ Function Consolidate {
 		"complete"
 	}
 	
-	Write-Host -NoNewline "Confirming AVX configuration..."
 	CheckNoAVX "$root/build/$configuration"
 
 	"complete"
