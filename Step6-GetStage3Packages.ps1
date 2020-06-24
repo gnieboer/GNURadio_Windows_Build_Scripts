@@ -53,6 +53,13 @@ GetPackage https://github.com/mossmann/hackrf.git -Stage3 -branch "$hackrf_versi
 
 # ____________________________________________________________________________________________________________
 #
+# SoapySDR
+#
+GetPackage https://github.com/pothosware/SoapySDR.git -Stage3 -branch "soapy-sdr-$SoapySDR_version"
+
+
+# ____________________________________________________________________________________________________________
+#
 # osmosdr
 #
 if ($mm -eq "3.8") {
@@ -299,6 +306,17 @@ if ($mm -eq "3.8") {
 	GetPackage https://github.com/gnieboer/gr-burst.git -Stage3 -branch "gr-3.8"
 } else {
 	GetPackage https://github.com/gnieboer/gr-burst.git -Stage3 -branch "msvc_fixes"
+}
+
+# ____________________________________________________________________________________________________________
+#
+# gr-soapy
+#
+#
+if ($mm -eq "3.8") {
+	GetPackage https://gitlab.com/librespacefoundation/gr-soapy.git -Stage3 -branch "maint-3.8"
+} else {
+	GetPackage https://gitlab.com/librespacefoundation/gr-soapy.git -Stage3 -branch "master"
 }
 
 # ____________________________________________________________________________________________________________

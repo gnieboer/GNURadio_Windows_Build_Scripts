@@ -92,6 +92,45 @@ function BuildDrivers
 
 	# ____________________________________________________________________________________________________________
 	#
+	# SoapySDR
+	#
+	# links to libusb dynamically and pthreads statically
+	#
+ 	SetLog "SoapySDR $configuration"
+	Write-Host -NoNewline "building $configuration SoapySDR..."
+	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/SoapySDR/build/$configuration  *>> $Log
+	$env:_CL_ = " $arch $runtime "
+	cd $root/src-stage3/oot_code/SoapySDR/build/$configuration
+	$ErrorActionPreference = "Continue"
+	cmake ../../ `
+		-G "Visual Studio 14 2015 Win64" `
+		-DLIBUSB_PATH="$root/build/$configuration" `
+		-DLIBUSB_LIBRARY_PATH_SUFFIX="lib" `
+		-DLIBUSB_LIBRARIES="$root/build/$configuration/lib/libusb-1.0.lib" `
+		-DLIBUSB_HEADER_FILE="$root/build/$configuration/include/libusb.h" `
+		-DLIBUSB_VERSION="$libusb_version" `
+		-DLIBUSB_SKIP_VERSION_CHECK=TRUE `
+		-DENABLE_BACKEND_LIBUSB=TRUE `
+		-DLIBPTHREADSWIN32_PATH="$root/build/$configuration" `
+		-DLIBPTHREADSWIN32_LIB_COPYING="$root/build/$configuration/lib/COPYING.lib" `
+		-DPTHREAD_LIBRARY="$root/build/$configuration/lib/pthreadVC2.lib" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27$debug_ext.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+		-Wno-dev `
+		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB " *>> $Log
+	Write-Host -NoNewline "building..."
+	msbuild .\SoapySDR.sln /m /p:"configuration=$buildconfig;platform=x64"  *>> $Log
+	Write-Host -NoNewline "installing..."
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+	Validate "$root/src-stage3/staged_install/$configuration/bin/SoapySDR.dll"
+	$ErrorActionPreference = "Stop"
+
+	# ____________________________________________________________________________________________________________
+	#
 	# bladeRF
 	#
 	# links to libusb dynamically and pthreads statically
@@ -354,6 +393,50 @@ function BuildOOTModules
 	if ($buildsymbols -and $buildconfig -eq "Release") {$buildconfig="RelWithDebInfo"}
 	if ($configuration -match "AVX2") {$arch="/arch:AVX2"} else {$arch=""}
 
+	# ____________________________________________________________________________________________________________
+	#
+	# gr-soapy
+	#
+	#
+	SetLog "gr-soapy $configuration"
+	$ErrorActionPreference = "Continue"
+	Write-Host -NoNewline "configuring $configuration gr-soapy..."
+	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-soapy/build/$configuration  *>> $Log
+	Copy-Item -Force $root\src-stage3\staged_install\$configuration\include\gnuradio\swig\gnuradio.i $root/bin/Lib
+	cd $root/src-stage3/oot_code/gr-soapy/build/$configuration 
+	$linkflags = " /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
+	$env:_LINK_= ""
+	$env:_CL_ = ""
+	$env:Path="" 
+	cmake ../../ `
+		-G "Visual Studio 14 2015 Win64" `
+		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+		-DCMAKE_C_FLAGS=" /DBOOST_ALL_DYN_LINK /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+		-DCMAKE_CXX_FLAGS=" /DBOOST_ALL_DYN_LINK /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
+		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+		-DBOOST_ROOT="$root/build/$configuration/" `
+		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+		-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
+		-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
+		-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
+		-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
+		-Wno-dev *>> $Log
+	$env:Path = $oldPath
+	Write-Host -NoNewline "building gr-soapy..."
+	msbuild .\gr-soapy.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+	Write-Host -NoNewline "installing..."
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+	$env:_CL_ = ""
+	$env:_LINK_ = ""
+	$ErrorActionPreference = "Stop"
+	Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-soapy.dll" 
+	
 	# ____________________________________________________________________________________________________________
 	#
 	# gr-acars2

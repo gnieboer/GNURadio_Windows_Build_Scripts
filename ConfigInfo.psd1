@@ -60,6 +60,7 @@
 		airspy = 'v1.0.9'
 		grdisplay = 'v3.7.3'   # last version for GR 3.7
 		airspyhf = '1.1.5'
+		SoapySDR = '0.7.1'
 		# TODO The following libraries are currently downloaded from current git snapshot.  This should be replaced by specific release tags
 		# PyQwt (5.2.1, abandoned, no releases marked)
 		# zlib (1.2.8 but should rarely change)
