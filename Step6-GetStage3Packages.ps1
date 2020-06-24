@@ -128,7 +128,7 @@ if ($mm -eq "3.8") {
 # awaiting merge requests to go back to upstream repo instead of my fork
 #
 if ($mm -eq "3.8") {
-	GetPackage https://github.com/osmocom/gr-fosphor.git -Stage3 -branch "gr38-qt5"
+	GetPackage https://github.com/osmocom/gr-fosphor.git -Stage3
 } else {
 	GetPackage https://github.com/gnieboer/gr-fosphor.git -Stage3 
 }
