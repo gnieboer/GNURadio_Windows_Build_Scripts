@@ -17,7 +17,8 @@ if "%GR_VERSION%" == "3.7" (
 set PATH=%~dp0;%~dp0..\gr-python27\dlls;%~dp0..\gr-python27;%PATH%
 
 REM --- Set GRC environment ---
-set GRC_BLOCKS_PATH=%~dp0..\share\gnuradio\grc\blocks
+REM set GRC_BLOCKS_PATH=%~dp0..\share\gnuradio\grc\blocks
+set GRC_BLOCKS_PATH=
 
 REM --- Set UHD environment ---
 set UHD_PKG_DATA_PATH=%~dp0..\share\uhd;%~dp0..\share\uhd\images
