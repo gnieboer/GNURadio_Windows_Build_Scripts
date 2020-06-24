@@ -362,31 +362,35 @@ function BuildDrivers
 	# ENABLE_RFSPACE=False is because the latest gr-osmosdr has linux-only support for that SDR
 	# /DNOMINMAX prevents errors related to std::min definition
 	# 
-	SetLog "gr-osmosdr $configuration"
+ 	SetLog "gr-osmosdr $configuration"
 	Write-Host -NoNewline "configuring $configuration gr-osmosdr..."
 	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-osmosdr/build/$configuration *>> $Log
 	cd $root/src-stage3/oot_code/gr-osmosdr/build/$configuration
 	$ErrorActionPreference = "Continue"
 	$env:LIB = "$root/build/$configuration/lib;" + $oldlib
 	$env:_CL_ = " $arch $runtime "
-	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  /DEBUG "
+	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib $root/src-stage3/staged_install/$configuration/lib/gnuradio-blocks.lib $root/build/$configuration/lib/log4cpp.lib /DEBUG "
 	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
 	if ($configuration -match "AVX") {$SIMD="-DUSE_SIMD=""AVX"""} else {$SIMD=""}
+	$env:Path = "$root/src-stage3\staged_install\$configuration;$root/src-stage3\staged_install\$configuration\bin;$root/src-stage3\staged_install\$configuration\lib;" + $oldPath
 	& cmake ../../ `
 		-G "Visual Studio 14 2015 Win64" `
+		-DPKG_CONFIG_EXECUTABLE="$root/bin/pkg-config.exe" `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INCLUDE_PATH="$root/build/$configuration/include" `
 		-DCMAKE_LIBRARY_PATH="$root/build/$configuration/lib" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
 		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
 		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib/" `
+		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+		-DBOOST_ROOT="$root/build/$configuration/" `
 		-DLIBAIRSPY_INCLUDE_DIRS="..\libairspy\src" `
 		-DLIBAIRSPY_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\airspy.lib" `
+		-DLIBAIRSPYHF_INCLUDE_DIRS="..\libairspy\src" `
+		-DLIBAIRSPYHF_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\airspyhf.lib" `
 		-DLIBBLADERF_INCLUDE_DIRS="$root\src-stage3\staged_install\$configuration\include\"  `
 		-DLIBBLADERF_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\bladeRF.lib" `
 		-DLIBHACKRF_INCLUDE_DIRS="$root\src-stage3\staged_install\$configuration\include\"  `
@@ -397,7 +401,7 @@ function BuildDrivers
 		-DLIBOSMOSDR_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\osmosdr.lib" `
 		-DVOLK_LIBRARIES="$root\src-stage3\staged_install\$configuration\lib\volk.lib" `
 		-DVOLK_INCLUDE_DIRS="$root\src-stage3\staged_install\$configuration\include\"  `
-		-DCMAKE_CXX_FLAGS="/DNOMINMAX /D_TIMESPEC_DEFINED $arch /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB /I$root/build/$configuration/include /EHsc " `
+		-DCMAKE_CXX_FLAGS="/DNOMINMAX /D_TIMESPEC_DEFINED $arch /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB /I$root/build/$configuration/include /EHsc /DBOOST_ALL_DYN_LINK" `
 		-DCMAKE_C_FLAGS="/DNOMINMAX /D_TIMESPEC_DEFINED $arch  /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB /EHsc " `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		$SIMD `
@@ -412,7 +416,8 @@ function BuildDrivers
 	(Get-Content $root\src-stage3\staged_install\$configuration\bin\osmocom_fft.py).replace('/dev/null', 'nul') | Set-Content $root\src-stage3\staged_install\$configuration\bin\osmocom_fft.py
 	Validate "$root\src-stage3\oot_code\gr-osmosdr\build\$configuration\lib\$buildconfig\gnuradio-osmosdr.dll"
 	CheckNoAVX "$root\src-stage3\oot_code\gr-osmosdr\build\$configuration\lib\$buildconfig"
-	$env:_LINK_ = ""
+	$env:_LINK_ = "" 
+	$env:Path = $oldPath
 }
 
 function BuildOOTModules 

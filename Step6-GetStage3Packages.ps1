@@ -68,11 +68,7 @@ GetPackage https://github.com/pothosware/SoapySDR.git -Stage3 -branch "soapy-sdr
 #
 # osmosdr
 #
-if ($mm -eq "3.8") {
-	GetPackage https://github.com/gnieboer/gr-osmosdr.git -Stage3 -branch "gr3.8-fmdx"
-} else {
-	GetPackage https://github.com/osmocom/gr-osmosdr.git -Stage3
-}
+GetPackage https://github.com/osmocom/gr-osmosdr.git -Stage3
 GetPackage https://github.com/osmocom/osmo-sdr.git -Stage3
 
 # ____________________________________________________________________________________________________________
