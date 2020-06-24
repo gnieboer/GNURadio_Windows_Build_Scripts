@@ -958,7 +958,7 @@ function BuildOOTModules
 		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-cdma/build/$configuration *>> $Log
 		cd $root/src-stage3/oot_code/gr-cdma/build/$configuration
 		$env:_CL_=" $arch /DNOMINMAX  /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /Zi "
-		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+		$env:_LINK_= " /DEBUG:FULL /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
 		if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
 		(Get-Content "../../python/cdma_parameters.py").replace('/home/anastas/gr-cdma/', '../lib/site-packages/cdma') | Set-Content "../../python/cdma_parameters.py"
 		$ErrorActionPreference = "Continue"
@@ -1006,8 +1006,8 @@ function BuildOOTModules
 	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-rds/build/$configuration *>> $Log
 	cd $root/src-stage3/oot_code/gr-rds/build/$configuration
 	$env:_CL_ = " $arch ";
-	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
-	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
+	$env:_LINK_= " /DEBUG:FULL /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib "
+	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib "}
 	$ErrorActionPreference = "Continue"
 	$env:Path="" 
 	& cmake ../../ `
@@ -1053,7 +1053,7 @@ function BuildOOTModules
 		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-ais/build/$configuration *>> $Log
 		cd $root/src-stage3/oot_code/gr-ais/build/$configuration
 		$env:_CL_ = " $arch ";
-		$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib $root/src-stage3/staged_install/$configuration/lib/volk.lib "
+		$env:_LINK_= " /DEBUG:FULL /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/volk.lib "
 		$ErrorActionPreference = "Continue"
 		$env:Path="" 
 		& cmake ../../ `
