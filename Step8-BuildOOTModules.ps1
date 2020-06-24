@@ -618,7 +618,7 @@ function BuildOOTModules
 		-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
 		-Wno-dev *>> $Log
 	Write-Host -NoNewline "building gr-air-modes..."
-	msbuild .\gr-gr-air-modes.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+	msbuild .\gr-air-modes.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
 	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	$env:Path = $oldPath
