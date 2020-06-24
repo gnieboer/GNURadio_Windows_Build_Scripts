@@ -341,7 +341,7 @@ GetPackage https://downloads.sourceforge.net/project/openlte/openlte_v$openlte_v
 # gr-gsm
 #
 if ($mm -eq "3.8") {
-	GetPackage https://github.com/velichkov/gsm.git -Stage3 -branch "maint-3.8"
+	GetPackage https://github.com/velichkov/gr-gsm.git -Stage3 -branch "maint-3.8"
 } else {
 	GetPackage https://github.com/ptrkrysik/gr-gsm.git -Stage3
 }
