@@ -1,4 +1,4 @@
-GNURadio Windows Build Scripts v1.6
+GNURadio Windows Build Scripts v1.7
 =====================================
 
 A series of Powershell scripts to automatically download,  build from source, and install GNURadio and -all- it's dependencies as 64-bit native binaries then package as an .msi using Visual Studio 2015.
@@ -9,17 +9,18 @@ IF YOU JUST WANT TO USE GNURADIO ON WINDOWS, DON'T USE THESE SCRIPTS... use the 
 
 The finished MSI includes:
 
-Device Support: UHD, RTL-SDR, hackrf, airspy, BladeRF, osmoSDR, FCD
+Device Support: UHD, RTL-SDR, hackrf, airspy, airspyhf, BladeRF, osmoSDR, FCD, SoapySDR
 
-GNURadio modules: 3.7.13.5 with all but gr-comedi modules built and included
+GNURadio modules: 3.8.1.0 and 3.7.13.5 with all but gr-comedi modules built and included
 
 OOT modules: gr-iqbal, gr-fosphor, gr-osmosdr, gr-acars, gr-adsb, gr-modtool, gr-air-modes, gr-ais, gr-ax25, gr-burst (incl. bitarray), gr-cdma, gr-display (incl. matplotlib), gr-eventstream, gr-inspector (incl. tensorflow), gr-lte, gr-mapper, gr-nacl, gr-paint (incl. PIL), gr-radar, gr-rds, gr-specest, OpenLTE, gr-gsm
+(not all modules available in gr 3.8)
 
 Other Applications: gqrx
 
 There are now two options for that for whatever your reason is, want to build these installers themselves.  The newest and recommended option is to use an AWS EC2 instance with a custom AMI that has successfully built these scripts, to avoid configuration issues.  I recommend a c5d.2xlarge because you must have the 200GB NVMe drive or larger.
 
-The AMI is: GnuRadio Windows Build - ami-0ac7160e7f16f76ac.  AMIs are regional, so you must be in N. Virginia to see it, but you should be able to make a copy as you wish.
+The AMI is: GnuRadio Windows Build - ami-0ac7160e7f16f76ac.  AMIs are regional, so you must connect to USA N. Virginia to see it, but you should be able to make a copy as you wish.
 Once you log in, there are two shortcuts.  The first will initialize the NVMe to your Z: drive.  The second will run the scripts. 
 
 The second option is to build your own machine:
@@ -63,11 +64,11 @@ Once complete, msi files can be found in the [root]/src-stage4-installer/dist su
 
 3- This has been tested with a B200 UHD, a hackRF, and an RTL-SDR.  Other device drivers have not been phyiscally verified to work.  If you own one, please let me know if you had success.
 
-4- In the event of issues, I highly recommend [Dependency Walker](https://www.dependencywalker.com/) to troubleshoot what libraries are linked to what.
+4- In the event of issues, I highly recommend [Dependency Walker](https://www.dependencywalker.com/) or similar to troubleshoot what libraries are linked to what.
 
 5- If your connection is spotty, you may get partially downloaded packages which cause build failures.  To correct, DELETE the suspect package from the /packages directory so it will retry the download.
 
-6- The following devices are NOT currently supported: FCD Pro+, RFSPACE, MiriSDR, SoapySDR, SDRPlay
+6- The following devices are NOT currently supported: FCD Pro+, RFSPACE, MiriSDR, SDRPlay, freeSRP
 
 7- CMake 3.13 is the only version currently supported, though versions after 3.5 may be successful; older versions have been reported to have issues detecting the custom python install when at the BuildGNURadio step. 
 
