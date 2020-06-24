@@ -65,5 +65,5 @@ if ($configmode -eq "2" -or $configmode -eq "all") {BuildMSI "Release-AVX2"}
 if ($configmode -eq "3" -or $configmode -eq "all") {BuildMSI "Debug"; ConsolidatePDBs "Debug"}
 
 ""
-"COMPLETED STEP 9: .msi files have been created and can be found in $root/src-stage4-installer/dist/(configuration)/gnuradio_$gnuradio_version_win64.msi"
+"COMPLETED STEP 9: .msi files have been created and can be found in $root/src-stage4-installer/dist/(configuration)/gnuradio_${gnuradio_version}_win64.msi"
 ""
