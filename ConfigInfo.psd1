@@ -6,7 +6,7 @@
 		gnuradio = '3.8.0.0' 
 		volk = '1.4'
 		openssl = '1.0.2r'
-		UHD = '3.14.1.1'
+		UHD = '3.15.0.0'
 		gqrx = '2.12.1'
 		Cython = '0.28.5'
 		numpy = '1.16.4'

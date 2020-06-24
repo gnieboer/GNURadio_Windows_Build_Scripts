@@ -998,7 +998,10 @@ Function makeUHD {
 	if ((TryValidate "..\..\dist\$configuration\bin\uhd.dll" "..\..\dist\$configuration\lib\uhd.lib" "..\..\dist\$configuration\include\uhd.h") -eq $false) {
 		Write-Host -NoNewline "  configuring $configuration..."
 		if ($configuration -match "AVX2") {$platform = "avx2"; $env:_CL_ = "/arch:AVX2 "} else {$platform = "x64"; $env:_CL_ = ""}
-		if ($configuration -match "Release") {$boostconfig = "Release"; $buildconfig="RelWithDebInfo"; $pythonexe = "python.exe"; $env:_CL_ = $env:_CL_ + " /MD "} else {$boostconfig = "Debug"; $buildconfig="Debug"; $pythonexe = "python_d.exe"; $env:_CL_ = $env:_CL_ + " /MDd "}
+		if ($configuration -match "Release") 
+			{$boostconfig = "Release"; $buildconfig="RelWithDebInfo"; $pythonexe = "python.exe"; $env:_CL_ = $env:_CL_ + " /MD "} 
+		else 
+			{$boostconfig = "Debug"; $buildconfig="Debug"; $pythonexe = "python_d.exe"; $env:_CL_ = $env:_CL_ + " /MDd "}
 		$linkflags= " /DEBUG  /NODEFAULTLIB:LIBCMT.lib /NODEFAULTLIB:LIBCMTD.lib "
 		& cmake .. `
 			-G "Visual Studio 14 2015 Win64" `
