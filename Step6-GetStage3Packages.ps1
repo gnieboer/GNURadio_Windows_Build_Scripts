@@ -53,6 +53,12 @@ GetPackage https://github.com/mossmann/hackrf.git -Stage3 -branch "$hackrf_versi
 
 # ____________________________________________________________________________________________________________
 #
+# freeSRP
+#
+GetPackage https://github.com/myriadrf/libfreesrp.git -Stage3 -branch "$freeSRP_version"
+
+# ____________________________________________________________________________________________________________
+#
 # SoapySDR
 #
 GetPackage https://github.com/pothosware/SoapySDR.git -Stage3 -branch "soapy-sdr-$SoapySDR_version"

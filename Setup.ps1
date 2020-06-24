@@ -379,6 +379,7 @@ $rtlsdr_version = $Config.VersionInfo.rtlsdr
 $hackrf_version = $Config.VersionInfo.hackrf
 $airspy_version = $Config.VersionInfo.airspy
 $airspyhf_version = $Config.VersionInfo.airspyhf
+$freeSRP_version = $Config.VersionInfo.freeSRP
 $SoapySDR_version = $Config.VersionInfo.SoapySDR
 $grdisplay_version = $Config.VersionInfo.grdisplay
 $boostbase = $boost_version_.substring(0,$boost_version_.length-2)

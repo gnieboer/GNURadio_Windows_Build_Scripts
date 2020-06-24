@@ -129,6 +129,38 @@ function BuildDrivers
 	Validate "$root/src-stage3/staged_install/$configuration/bin/SoapySDR.dll"
 	$ErrorActionPreference = "Stop"
 
+<# 	# ____________________________________________________________________________________________________________
+	#
+	# freeSRP
+	#
+	# not working currently, CMAKE files have windows issues and then duplicate ambiguous symbols
+	#
+ 	SetLog "freeSRP $configuration"
+	Write-Host -NoNewline "building $configuration freeSRP..."
+	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/libfreesrp/build/$configuration  *>> $Log
+	$env:_CL_ = " $arch $runtime "
+	cd $root/src-stage3/oot_code/libfreesrp/build/$configuration
+	$ErrorActionPreference = "Continue"	
+	cmake ../../ `
+		-G "Visual Studio 14 2015 Win64" `
+		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+		-DLIBUSB_PATH="$root/build/$configuration" `
+		-DLIBUSB_1_LIBRARY="$root/build/$configuration/lib/libusb-1.0.lib" `
+		-DLIBUSB_1_INCLUDE_DIR="$root/build/$configuration/include" `
+		-DLIBUSB_SKIP_VERSION_CHECK=TRUE `
+		-DENABLE_BACKEND_LIBUSB=TRUE `
+		-DLIBPTHREADSWIN32_PATH="$root/build/$configuration" `
+		-DLIBPTHREADSWIN32_LIB_COPYING="$root/build/$configuration/lib/COPYING.lib" `
+		-DPTHREAD_LIBRARY="$root/build/$configuration/lib/pthreadVC2.lib" `
+		-Wno-dev `
+		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB " *>> $Log
+	Write-Host -NoNewline "building..."
+	msbuild .\libfreesrp.sln /m /p:"configuration=$buildconfig;platform=x64"  *>> $Log
+	Write-Host -NoNewline "installing..."
+	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+	Validate "$root/src-stage3/staged_install/$configuration/bin/libfreesrp.dll"
+	$ErrorActionPreference = "Stop" #>
+
 	# ____________________________________________________________________________________________________________
 	#
 	# bladeRF
