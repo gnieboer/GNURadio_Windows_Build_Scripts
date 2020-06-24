@@ -1236,6 +1236,7 @@ if ($mm -eq "3.8") {
 
 # ____________________________________________________________________________________________________________
 # MPIR
+#
 
 	SetLog "MPIR"
 	Write-Host -NoNewline "Building MPIR..."
@@ -1244,12 +1245,15 @@ if ($mm -eq "3.8") {
 		"../dll/x64/Debug/mpir.dll" "../dll/x64/Debug/mpir.lib"  "../dll/x64/Debug/mpir.pdb" `
 		"../lib/x64/Release/mpirxx.lib" "../lib/x64/Release/mpir.lib"  "../lib/x64/Release/mpir.pdb" `
 		"../lib/x64/Debug/mpirxx.lib" "../lib/x64/Debug/mpir.lib"  "../lib/x64/Debug/mpir.pdb"		) -eq $false) {
+		$env:_CL_ = "/MD"
 		./msbuild.bat gc dll x64 release *>> $Log
-		./msbuild.bat gc dll x64 debug *>> $Log
 		./msbuild.bat gc lib x64 release *>> $Log
-		./msbuild.bat gc lib x64 debug *>> $Log
 		./msbuild.bat cxx lib x64 release *>> $Log
+		$env:_CL_ = "/MDd"
+		./msbuild.bat gc dll x64 debug *>> $Log
+		./msbuild.bat gc lib x64 debug *>> $Log
 		./msbuild.bat cxx lib x64 debug *>> $Log
+		$env:_CL_ = ""
 		Validate "../dll/x64/Release/mpir.dll" "../dll/x64/Release/mpir.lib"  "../dll/x64/Release/mpir.pdb" `
 		"../dll/x64/Debug/mpir.dll" "../dll/x64/Debug/mpir.lib"  "../dll/x64/Debug/mpir.pdb"`
 		"../lib/x64/Release/mpirxx.lib" "../lib/x64/Release/mpir.lib"  "../lib/x64/Release/mpir.pdb" `

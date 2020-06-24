@@ -374,6 +374,9 @@ Function Consolidate {
     }
 	
 	# MPIR
+	#
+	# GNURadio will want to link statically
+	#
 	if ($mm -eq "3.8") {
 		Write-Host -NoNewline "Consolidating MPIR..."
 		cp -Recurse -Force $root\src-stage1-dependencies\MPIR\lib\x64\$baseconfig\mpirxx.lib $root/build/$configuration/lib/ *>> $log
