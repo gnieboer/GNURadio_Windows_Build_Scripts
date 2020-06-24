@@ -312,41 +312,45 @@ function BuildDrivers
 	# Also the upstream sources uses C99 complex constructs that MSVC doesn't support
 	# so we're using a custom version of the source.
 	#
-	SetLog "gr-iqbal $configuration"
-	$ErrorActionPreference = "Continue"
-	Write-Host -NoNewline "configuring $configuration gr-iqbal..."
-	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-iqbal/build/$configuration  *>> $Log
-	cd $root/src-stage3/oot_code/gr-iqbal/build/$configuration 
-	$env:_CL_ = " $arch $runtime "
-	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG "
-	if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
-	if (Test-Path CMakeCache.txt) {Remove-Item -Force CMakeCache.txt} # Don't keep the old cache because if the user is fixing a config problem it may not re-check the fix
-	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
-		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
-		-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27$debug_ext.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib/" `
-		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DFFTW3F_LIBRARIES="$root/build/Release/lib/libfftw3f.lib" `
-		-DFFTW3F_INCLUDE_DIRS="$root/build/Release/include/" `
-		-DLINK_LIBRARIES="gnuradio-pmt.lib"  `
-		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-Wno-dev *>> $Log
-	Write-Host -NoNewline "building..."
-	msbuild .\gr-iqbalance.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
-	Write-Host -NoNewline "installing..."
-	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
-	Validate "$root\src-stage3\oot_code\gr-iqbal\build\$configuration\lib\$buildconfig\gnuradio-iqbalance.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\gnuradio\iqbalance\_iqbalance_swig.pyd"
-	CheckNoAVX "$root\src-stage3\oot_code\gr-iqbal\build\$configuration\lib\$buildconfig"
-	$env:_LINK_ = ""
-	$ErrorActionPreference = "Stop"
+	if ($mm -eq "3.8") {
+		Write-Host "gr-iqbal not gr3.8 compatible"
+	} else {
+		SetLog "gr-iqbal $configuration"
+		$ErrorActionPreference = "Continue"
+		Write-Host -NoNewline "configuring $configuration gr-iqbal..."
+		New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-iqbal/build/$configuration  *>> $Log
+		cd $root/src-stage3/oot_code/gr-iqbal/build/$configuration 
+		$env:_CL_ = " $arch $runtime "
+		$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG "
+		if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
+		if (Test-Path CMakeCache.txt) {Remove-Item -Force CMakeCache.txt} # Don't keep the old cache because if the user is fixing a config problem it may not re-check the fix
+		cmake ../../ `
+			-G "Visual Studio 14 2015 Win64" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
+			-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27$debug_ext.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib/" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DFFTW3F_LIBRARIES="$root/build/Release/lib/libfftw3f.lib" `
+			-DFFTW3F_INCLUDE_DIRS="$root/build/Release/include/" `
+			-DLINK_LIBRARIES="gnuradio-pmt.lib"  `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-Wno-dev *>> $Log
+		Write-Host -NoNewline "building..."
+		msbuild .\gr-iqbalance.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		Validate "$root\src-stage3\oot_code\gr-iqbal\build\$configuration\lib\$buildconfig\gnuradio-iqbalance.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\gnuradio\iqbalance\_iqbalance_swig.pyd"
+		CheckNoAVX "$root\src-stage3\oot_code\gr-iqbal\build\$configuration\lib\$buildconfig"
+		$env:_LINK_ = ""
+		$ErrorActionPreference = "Stop"
+	}
 
 	# ____________________________________________________________________________________________________________
 	#
