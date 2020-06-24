@@ -183,6 +183,7 @@ function BuildDrivers
 		-DLIBUSB_HEADER_FILE="$root/build/$configuration/include/libusb.h" `
 		-DLIBUSB_VERSION="$libusb_version" `
 		-DLIBUSB_SKIP_VERSION_CHECK=TRUE `
+		-DLIBUSB_EXTRA_PATHS="$root/build/$configuration/lib $root/build/$configuration/include" `
 		-DENABLE_BACKEND_LIBUSB=TRUE `
 		-DLIBPTHREADSWIN32_PATH="$root/build/$configuration" `
 		-DLIBPTHREADSWIN32_LIB_COPYING="$root/build/$configuration/lib/COPYING.lib" `
