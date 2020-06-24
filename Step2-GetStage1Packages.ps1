@@ -145,7 +145,7 @@ mkdir $root\src-stage1-dependencies\openssl\build\intermediate\x64\ReleaseDLL-AV
 
 # Qt
 GetPackage http://download.qt.io/archive/qt/4.8/4.8.7/qt-everywhere-opensource-src-4.8.7.tar.gz Qt4
-GetPackage https://github.com/qt/qt5.git -branch "v$qt5_version"
+GetPackage https://github.com/qt/qt5.git -branch "v$qt5_version" 
 
 # Boost
 GetPackage http://downloads.sourceforge.net/project/boost/boost/$boost_version/boost_$boost_version_.zip boost

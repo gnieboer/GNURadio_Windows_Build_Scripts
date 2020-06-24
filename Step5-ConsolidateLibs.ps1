@@ -126,7 +126,7 @@ Function Consolidate {
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin $root/build/$configuration/ *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/lib/cmake $root/build/$configuration/lib/ *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/mkspecs $root/build/$configuration/ *>> $log
-		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/plugins $root/build/$configuration/ *>> $log
+		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/plugins $root/build/$configuration/plugins/ *>> $log
 		robocopy "$root/src-stage1-dependencies/Qt5Stage/build/$configDLL/qtbase/src/" "$root/build/$configuration/src/" "*.h" /s /xd ".moc" ".tracegen" *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Core$q5d.dll $root/build/$configuration/bin/ *>> $log
 		cp -Recurse -Force $root/src-stage1-dependencies/Qt5Stage/build/$configDLL/bin/Qt5Gui$q5d.dll $root/build/$configuration/bin/ *>> $log
