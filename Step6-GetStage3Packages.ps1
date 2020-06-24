@@ -78,6 +78,9 @@ GetPackage https://github.com/osmocom/osmo-sdr.git -Stage3
 # upstream: https://github.com/osmocom/gr-iqbal.git 
 if ($mm -eq "3.8") {
 	GetPackage https://github.com/gnieboer/gr-iqbal.git -Stage3 -branch "gr3.8"
+	cd  $root/src-stage3/oot_code/gr-iqbal
+	git pull --recurse-submodules=on
+	git submodule update
 } else {
 	GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gr-iqbal.7z -Stage3
 }
