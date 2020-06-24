@@ -796,7 +796,7 @@ if ((TryValidate "build/x64/Debug-Release/lib/qwtd.lib" "build/x64/Debug-Release
 # QWT 6
 #
 # This links against Qt4 when building GR 3.7, and against Qt5 when building against 3.8
-# Do not mix the streams
+# Do not mix the streams, manually wipe the build subdir if you switch from one to the other
 #
 # This builds both debug and release libraries versions for each 
 #
@@ -807,9 +807,7 @@ $env:_LINK_ = ""
 Function MakeQwt6 {
 	Write-Host -NoNewLine $args[0]"..."
 	$qmakever = $args[0]
-	$env:Path = "$root/src-stage1-dependencies/$qtbuilddir/build/$qmakever/bin;" + $oldPath
-	$command = "$root/src-stage1-dependencies/$qtbuilddir/build/$qmakever/bin/qmake.exe $command"
-	$env:Path = "$root/src-stage1-dependencies/$qtbuilddir/build/$qmakever/bin;" + $oldPath
+	$env:Path = "$root/src-stage1-dependencies/$qtbuilddir/build/$qmakever/bin;C:\Program Files (x86)\Windows Kits\10\bin\x64;" + $oldPath
 	$command = "$root/src-stage1-dependencies/$qtbuilddir/build/$qmakever/bin/qmake.exe $command"
 	Remove-Item -Force src/Makefile *>> $Log
 	Remove-Item -Force src/Makefile.Debug *>> $Log
@@ -848,20 +846,21 @@ if ((TryValidate "build/x64/DebugDLL/lib/qwtd6.dll" "build/x64/ReleaseDLL/lib/qw
 	$env:_CL_ = " /Zi /EHsc "
 	$env:_LINK_ = " /SUBSYSTEM:CONSOLE "
 	$env:LIB = "$root/src-stage1-dependencies/$qtbuilddir/build/DebugDLL/lib;$root/src-stage1-dependencies/$qtbuilddir/build/ReleaseDLL/lib;" + $oldlib
-	$command = "-d  qwt.pro -d ""INSTALL_PREFIX=$root/src-stage1-dependencies/qwt-$qwt6_version/build/x64/DebugDLL"" ""CONFIG+=release_with_debuginfo"" ""CONFIG+=debug"" ""MAKEDLL=YES"" ""AVX2=NO"" ""QT_DLL=YES"""
+	$command = "qwt.pro ""INSTALL_PREFIX=$root/src-stage1-dependencies/qwt-$qwt6_version/build/x64/DebugDLL"" ""CONFIG+=release_with_debuginfo"" ""CONFIG+=debug"" ""MAKEDLL=YES"" ""AVX2=NO"" ""QT_DLL=YES"" "
 	MakeQwt6 "DebugDLL"
+
 
 	# Release DLL
 	$env:_CL_ = " /Zi /EHsc "
 	$env:LIB = "$root/src-stage1-dependencies/$qtbuilddir/build/ReleaseDLL/lib;$root/src-stage1-dependencies/$qtbuilddir/build/DebugDLL/lib;" + $oldlib
 	$env:_LINK_ = ""
-	$command = "-d  qwt.pro -d ""INSTALL_PREFIX=$root/src-stage1-dependencies/qwt-$qwt6_version/build/x64/ReleaseDLL"" ""CONFIG-=debug"" ""CONFIG+=release_with_debuginfo"" ""MAKEDLL=YES"" ""AVX2=NO"" ""QT_DLL=YES"""
+	$command = "qwt.pro ""INSTALL_PREFIX=$root/src-stage1-dependencies/qwt-$qwt6_version/build/x64/ReleaseDLL"" ""CONFIG-=debug"" ""CONFIG+=release_with_debuginfo"" ""MAKEDLL=YES"" ""AVX2=NO"" ""QT_DLL=YES"""
 	MakeQwt6 "ReleaseDLL" 
 
 	# Release AVX2 DLL
 	$env:_CL_ = " /Ox /arch:AVX2 /Zi /Gs- /EHsc " 
 	$env:LIB = "$root\src-stage1-dependencies\$qtbuilddir\build\ReleaseDLL-AVX2\lib;$root\src-stage1-dependencies\$qtbuilddir\build\DebugDLL\lib;" + $oldlib
-	$command = "-d  qwt.pro -d ""INSTALL_PREFIX=$root/src-stage1-dependencies/qwt-$qwt6_version/build/x64/ReleaseDLL-AVX2"" ""CONFIG-=release_with_debuginfo"" ""CONFIG+=release"" ""MAKEDLL=YES"" ""AVX2=YES"" ""QT_DLL=YES"""
+	$command = "qwt.pro ""INSTALL_PREFIX=$root/src-stage1-dependencies/qwt-$qwt6_version/build/x64/ReleaseDLL-AVX2"" ""CONFIG-=release_with_debuginfo"" ""CONFIG+=release"" ""MAKEDLL=YES"" ""AVX2=YES"" ""QT_DLL=YES"""
 	MakeQwt6 "ReleaseDLL-AVX2" 
 
 	$env:_CL_ = ""
