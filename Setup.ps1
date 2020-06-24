@@ -43,9 +43,15 @@ function getPackage
 			}
 			$ErrorActionPreference = "Continue"
 			if ($branch -eq "") {
-				git clone --recursive --depth=1 $toGet  2>&1 >> $Log 
+				git clone --recursive --depth=100 $toGet  *>> $Log 
 			} else {
-				git clone --recursive --depth=1 $toGet --branch $branch  2>&1 >> $Log 
+				git clone --recursive $toGet  *>> $Log 
+				cd $archiveName
+				git fetch 
+				git fetch --tags
+				git checkout $branch  2>&1 >> $Log 
+				git submodule update --init --recursive 2>&1 >> $Log
+				cd ..
 			}
 			$ErrorActionPreference = "Stop"
 			if ($LastErrorCode -eq 1) {
