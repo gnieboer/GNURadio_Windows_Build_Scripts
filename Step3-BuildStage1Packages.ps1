@@ -22,6 +22,8 @@ if (Test-Path $mypath\Setup.ps1) {
 	. $root\scripts\Setup.ps1 -Force
 }
 $mm = GetMajorMinor($gnuradio_version)
+$env:_CL_ = ""
+$env:_LINK_ = ""
 
 # Build packages needed for Stage 1
 cd src-stage1-dependencies
@@ -308,6 +310,8 @@ if ((TryValidate "x64/Debug/dll/cppunit.dll" "x64/Release/dll/cppunit.dll" "x64/
 # fftw3
 SetLog "fftw3"
 Write-Host -NoNewline "building fftw3..."
+$env:_CL_ = ""
+$env:_LINK_ = ""
 cd $root\src-stage1-dependencies\fftw-$fftw_version\msvc
 if ((TryValidate "x64/Release/libfftwf-3.3.lib" "x64/Release-AVX2/libfftwf-3.3.lib" "x64/Debug/libfftwf-3.3.lib" `
 	"x64/Release DLL/libfftwf-3.3.DLL" "x64/Release DLL-AVX2/libfftwf-3.3.DLL" "x64/Debug DLL/libfftwf-3.3.DLL" ) -eq $false) {
@@ -702,12 +706,12 @@ Function MakeQt5
 		Write-Host -NoNewline "building..."
 		nmake *>> $Log
 		nmake install *>> $Log
-		$env:_CL_ = ""
         cd $root/src-stage1-dependencies/Qt5Stage/build/$type
 		Validate "bin/qmake.exe" "bin/Qt5Core$debug.dll" "bin/Qt5OpenGL$debug.dll" "bin/Qt5Svg$debug.dll" "bin/Qt5Gui$debug.dll"
 	} else {
 		Write-Host "already built"
 	}
+	$env:_CL_ = ""
 }
 cd $root/src-stage1-dependencies/Qt5
 # Various things in Qt build are intepreted as errors so 
@@ -798,6 +802,8 @@ if ((TryValidate "build/x64/Debug-Release/lib/qwtd.lib" "build/x64/Debug-Release
 #
 SetLog "Qwt6"
 Write-Host -NoNewline "building qwt6..."
+$env:_CL_ = ""
+$env:_LINK_ = ""
 Function MakeQwt6 {
 	Write-Host -NoNewLine $args[0]"..."
 	$qmakever = $args[0]
@@ -1014,10 +1020,10 @@ Function makeUHD {
 		New-Item -ItemType Directory -Path $root/src-stage1-dependencies/uhd\dist\$configuration\share\uhd\examples\ -Force *>> $Log
 		cp -Recurse -Force $root/src-stage1-dependencies/uhd/host/build/examples/$buildconfig/* $root/src-stage1-dependencies/uhd\dist\$configuration\share\uhd\examples\
 		Validate "..\..\dist\$configuration\bin\uhd.dll" "..\..\dist\$configuration\lib\uhd.lib" "..\..\dist\$configuration\include\uhd.h"
-		$env:_CL_ = ""
 	} else {
 		Write-Host "  $configuration already built"
 	}
+	$env:_CL_ = ""
 }
 
 # AVX2 build
@@ -1097,13 +1103,14 @@ if (!$BuildNumpyWithMKL -or $true) {
 			Write-Host -NoNewline "building..."
 			msbuild .\OpenBLAS.sln /m /p:"configuration=$cmakebuildtype;platform=x64" *>> $Log 
 			cp $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration\lib\$cmakebuildtype\libopenblas.lib $root\src-stage1-dependencies\OpenBLAS-$openblas_version\build\$configuration\lib\libopenblas_static.lib *>> $Log 
-			$env:_CL_ = ""
-			$env:__INTEL_POST_FFLAGS = ""
+
 			Validate "lib\libopenblas.lib" "lib\libopenblas.dll" "lib\libopenblas_static.lib"
 			$ErrorActionPreference = "Stop"
 		} else {
 			Write-Host "already built"
 		}
+		$env:_CL_ = ""
+		$env:__INTEL_POST_FFLAGS = ""
 	}
 	MakeOpenBlas "Debug"
 	MakeOpenBlas "Release"
@@ -1184,7 +1191,6 @@ function MakembedTLS {
 		msbuild ".\mbed TLS.sln" /m /p:"configuration=$debug;platform=x64" *>> $Log 
 		Write-Host -NoNewline "installing..."
 		msbuild .\INSTALL.vcxproj /m /p:"configuration=$debug;platform=x64;BuildProjectReferences=false" *>> $Log
-		$env:_CL_ = ""
 		if ($configuration -match "DLL") {
 			Validate "..\..\dist\$configuration\lib\mbedtls.lib" "..\..\dist\$configuration\lib\mbedtls.dll" 
 		} else {
@@ -1193,6 +1199,7 @@ function MakembedTLS {
 	} else {
 		Write-Host "already built"
 	}
+	$env:_CL_ =
 	$ErrorActionPreference = "Stop"
 }
 MakembedTLS "Debug"
