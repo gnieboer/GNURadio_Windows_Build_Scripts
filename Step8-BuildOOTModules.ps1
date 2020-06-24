@@ -547,7 +547,7 @@ function BuildOOTModules
 	# gr-adsb
 	#
 	#
-	SetLog "gr-adsb $configuration"
+<# 	SetLog "gr-adsb $configuration"
 	$ErrorActionPreference = "Continue"
 	Write-Host -NoNewline "configuring $configuration gr-adsb..."
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-adsb/build/$configuration  *>> $Log
@@ -577,7 +577,7 @@ function BuildOOTModules
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	$ErrorActionPreference = "Stop"
-	Validate "$root/src-stage3/staged_install/$configuration/Lib/site-packages/adsb/decoder.py"
+	Validate "$root/src-stage3/staged_install/$configuration/Lib/site-packages/adsb/decoder.py" #>
 
 	# ____________________________________________________________________________________________________________
 	#
