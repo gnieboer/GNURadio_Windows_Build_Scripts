@@ -61,6 +61,37 @@ function BuildDrivers
 
 	# ____________________________________________________________________________________________________________
 	#
+	# airspyhf
+	#
+	# links to libusb dynamically and pthreads statically
+	#
+	# Note no AVX config is present, so the Release will actually be built twice.
+	#
+ 	SetLog "airspyhf $configuration"
+	Write-Host -NoNewline "building $configuration airspyhf..."
+	cd $root/src-stage3/oot_code/airspyhf/libairspyhf
+	if ($configuration -match "Release") {
+		$airspyhf_buildconfig="Release"
+	} else {
+		$airspyhf_buildconfig="Debug"
+	}
+	$env:_CL_ = " $arch $runtime /I$root/build/$configuration/include"
+	$env:_LINK_ = " $root/build/$configuration/lib/libusb-1.0.lib "
+	msbuild .\airspyhf.sln /m /p:"PlatformToolset=v140;configuration=$airspyhf_buildconfig;platform=x64"  *>> $Log
+	Write-Host -NoNewLine "installing..."
+	New-Item -ItemType Directory -Force -Path $root/src-stage3/staged_install/$configuration/include/libairspyhf  *>> $Log
+	Copy-Item -Force -Path "$root/src-stage3/oot_code/airspyhf/libairspyhf/x64/$airspyhf_buildconfig/airspyhf.lib" "$root/src-stage3/staged_install/$configuration/lib" *>> $Log
+	Copy-Item -Force -Path "$root/src-stage3/oot_code/airspyhf/libairspyhf/x64/$airspyhf_buildconfig/airspyhf.dll" "$root/src-stage3/staged_install/$configuration/bin" *>> $Log
+	Copy-Item -Force -Path "$root/src-stage3/oot_code/airspyhf/libairspyhf/x64/$airspyhf_buildconfig/*.exe" "$root/src-stage3/staged_install/$configuration/bin" *>> $Log
+	Copy-Item -Force -Path "$root/src-stage3/oot_code/airspyhf/libairspyhf/src/airspyhf.h" "$root/src-stage3/staged_install/$configuration/include/libairspyhf" *>> $Log
+	Copy-Item -Force -Path "$root/src-stage3/oot_code/airspyhf/libairspyhf/src/airspyhf_commands.h" "$root/src-stage3/staged_install/$configuration/include/libairspyhf" *>> $Log
+	Validate "$root/src-stage3/oot_code/airspyhf/libairspyhf/x64/$airspyhf_buildconfig/airspyhf.dll" "$root/src-stage3/staged_install/$configuration/include/libairspyhf/airspyhf.h"
+	CheckNoAVX "$root/src-stage3/oot_code/airspyhf/libairspyhf/x64/$airspyhf_buildconfig" 
+	$env:_CL_ = ""
+	$env:_LINK_ = ""
+
+	# ____________________________________________________________________________________________________________
+	#
 	# bladeRF
 	#
 	# links to libusb dynamically and pthreads statically

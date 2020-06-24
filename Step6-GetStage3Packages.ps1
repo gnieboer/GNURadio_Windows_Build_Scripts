@@ -29,6 +29,12 @@ GetPatch airspy_vs2015.7z airspy/libairspy/vc -Stage3
 
 # ____________________________________________________________________________________________________________
 #
+# airspyHF
+#
+GetPackage https://github.com/airspy/airspyhf.git -Stage3 -branch "$airspyhf_version"
+
+# ____________________________________________________________________________________________________________
+#
 # bladeRF
 #
 GetPackage https://github.com/Nuand/bladeRF.git -Stage3 -branch "$bladerf_version"

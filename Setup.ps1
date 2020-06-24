@@ -378,6 +378,7 @@ $bladerf_version = $Config.VersionInfo.bladerf
 $rtlsdr_version = $Config.VersionInfo.rtlsdr 
 $hackrf_version = $Config.VersionInfo.hackrf
 $airspy_version = $Config.VersionInfo.airspy
+$airspyhf_version = $Config.VersionInfo.airspyhf
 $grdisplay_version = $Config.VersionInfo.grdisplay
 $boostbase = $boost_version_.substring(0,$boost_version_.length-2)
 # The below libraries will have AVX code detected, even for non-AVX builds
