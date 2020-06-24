@@ -229,13 +229,8 @@ if ($mm -eq "3.8") {
 #
 # gr-display
 #
-# v3.8 support doesn't have a tagged release yet, just use master
-#
-if ($mm -eq "3.8") {
-	GetPackage https://github.com/dl1ksv/gr-display.git -Stage3
-} else {
-	GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 -branch "$grdisplay_version"
-}
+GetPackage https://github.com/dl1ksv/gr-display.git -Stage3 -branch "v$grdisplay_version"
+
 
 # ____________________________________________________________________________________________________________
 #

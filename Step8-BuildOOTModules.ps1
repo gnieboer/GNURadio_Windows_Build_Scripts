@@ -1091,13 +1091,14 @@ function BuildOOTModules
 	$env:_CL_ = " $arch ";
 	$env:_LINK_= " /DEBUG:FULL $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib  "
 	$ErrorActionPreference = "Continue"
-	$env:Path="" 
+	#$env:Path="" 
 	& cmake ../../ `
 		-G "Visual Studio 14 2015 Win64" `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
@@ -1109,10 +1110,11 @@ function BuildOOTModules
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+		-DDOXY_FILE_PATH="$root/src-stage3/src/gnuradio/docs/doxygen" `
 		-Wno-dev *>> $Log
-	$env:Path = $oldPath
+	#$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-display..."
 	msbuild .\gr-display.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	Write-Host -NoNewline "installing..."
