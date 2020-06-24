@@ -600,8 +600,8 @@ function BuildOOTModules
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /DNOMINMAX /EHsc /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /DNOMINMAX /EHsc /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+		-DCMAKE_C_FLAGS="/DBOOST_ALL_DYN_LINK /D_USE_MATH_DEFINES /DNOMINMAX /EHsc /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
+		-DCMAKE_CXX_FLAGS="/DBOOST_ALL_DYN_LINK /D_USE_MATH_DEFINES /DNOMINMAX /EHsc /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
 		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
 		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
@@ -1015,6 +1015,7 @@ function BuildOOTModules
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
@@ -1023,8 +1024,8 @@ function BuildOOTModules
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime  /DBOOST_ALL_DYN_LINK" `
+		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime  /DBOOST_ALL_DYN_LINK" `
 		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-rds..."
@@ -1161,8 +1162,8 @@ function BuildOOTModules
 			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 			-Wno-dev *>> $Log
 		$env:Path = $oldPath
 		Write-Host -NoNewline "building gr-ax25..."
@@ -1213,8 +1214,8 @@ function BuildOOTModules
 			-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
 			-DQWT_INCLUDE_DIRS="$root\build\$configuration\include\qwt6" `
 			-DQWT_LIBRARIES="$root\build\$configuration\lib\qwt${debugext}6.lib" `
-			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 			-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
@@ -1257,6 +1258,7 @@ function BuildOOTModules
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
@@ -1265,8 +1267,8 @@ function BuildOOTModules
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-paint..."
@@ -1301,6 +1303,7 @@ function BuildOOTModules
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
+		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
@@ -1309,8 +1312,8 @@ function BuildOOTModules
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 		-Wno-dev *>> $Log
 	$env:Path = $oldPath
 	Write-Host -NoNewline "building gr-mapper..."
@@ -1357,8 +1360,8 @@ function BuildOOTModules
 			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
-			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
+			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
+			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 			-Wno-dev *>> $Log
 		$env:Path = $oldPath
 		Write-Host -NoNewline "building gr-nacl..."
@@ -1407,8 +1410,8 @@ function BuildOOTModules
 			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-			-DCMAKE_CXX_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime  " `
-			-DCMAKE_C_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime " `
+			-DCMAKE_CXX_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime /DBOOST_ALL_DYN_LINK  " `
+			-DCMAKE_C_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime /DBOOST_ALL_DYN_LINK " `
 			-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
@@ -1547,11 +1550,12 @@ function BuildOOTModules
 		-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
 		-DCPPUNIT_INCLUDE_DIRS="$root/build/$configuration/include" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime  " `
-		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
+		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration /DBOOST_ALL_DYN_LINK"" " `
 		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
 		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
 		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
 		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
