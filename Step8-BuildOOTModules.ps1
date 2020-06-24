@@ -718,7 +718,7 @@ function BuildOOTModules
 	#
 	# gqrx
 	#
-	# Requires Qt5, which is a pain because it conflicts with Qt4's headers.  
+	# Requires Qt5,
 	# TODO Doesn't currently seem to support UHD devices, even though the same gr-osmosdr block in GRC with the same device string will work.
 	#
 	SetLog "gqrx $configuration"
@@ -728,10 +728,10 @@ function BuildOOTModules
 		New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gqrx/build/$configuration *>> $Log
 		cd $root/src-stage3/oot_code/gqrx/build/$configuration
 		$ErrorActionPreference = "Continue"
-		$env:_LINK_= " /DEBUG  $root/build/$configuration/lib/log4cpp.lib "
+		$env:_LINK_= " /DEBUG  /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/volk.lib "
 		& cmake ../../ `
 			-G "Visual Studio 14 2015 Win64" `
-			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration;$root/src-stage3/staged_install/$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
 			-DCMAKE_C_FLAGS=" $arch $runtime  /EHsc /DENABLE_GR_LOG=ON " `

@@ -143,7 +143,8 @@ GetPackage https://github.com/glfw/glfw.git -Stage3
 # gqrx
 #
 if ($mm -eq "3.8") {
-	GetPackage https://github.com/lukaskuzmiak/gqrx.git -Stage3 -Branch "3.8_tech_preview_compatibility"
+	# GetPackage https://github.com/lukaskuzmiak/gqrx.git -Stage3 -Branch "3.8_tech_preview_compatibility"
+	GetPackage https://github.com/csete/gqrx.git -Stage3 -Branch v$gqrx_version
 } else {
 	GetPackage https://github.com/csete/gqrx.git -Stage3 -Branch v$gqrx_version
 }
