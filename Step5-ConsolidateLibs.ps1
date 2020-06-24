@@ -57,6 +57,7 @@ Function Consolidate {
 
 	# move boost
 	Write-Host -NoNewline "Consolidating Boost..."
+	$boostbase = $boost_version_.substring(0,$boost_version_.length-2)
 	if ($configuration -match "AVX2") {$platform = "avx2"} else {$platform = "x64"}
 	if ($configuration -match "Debug") {$baseconfig = "Debug"} else {$baseconfig = "Release"}
 	New-Item -ItemType Directory -Force -Path $root/build/$configuration/lib/ *>> $log
@@ -64,9 +65,9 @@ Function Consolidate {
 	cp -Recurse -Force $root/src-stage1-dependencies/boost/build/$platform/$baseconfig/lib/boost*.lib $root/build/$configuration/lib/ *>> $log
 	# GNURadio uses shared libraries, but some OOT modules use static linking so we need both
 	cp -Recurse -Force $root/src-stage1-dependencies/boost/build/$platform/$baseconfig/lib/libboost*.lib $root/build/$configuration/lib/ *>> $log
-	robocopy "$root/src-stage1-dependencies/boost/build/$platform/$baseconfig/include/boost-1_60/" "$root/build/$configuration/include/" /e *>> $log
+	robocopy "$root/src-stage1-dependencies/boost/build/$platform/$baseconfig/include/boost-$boostbase/" "$root/build/$configuration/include/" /e *>> $log
 	# repeat for gqrx (or else we WILL get include directory conflicts with Qt4 headers)
-	robocopy "$root/src-stage1-dependencies/boost/build/$platform/$baseconfig/include/boost-1_60/" "$root/build/$configuration/gqrx/include/" /e *>> $log
+	robocopy "$root/src-stage1-dependencies/boost/build/$platform/$baseconfig/include/boost-$boostbase/" "$root/build/$configuration/gqrx/include/" /e *>> $log
 	"complete"
 
 	# move Qt

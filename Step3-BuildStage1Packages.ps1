@@ -466,10 +466,12 @@ GatherPython
 SetLog "boost"
 Write-Host -NoNewline "building boost..."
 cd $root/src-stage1-dependencies/boost
-if ((TryValidate "build/x64/Debug/lib/boost_python-vc140-mt-gd-1_60.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-1_60.dll" `
-	"build/x64/Release/lib/boost_python-vc140-mt-1_60.dll" "build/x64/Release/lib/boost_system-vc140-mt-1_60.dll" `
-	"build/avx2/Release/lib/boost_python-vc140-mt-1_60.dll" "build/avx2/Release/lib/boost_system-vc140-mt-1_60.dll") -eq $false) {
-	cmd.exe /c "bootstrap.bat" *>> $Log
+$ErrorActionPreference = "Continue"
+$boostbase = $boost_version_.substring(0,$boost_version_.length-2)
+if ((TryValidate "build/x64/Debug/lib/boost_python-vc140-mt-gd-x64-$boostbase.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-x64-$boostbase.dll" `
+	"build/x64/Release/lib/boost_python-vc140-mt-x64-$boostbase.dll" "build/x64/Release/lib/boost_system-vc140-mt-x64-$boostbase.dll" `
+	"build/avx2/Release/lib/boost_python-vc140-mt-x64-$boostbase.dll" "build/avx2/Release/lib/boost_system-vc140-mt-x64-$boostbase.dll") -eq $false) {
+	cmd.exe /c "bootstrap.bat msvc" *>> $Log
 	# point boost build to our custom python libraries
 	$doubleroot = $root -replace "\\", "\\"
 	Add-Content .\project-config.jam "`nusing python : 2.7 : $doubleroot\\src-stage2-python\\gr-python27\\python.exe : $doubleroot\\src-stage2-python\\gr-python27\\Include : $doubleroot\\src-stage2-python\\gr-python27\\Libs ;" *>> $Log
@@ -482,12 +484,13 @@ if ((TryValidate "build/x64/Debug/lib/boost_python-vc140-mt-gd-1_60.dll" "build/
 	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Release --libdir=build\x64\Release\lib --includedir=build\x64\Release\include --stagedir=build\x64\Release --layout=versioned address-model=64 threading=multi link=static,shared variant=release cxxflags="" -FS"" cflags="" -FS"" install" *>> $Log
 	# Regular  static+shared debug libraries
 	cmd.exe /c "b2.exe -j$corestr -a --build-type=minimal --prefix=build\x64\Debug --libdir=build\x64\Debug\lib --includedir=build\x64\Debug\include --stagedir=build\x64\Debug --layout=versioned address-model=64 threading=multi link=static,shared variant=debug cxxflags="" -FS"" cflags="" -FS"" install" *>> $Log
-	Validate "build/x64/Debug/lib/boost_python-vc140-mt-gd-1_60.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-1_60.dll" `
-		"build/x64/Release/lib/boost_python-vc140-mt-1_60.dll" "build/x64/Release/lib/boost_system-vc140-mt-1_60.dll" `
-		"build/avx2/Release/lib/boost_python-vc140-mt-1_60.dll" "build/avx2/Release/lib/boost_system-vc140-mt-1_60.dll"
+	Validate "build/x64/Debug/lib/boost_python-vc140-mt-gd-x64-$boostbase.dll" "build/x64/Debug/lib/boost_system-vc140-mt-gd-x64-$boostbase.dll" `
+		"build/x64/Release/lib/boost_python-vc140-mt-x64-$boostbase.dll" "build/x64/Release/lib/boost_system-vc140-mt-x64-$boostbase.dll" `
+		"build/avx2/Release/lib/boost_python-vc140-mt-x64-$boostbase.dll" "build/avx2/Release/lib/boost_system-vc140-mt-x64-$boostbase.dll"
 } else {
 	Write-Host "already built"
 }
+$ErrorActionPreference = "Stop"
 
 # ____________________________________________________________________________________________________________
 # libsodium
@@ -1000,7 +1003,7 @@ Function makeUHD {
 			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
 			-DCMAKE_CXX_FLAGS=" /DBOOST_FORCE_SYMMETRIC_OPERATORS /EHsc " `
-			-DBoost_INCLUDE_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/include/boost-1_60" `
+			-DBoost_INCLUDE_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/include/boost-$boostbase" `
 			-DBoost_LIBRARY_DIR="$root/src-stage1-dependencies/boost/build/$platform/$boostconfig/lib" `
 			-DLIBUSB_INCLUDE_DIRS="$root/src-stage1-dependencies/libusb/libusb" `
 			-DLIBUSB_LIBRARIES="$root/src-stage1-dependencies/libusb/x64/$configuration/lib/libusb-1.0.lib" *>> $Log 
