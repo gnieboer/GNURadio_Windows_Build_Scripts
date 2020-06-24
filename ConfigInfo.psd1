@@ -10,7 +10,7 @@
 		gqrx = '2.12.1'
 		Cython = '0.28.5'
 		numpy = '1.16.4'
-		scipy = '1.1.0'
+		scipy = '1.2.2'
 		lapack = '3.8.0'
 		OpenBLAS  = '0.3.3'
 		pyzmq = '17.1.2'
