@@ -86,7 +86,11 @@ if ($Config.BuildGTKFromSource) {
 	"NOT building GTK from source, retrieving GTK VS2015 binaries"
 	# These where built by the hexchat project, but they no longer host them
 	# so we are pulling a mirror from our own website.
-	GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gtk-x64.7z
+	if ($mm -eq "3.7") {
+		GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gtk-x64.7z
+	} else {
+		GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gtk3-x64.7z
+	}
 	# need to add a bunch of pkgconfig files so we can build pyGTK later
 	GetPatch pkgconfig.7z x64/lib/pkgconfig
 }
