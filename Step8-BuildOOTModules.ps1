@@ -621,54 +621,58 @@ function BuildOOTModules
 	# 
 	SetLog "gr-fosphor $configuration"
 	if ($env:AMDAPPSDKROOT) {
-		$ErrorActionPreference = "Continue"
-		Write-Host -NoNewline "configuring $configuration gr-fosphor..."
-		New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-fosphor/build/$configuration  *>> $Log
-		cd $root/src-stage3/oot_code/gr-fosphor/build/$configuration 
-		if ($configuration -match "AVX2") {
-			$DLLconfig="ReleaseDLL-AVX2"
+		if ($mm -eq "3.8") {
+			"gr-fosphor with 3.8 requires python >= 3, skipping"		
 		} else {
-			$DLLconfig = $configuration + "DLL"
+			$ErrorActionPreference = "Continue"
+			Write-Host -NoNewline "configuring $configuration gr-fosphor..."
+			New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-fosphor/build/$configuration  *>> $Log
+			cd $root/src-stage3/oot_code/gr-fosphor/build/$configuration 
+			if ($configuration -match "AVX2") {
+				$DLLconfig="ReleaseDLL-AVX2"
+			} else {
+				$DLLconfig = $configuration + "DLL"
+			}
+			$env:_CL_ = ""
+			$env:_LINK_= " /DEBUG /OPT:ref,icf "
+			if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
+			$env:Path = $env:AMDAPPSDKROOT + ";" + $oldPath 
+			cmake ../../ `
+				-G "Visual Studio 14 2015 Win64" `
+				-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+				-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+				-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
+				-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+				-DBOOST_ROOT="$root/build/$configuration/" `
+				-DOpenCL_LIBRARY="$env:AMDAPPSDKROOT/lib/x86_64/OpenCL.lib" `
+				-DOpenCL_INCLUDE_DIR="$env:AMDAPPSDKROOT/include" `
+				-DFREETYPE2_PKG_INCLUDE_DIRS="$root/build/$configuration/include" `
+				-DFREETYPE2_PKG_LIBRARY_DIRS="$root/build/$configuration/lib" `
+				-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX /DWIN32 /D_WINDOWS /W3 /Zi /EHsc " `
+				-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX  /DWIN32 /D_WINDOWS /W3 /Zi /EHsc" `
+				-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
+				-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
+				-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+				-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+				-DQT_QMAKE_EXECUTABLE="$root/build/$configuration/bin/qmake.exe" `
+				-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
+				-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
+				-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
+				-DGLFW3_PKG_INCLUDE_DIRS="$root\src-stage3\oot_code\glfw\include\" `
+				-DGLFW3_PKG_LIBRARY_DIRS="$root\src-stage3\oot_code\glfw\build\$configuration\src\$buildconfig" `
+				-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+				-Wno-dev *>> $Log
+			Write-Host -NoNewline "building gr-fosphor..."
+			msbuild .\gr-fosphor.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+			Write-Host -NoNewline "installing..."
+			msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+			cp $env:AMDAPPSDKROOT/bin/x86_64/glew64.dll $root/src-stage3/staged_install/$configuration/bin
+			$env:_LINK_ = ""
+			$env:_CL_ = ""
+			$env:Path = $oldPath 
+			$ErrorActionPreference = "Stop"
+			Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-fosphor.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\gnuradio\fosphor\_fosphor_swig.pyd"
 		}
-		$env:_CL_ = ""
-		$env:_LINK_= " /DEBUG /OPT:ref,icf "
-		if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
-		$env:Path = $env:AMDAPPSDKROOT + ";" + $oldPath 
-		cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
-			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
-			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DOpenCL_LIBRARY="$env:AMDAPPSDKROOT/lib/x86_64/OpenCL.lib" `
-			-DOpenCL_INCLUDE_DIR="$env:AMDAPPSDKROOT/include" `
-			-DFREETYPE2_PKG_INCLUDE_DIRS="$root/build/$configuration/include" `
-			-DFREETYPE2_PKG_LIBRARY_DIRS="$root/build/$configuration/lib" `
-			-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX /DWIN32 /D_WINDOWS /W3 /Zi /EHsc " `
-			-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX  /DWIN32 /D_WINDOWS /W3 /Zi /EHsc" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-			-DQT_QMAKE_EXECUTABLE="$root/build/$configuration/bin/qmake.exe" `
-			-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
-			-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
-			-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-			-DGLFW3_PKG_INCLUDE_DIRS="$root\src-stage3\oot_code\glfw\include\" `
-			-DGLFW3_PKG_LIBRARY_DIRS="$root\src-stage3\oot_code\glfw\build\$configuration\src\$buildconfig" `
-			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-			-Wno-dev *>> $Log
-		Write-Host -NoNewline "building gr-fosphor..."
-		msbuild .\gr-fosphor.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
-		Write-Host -NoNewline "installing..."
-		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
-		cp $env:AMDAPPSDKROOT/bin/x86_64/glew64.dll $root/src-stage3/staged_install/$configuration/bin
-		$env:_LINK_ = ""
-		$env:_CL_ = ""
-		$env:Path = $oldPath 
-		$ErrorActionPreference = "Stop"
-		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-fosphor.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\gnuradio\fosphor\_fosphor_swig.pyd"
 	} else {
 		"Unable to build gr-fosphor, AMD APP SDK not found, skipping"
 	}
