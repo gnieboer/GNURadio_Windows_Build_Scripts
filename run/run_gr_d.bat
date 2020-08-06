@@ -27,8 +27,8 @@ set UHD_RFNOC_DIR=%~dp0..\share\uhd\rfnoc\
 if "%1"=="" goto noscript
 
 REM --- Set QT environment ---
-set QT_QPA_PLATFORM_PLUGIN_PATH=%~dp0\plugins\platforms
-set QT_PLUGIN_PATH=%~dp0\plugins
+set QT_QPA_PLATFORM_PLUGIN_PATH=%~dp0\platforms
+set QT_PLUGIN_PATH=%~dp0..\plugins
 
 CALL "%~dp0..\gr-python27\python_d.exe" %1 %2 %3 %4 %5 %6 %7 %8 %9
 
