@@ -3,7 +3,7 @@
 #
 Write-Host "Welcome to GNURadio windows build and installation script."
 Write-Host ""
-Write-Host "This script can build GNURadio and every dependency needed using Visual Studio 2015"
+Write-Host "This script can build GNURadio and every dependency needed using Visual Studio 2017+"
 Write-Host "to ensure version and binary compatibility."
 Write-Host ""
 Write-Host "This build script also includes a number of OOT packages in the final installer"
@@ -48,7 +48,7 @@ if ($script:MyInvocation.MyCommand.Path -eq $null) {
 . $mypath\Setup.ps1 -Force
 SetLog "Initial Configuration"
 
-Write-Host "Dependencies checked passed: VS 2015, git, perl, cmake, 7-zip, & doxygen are installed."
+Write-Host "Dependencies checked passed: VS 2017+, git, perl, cmake, 7-zip, & doxygen are installed."
 if ($hasIFORT -and $buildoption -eq "1") 
 {
     Write-Host "Intel Fortran compiler has been detected.  Numpy/Scipy will be built from source"

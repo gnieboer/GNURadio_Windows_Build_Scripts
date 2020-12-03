@@ -110,9 +110,6 @@ function getPackage
 			}
 			if ($archiveExt -eq ".7z" -or ($archiveExt -eq ".zip")) {
 				sz x -y $archive 2>&1 >> $Log
-			} elseif ($archiveExt -eq ".zip") {
-				$destination = "$root/$destdir"
-				[io.compression.zipfile]::ExtractToDirectory($archive, $destination) >> $Log
 			} elseif ($archiveExt -eq ".tar.xz" -or $archiveExt -eq ".tgz" -or $archiveExt -eq ".tar.gz" -or $archiveExt -eq ".tar.bz2") {
 				sz x -y $archive >> $Log
 				if (!(Test-Path $root\$destdir\$archiveName.tar)) {
@@ -127,6 +124,9 @@ function getPackage
 					sz x -aoa -ttar -o"$root\$destdir" "$archiveName.tar" >> $Log
 					del "$archiveName.tar" -Force
 					}
+			} elseif ($archiveExt -eq ".exe" -or $archiveExt -eq ".msi") {
+				# a stand-alone binary installation package, leave in /packages
+				# and let the compilation step handle it
 			} else {
 				throw "Unknown file extension on $archiveName$archiveExt"
 			}
@@ -329,10 +329,39 @@ function CheckFortran
 	return $detected
 }
 
+Function PipInstall
+{
+	[CmdletBinding()]
+	Param(
+		[Parameter(Mandatory=$True,Position=1)]
+		[string]$package,
+	
+		[Parameter(Mandatory=$False, Position=2)]
+		[string]$validationfile = "",
+
+		[Parameter(Mandatory=$False)]
+		[switch]$NoUsePEP517= $false 
+	)
+	SetLog $package
+	$ErrorActionPreference = "Continue"
+	Write-Host -NoNewline "Installing $package using pip..."
+	if ( ($validationfile -ne "") -and ((TryValidate $validationfile) -eq $true)) {
+		Write-Host "already installed"
+	} else {
+		$env:Path = "$pythonroot;$pythonroot/Dlls"+ ";$oldPath"
+		$env:PYTHONHOME="$pythonroot"
+		if ($NoUsePEP517) {$pep517string = "--no-use-pep517"} else {$pep517string = ""}
+		& $pythonroot/Scripts/pip.exe --disable-pip-version-check install $pep517string $package -U -t $pythonroot\lib\site-packages *>> $log
+		if (-not ($validationfile -eq $null)) {Validate $validationfile} else {Write-Host "complete"}
+		$ErrorActionPreference = "Stop"
+	}
+}
+
 #load configuration variables
 $mypath =  Split-Path $script:MyInvocation.MyCommand.Path
 $Config = Import-LocalizedData -BaseDirectory $mypath -FileName ConfigInfo.psd1 
 $gnuradio_version = $Config.VersionInfo.gnuradio
+$python_version = $Config.VersionInfo.python
 $png_version = $Config.VersionInfo.libpng
 $sdl_version = $Config.VersionInfo.SDL
 $cppunit_version = $Config.VersionInfo.cppunit
@@ -388,21 +417,31 @@ $airspyhf_version = $Config.VersionInfo.airspyhf
 $freeSRP_version = $Config.VersionInfo.freeSRP
 $SoapySDR_version = $Config.VersionInfo.SoapySDR
 $grdisplay_version = $Config.VersionInfo.grdisplay
+$iqbal_version = $Config.VersionInfo.iqbal
+$grosmosdr_version = $Config.VersionInfo.gr_osmosdr
 $boostbase = $boost_version_.substring(0,$boost_version_.length-2)
+
+$pyverdot = GetMajorMinor($python_version)
+$pyver = $pyverdot -Replace "\.", ""
+Set-Variable -Name "pythonroot" -Value "$root\src-stage2-python\gr-python$pyver" -Option readonly
+$pythonexe = "python.exe"  # used to also support use of python_d.exe, but added no value
+
 # The below libraries will have AVX code detected, even for non-AVX builds
 # these libraries all have guards to ensure the feature is supported 
 # whether in the code itself or because the intel fortran compiler added them
 # or it's a known false alarm
 $AVX_Whitelist = @(
-	"boost_log-vc140-mt-$boostbase.dll",  # specifically built with guards (dump.cpp)
-	"boost_log-vc140-mt-x64-$boostbase.dll",  # specifically built with guards 
-	"libboost_log_setup-vc140-mt-x64-$boostbase.lib",  # specifically built with guards 
-	"libboost_log-vc140-mt-x64-$boostbase.lib",  # specifically built with guards 
-	"boost_log-vc140-mt-gd-$boostbase.dll",  # specifically built with guards (dump.cpp)
-	"boost_log-vc140-mt-gd-x64-$boostbase.dll",  # specifically built with guards 
-	"libboost_log_setup-vc140-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
-	"libboost_log-vc140-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
+	"boost_log-vc142-mt-$boostbase.dll",  # specifically built with guards (dump.cpp)
+	"boost_log-vc142-mt-x64-$boostbase.dll",  # specifically built with guards 
+	"libboost_log_setup-vc142-mt-x64-$boostbase.lib",  # specifically built with guards 
+	"libboost_log-vc142-mt-x64-$boostbase.lib",  # specifically built with guards 
+	"boost_log-vc142-mt-gd-$boostbase.dll",  # specifically built with guards (dump.cpp)
+	"boost_log-vc142-mt-gd-x64-$boostbase.dll",  # specifically built with guards 
+	"libboost_log_setup-vc142-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
+	"libboost_log-vc142-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
 	"volk.dll",                     # specifically built with guards
+	"uhd.dll",
+	"multichan_register_iface_test.exe",
 	"sqlite3.dll",
 	"sqlite3_d.dll",
 	"wininst-14.0-amd64.exe",
@@ -463,7 +502,10 @@ $AVX_Whitelist = @(
 	"Qt5Cored.dll",                  # specifically built with guards
 	"Qt5Multimediad.dll",            # specifically built with guards
 	"Qt5Guid.dll",                   # specifically built with guards 
+	"Qt53DRender.dll",               # specifically built with guards 
+	"Qt5Widgets.dll",                # specifically built with guards 
 	"qwtd6.dll",					 # inherits from Qt5 
+	"qgltk.exe",
 	"qmake.exe"                      # specifically built with guards
 )
 
@@ -488,9 +530,19 @@ Set-Alias cmake (Get-Command "cmake.exe").Source
 	
 # ActivePerl (to build OpenSSL)
 if ((Get-Command "perl.exe" -ErrorAction SilentlyContinue) -eq $null)  {throw "ActiveState Perl must be installed and on the path.  Aborting script"} 
-	
-# MSVC 2015
-if ($env:VS140COMNTOOLS -eq $null) {throw "Visual Studio 2015 must be installed.  Aborting script"} 
+
+# MSVC 2017/2019 (No environment variable to check)
+$VSSetupExists = Get-Command Get-VSSetupInstance -ErrorAction SilentlyContinue
+if (-not $VSSetupExists) { Install-Module VSSetup -Scope CurrentUser -Force }
+$vsPath = (Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.Component.MSBuild).InstallationPath
+if (-not ($vsPath -eq $null)) {
+	# MSVC 2017+
+	$vsver =  (Get-VSSetupInstance | Select-VSSetupInstance -Latest -Require Microsoft.Component.MSBuild).DisplayName -Replace "[^0-9]", ''
+	if ($vsver -eq "2017")  {$cmakeGenerator = "Visual Studio 15 2017"; $vstoolset = "141"} else {$cmakeGenerator = "Visual Studio 16 2019"; $vstoolset = "142"}
+	$vcPath = (Get-ChildItem $vsPath -Recurse -Filter "vcvarsall.bat" | where {$_.Directory.FullName -like "*VC*"}).Directory.FullName 
+} else {
+	throw "Visual Studio 2017+ must be installed.  Aborting script"
+}
 
 # WIX
 if (-not (test-path $env:WIX)) {throw "WIX toolset must be installed.  Aborting script"}
@@ -498,10 +550,10 @@ if (-not (test-path $env:WIX)) {throw "WIX toolset must be installed.  Aborting 
 # doxygen
 if ((Get-Command "doxygen.exe" -ErrorAction SilentlyContinue) -eq $null)  {throw "Doxygen must be installed and on the path.  Aborting script"} 
 	
-# set VS 2015 environment
+# set VS environment
 if (!(Test-Path variable:global:oldpath))
 {
-	pushd "$env:VS140COMNTOOLS/../../VC"
+	pushd $vcPath 
 	cmd.exe /c "vcvarsall.bat amd64&set" |
 	foreach {
 		if ($_ -match "=") {
@@ -509,7 +561,7 @@ if (!(Test-Path variable:global:oldpath))
 		}
 	}
 	popd
-	write-host "Visual Studio 2015 Command Prompt variables set." -ForegroundColor Yellow
+	write-host "Visual Studio $vsver Command Prompt variables set." -ForegroundColor Yellow
 	# set Intel Fortran environment (if exists)... will detect 2016/2017/2018/2019 compilers only 
 	if (Test-Path env:IFORT_COMPILER19) {
 		& $env:IFORT_COMPILER19\bin\ifortvars.bat -arch intel64 vs2015 

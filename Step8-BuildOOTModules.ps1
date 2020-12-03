@@ -28,7 +28,7 @@ function BuildDrivers
 {
 	$configuration = $args[0]
 	$buildsymbols=$true
-	$pythonroot = "$root/src-stage3/staged_install/$configuration/gr-python27"
+	$pythonroot = "$root/src-stage3/staged_install/$configuration/gr-python$pyver"
 	if ($configuration -match "Release") {
 		$buildconfig="Release";$pythonexe = "python.exe";  $debugext = "";  $debug_ext = "";  $runtime = "/MD"
 	} 
@@ -76,8 +76,9 @@ function BuildDrivers
 		$airspyhf_buildconfig="Debug"
 	}
 	$env:_CL_ = " $arch $runtime /I$root/build/$configuration/include"
-	$env:_LINK_ = " $root/build/$configuration/lib/libusb-1.0.lib "
-	msbuild .\airspyhf.sln /m /p:"PlatformToolset=v140;configuration=$airspyhf_buildconfig;platform=x64"  *>> $Log
+	$env:_LINK_ = " $root/build/$configuration/lib/libusb-1.0.lib $root/build/$configuration/lib/pthreadVC2.lib"
+	devenv airspyhf.sln /Upgrade *>> $Log  
+	msbuild .\airspyhf.sln /m /p:"WindowsTargetPlatformVersion=10.0;PlatformToolset=v$vstoolset;configuration=$airspyhf_buildconfig;platform=x64"  *>> $Log
 	Write-Host -NoNewLine "installing..."
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/staged_install/$configuration/include/libairspyhf  *>> $Log
 	Copy-Item -Force -Path "$root/src-stage3/oot_code/airspyhf/libairspyhf/x64/$airspyhf_buildconfig/airspyhf.lib" "$root/src-stage3/staged_install/$configuration/lib" *>> $Log
@@ -103,7 +104,7 @@ function BuildDrivers
 	cd $root/src-stage3/oot_code/SoapySDR/build/$configuration
 	$ErrorActionPreference = "Continue"
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DLIBUSB_PATH="$root/build/$configuration" `
 		-DLIBUSB_LIBRARY_PATH_SUFFIX="lib" `
 		-DLIBUSB_LIBRARIES="$root/build/$configuration/lib/libusb-1.0.lib" `
@@ -114,10 +115,10 @@ function BuildDrivers
 		-DLIBPTHREADSWIN32_PATH="$root/build/$configuration" `
 		-DLIBPTHREADSWIN32_LIB_COPYING="$root/build/$configuration/lib/COPYING.lib" `
 		-DPTHREAD_LIBRARY="$root/build/$configuration/lib/pthreadVC2.lib" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27$debug_ext.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver$debug_ext.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-Wno-dev `
@@ -142,7 +143,7 @@ function BuildDrivers
 	cd $root/src-stage3/oot_code/libfreesrp/build/$configuration
 	$ErrorActionPreference = "Continue"	
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DLIBUSB_PATH="$root/build/$configuration" `
 		-DLIBUSB_1_LIBRARY="$root/build/$configuration/lib/libusb-1.0.lib" `
@@ -176,7 +177,7 @@ function BuildDrivers
 	$env:_CL_ = " $arch $runtime "
 	cd $root/src-stage3/oot_code/bladeRF/host/build/$configuration
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DLIBUSB_PATH="$root/build/$configuration" `
 		-DLIBUSB_LIBRARY_PATH_SUFFIX="lib" `
 		-DLIBUSB_LIBRARIES="$root/build/$configuration/lib/libusb-1.0.lib" `
@@ -190,7 +191,7 @@ function BuildDrivers
 		-DPTHREAD_LIBRARY="$root/build/$configuration/lib/pthreadVC2.lib" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-Wno-dev `
-		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch /DWIN32 /D_WINDOWS /W3 /DPTW32_STATIC_LIB " *>> $Log
+		-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch /DWIN32 /D_WINDOWS /DPTW32_STATIC_LIB " *>> $Log
 	Write-Host -NoNewline "building..."
 	msbuild .\bladeRF.sln /m /p:"configuration=$buildconfig;platform=x64"  *>> $Log
 	Write-Host -NoNewline "installing..."
@@ -206,13 +207,16 @@ function BuildDrivers
 	#
 	# links to libusb dynamically and pthreads statically
 	#
+	# This is firing a deprecation warning about the cmake version required, as new versions of cmake will break compatibility w/ 2.6
+	#
 	SetLog "rtl-sdr $configuration"
 	Write-Host -NoNewline "configuring $configuration rtl-sdr..."
+	$ErrorActionPreference = "Continue"
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/rtl-sdr/build/$configuration  *>> $Log
 	$env:_CL_ = " $arch $runtime "
 	cd $root/src-stage3/oot_code/rtl-sdr/build/$configuration 
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DTHREADS_PTHREADS_WIN32_LIBRARY="$root/build/$configuration/lib/pthreadVC2.lib" `
 		-DTHREADS_PTHREADS_INCLUDE_DIR="$root/build/$configuration/include" `
 		-DLIBUSB_LIBRARIES="$root/build/$configuration/lib/libusb-1.0.lib" `
@@ -225,6 +229,7 @@ function BuildDrivers
 	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	Validate "$root/src-stage3/oot_code/rtl-sdr/build/$configuration/src/$buildconfig/rtlsdr.dll"
 	CheckNoAVX "$root/src-stage3/oot_code/rtl-sdr/build/$configuration/src/$buildconfig"
+	$ErrorActionPreference = "Stop"
 
 	# ____________________________________________________________________________________________________________
 	#
@@ -239,7 +244,7 @@ function BuildDrivers
 	$env:_CL_ = " $arch $runtime "
 	$ErrorActionPreference = "Continue"
 	cmake ../../host/ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DLIBUSB_INCLUDE_DIR="$root/build/$configuration/include/" `
 		-DLIBUSB_LIBRARIES="$root/build/$configuration/lib/libusb-1.0.lib" `
@@ -265,13 +270,16 @@ function BuildDrivers
 	#
 	# links to libusb dynamically and pthreads statically
 	#
+	# This is firing a deprecation warning about the cmake version required, as new versions of cmake will break compatibility w/ 2.6
+	#
 	SetLog "osmo-sdr $configuration"
 	Write-Host -NoNewline "configuring $configuration osmo-sdr..."
+	$ErrorActionPreference = "Continue"
 	New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/osmo-sdr/build/$configuration  *>> $Log
 	cd $root/src-stage3/oot_code/osmo-sdr/build/$configuration 
 	$env:_CL_ = " $arch $runtime "
 	cmake ../../software/libosmosdr/ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DLIBUSB_INCLUDE_DIR="$root/build/$configuration/include/" `
 		-DLIBUSB_LIBRARIES="$root/build/$configuration/lib/libusb-1.0.lib" `
@@ -283,7 +291,7 @@ function BuildDrivers
 	msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
 	Validate "$root\src-stage3\oot_code\osmo-sdr\build\$configuration\src\$buildconfig\osmosdr.dll"
 	CheckNoAVX "$root\src-stage3\oot_code\osmo-sdr\build\$configuration\src\$buildconfig"
-	
+	$ErrorActionPreference = "Stop"
 	# ____________________________________________________________________________________________________________
 	#
 	# UHD
@@ -313,9 +321,9 @@ function BuildDrivers
 	# Also the upstream sources uses C99 complex constructs that MSVC doesn't support
 	# so we're using a custom version of the source.
 	#
-	if ($mm -eq "3.8") {
-		Write-Host "gr-iqbal not gr3.8 compatible"
-	} else {
+	# There are a ton of MSVC-related issues here involved complex numbers and more... not implemented.
+	#
+	if ($false) {
 		SetLog "gr-iqbal $configuration"
 		$ErrorActionPreference = "Continue"
 		Write-Host -NoNewline "configuring $configuration gr-iqbal..."
@@ -323,17 +331,17 @@ function BuildDrivers
 		cd $root/src-stage3/oot_code/gr-iqbal/build/$configuration 
 		$env:_CL_ = " $arch $runtime "
 		$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG "
-		if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
+		$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "
 		if (Test-Path CMakeCache.txt) {Remove-Item -Force CMakeCache.txt} # Don't keep the old cache because if the user is fixing a config problem it may not re-check the fix
 		cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
 			-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /EHsc /DWIN32 /DNOMINMAX /D_WINDOWS /W3 /DENABLE_GR_LOG=ON " `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27$debug_ext.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver$debug_ext.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib/" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
@@ -352,7 +360,6 @@ function BuildDrivers
 		$env:_LINK_ = ""
 		$ErrorActionPreference = "Stop"
 	}
-
 	# ____________________________________________________________________________________________________________
 	#
 	# gr-osmosdr
@@ -363,6 +370,8 @@ function BuildDrivers
 	# ENABLE_RFSPACE=False is because the latest gr-osmosdr has linux-only support for that SDR
 	# /DNOMINMAX prevents errors related to std::min definition
 	# 
+	# In the GNURadioConfig.cmake file, SYSCONFDIR and GR_PREFS_DIR need to have back-slashed changes to forward (or doubled up)
+	#
  	SetLog "gr-osmosdr $configuration"
 	Write-Host -NoNewline "configuring $configuration gr-osmosdr..."
 	New-Item -Force -ItemType Directory $root/src-stage3/oot_code/gr-osmosdr/build/$configuration *>> $Log
@@ -375,16 +384,16 @@ function BuildDrivers
 	if ($configuration -match "AVX") {$SIMD="-DUSE_SIMD=""AVX"""} else {$SIMD=""}
 	$env:Path = "$root/src-stage3\staged_install\$configuration;$root/src-stage3\staged_install\$configuration\bin;$root/src-stage3\staged_install\$configuration\lib;" + $oldPath
 	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DPKG_CONFIG_EXECUTABLE="$root/bin/pkg-config.exe" `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INCLUDE_PATH="$root/build/$configuration/include" `
 		-DCMAKE_LIBRARY_PATH="$root/build/$configuration/lib" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib/" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
@@ -425,7 +434,7 @@ function BuildOOTModules
 {
 	$configuration = $args[0]
 	$buildsymbols=$true
-	$pythonroot = "$root/src-stage3/staged_install/$configuration/gr-python27"
+	$pythonroot = "$root/src-stage3/staged_install/$configuration/gr-python$pyver"
 	if ($configuration -match "Release") {
 		$buildconfig="Release";$pythonexe = "python.exe";  $debugext = "";  $debug_ext = "";  $runtime = "/MD"
 	} 
@@ -451,14 +460,14 @@ function BuildOOTModules
 	$env:_CL_ = ""
 	$env:Path="" 
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_C_FLAGS=" /DBOOST_ALL_DYN_LINK /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
 		-DCMAKE_CXX_FLAGS=" /DBOOST_ALL_DYN_LINK /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
@@ -503,17 +512,17 @@ function BuildOOTModules
 		$env:_CL_ = ""
 		$env:Path="" 
 		cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
 			-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
 			-DCMAKE_C_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
 			-DCMAKE_CXX_FLAGS=" /DUSING_GLEW /EHsc /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
@@ -557,12 +566,12 @@ function BuildOOTModules
 	$env:_CL_ = $env:_CL_  + "  -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
 	$env:Path="" 
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-Wno-dev *>> $Log
 	$env:Path = $oldPath
@@ -596,21 +605,21 @@ function BuildOOTModules
 	$env:Path= "$root/build/$configuration/lib;" + $oldPath
 	$env:PYTHONPATH="$pythonroot/Lib/site-packages"
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
 		-DCMAKE_C_FLAGS="/DBOOST_ALL_DYN_LINK /D_USE_MATH_DEFINES /DNOMINMAX /EHsc /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
 		-DCMAKE_CXX_FLAGS="/DBOOST_ALL_DYN_LINK /D_USE_MATH_DEFINES /DNOMINMAX /EHsc /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" /I""$root/src-stage3/staged_install/$configuration/include""  /I""$root/src-stage3/staged_install/$configuration/include/swig"" " `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYUIC4_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/pyuic4.bat" `
+		-DPYUIC4_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/pyuic4.bat" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_SHARED_LINKER_FLAGS=" $linkflags " `
 		-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
@@ -641,12 +650,12 @@ function BuildOOTModules
 	$env:_CL_ = " $arch $runtime "
 	$ErrorActionPreference = "Continue"
 	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DBUILD_SHARED_LIBS="true"  *>> $Log
 	Write-Host -NoNewline "building for shared..."
 	msbuild .\glfw.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
 	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DBUILD_SHARED_LIBS="false"  *>> $Log
 	Write-Host -NoNewline "building for static..."
 	msbuild .\glfw.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
@@ -663,58 +672,54 @@ function BuildOOTModules
 	# 
 	SetLog "gr-fosphor $configuration"
 	if ($env:AMDAPPSDKROOT) {
-		if ($mm -eq "3.8") {
-			"gr-fosphor with 3.8 requires python >= 3, skipping"		
+		$ErrorActionPreference = "Continue"
+		Write-Host -NoNewline "configuring $configuration gr-fosphor..."
+		New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-fosphor/build/$configuration  *>> $Log
+		cd $root/src-stage3/oot_code/gr-fosphor/build/$configuration 
+		if ($configuration -match "AVX2") {
+			$DLLconfig="ReleaseDLL-AVX2"
 		} else {
-			$ErrorActionPreference = "Continue"
-			Write-Host -NoNewline "configuring $configuration gr-fosphor..."
-			New-Item -ItemType Directory -Force -Path $root/src-stage3/oot_code/gr-fosphor/build/$configuration  *>> $Log
-			cd $root/src-stage3/oot_code/gr-fosphor/build/$configuration 
-			if ($configuration -match "AVX2") {
-				$DLLconfig="ReleaseDLL-AVX2"
-			} else {
-				$DLLconfig = $configuration + "DLL"
-			}
-			$env:_CL_ = ""
-			$env:_LINK_= " /DEBUG /OPT:ref,icf "
-			if ($mm -eq '3.8') {$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "}
-			$env:Path = $env:AMDAPPSDKROOT + ";" + $oldPath 
-			cmake ../../ `
-				-G "Visual Studio 14 2015 Win64" `
-				-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
-				-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
-				-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
-				-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
-				-DBOOST_ROOT="$root/build/$configuration/" `
-				-DOpenCL_LIBRARY="$env:AMDAPPSDKROOT/lib/x86_64/OpenCL.lib" `
-				-DOpenCL_INCLUDE_DIR="$env:AMDAPPSDKROOT/include" `
-				-DFREETYPE2_PKG_INCLUDE_DIRS="$root/build/$configuration/include" `
-				-DFREETYPE2_PKG_LIBRARY_DIRS="$root/build/$configuration/lib" `
-				-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX /DWIN32 /D_WINDOWS /W3 /Zi /EHsc " `
-				-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX  /DWIN32 /D_WINDOWS /W3 /Zi /EHsc" `
-				-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-				-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-				-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-				-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
-				-DQT_QMAKE_EXECUTABLE="$root/build/$configuration/bin/qmake.exe" `
-				-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
-				-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
-				-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-				-DGLFW3_PKG_INCLUDE_DIRS="$root\src-stage3\oot_code\glfw\include\" `
-				-DGLFW3_PKG_LIBRARY_DIRS="$root\src-stage3\oot_code\glfw\build\$configuration\src\$buildconfig" `
-				-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
-				-Wno-dev *>> $Log
-			Write-Host -NoNewline "building gr-fosphor..."
-			msbuild .\gr-fosphor.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
-			Write-Host -NoNewline "installing..."
-			msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
-			cp $env:AMDAPPSDKROOT/bin/x86_64/glew64.dll $root/src-stage3/staged_install/$configuration/bin
-			$env:_LINK_ = ""
-			$env:_CL_ = ""
-			$env:Path = $oldPath 
-			$ErrorActionPreference = "Stop"
-			Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-fosphor.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\gnuradio\fosphor\_fosphor_swig.pyd"
+			$DLLconfig = $configuration + "DLL"
 		}
+		$env:_CL_ = ""
+		$env:_LINK_= " /DEBUG /OPT:ref,icf "
+		$env:_LINK_= $env:_LINK_ + " $root/build/$configuration/lib/log4cpp.lib "
+		$env:Path = $env:AMDAPPSDKROOT + ";" + $oldPath 
+		cmake ../../ `
+			-G $cmakeGenerator -A x64 `
+			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
+			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
+			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
+			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
+			-DBOOST_ROOT="$root/build/$configuration/" `
+			-DOpenCL_LIBRARY="$env:AMDAPPSDKROOT/lib/x86_64/OpenCL.lib" `
+			-DOpenCL_INCLUDE_DIR="$env:AMDAPPSDKROOT/include" `
+			-DFREETYPE2_PKG_INCLUDE_DIRS="$root/build/$configuration/include" `
+			-DFREETYPE2_PKG_LIBRARY_DIRS="$root/build/$configuration/lib" `
+			-DCMAKE_C_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX /DWIN32 /D_WINDOWS /W3 /Zi /EHsc " `
+			-DCMAKE_CXX_FLAGS="/D_TIMESPEC_DEFINED $arch $runtime /DNOMINMAX  /DWIN32 /D_WINDOWS /W3 /Zi /EHsc" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
+			-DQT_QMAKE_EXECUTABLE="$root/build/$configuration/bin/qmake.exe" `
+			-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
+			-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
+			-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
+			-DGLFW3_PKG_INCLUDE_DIRS="$root\src-stage3\oot_code\glfw\include\" `
+			-DGLFW3_PKG_LIBRARY_DIRS="$root\src-stage3\oot_code\glfw\build\$configuration\src\$buildconfig" `
+			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
+			-Wno-dev *>> $Log
+		Write-Host -NoNewline "building gr-fosphor..."
+		msbuild .\gr-fosphor.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log
+		Write-Host -NoNewline "installing..."
+		msbuild .\INSTALL.vcxproj /m /p:"configuration=$buildconfig;platform=x64;BuildProjectReferences=false" *>> $Log
+		cp $env:AMDAPPSDKROOT/bin/x86_64/glew64.dll $root/src-stage3/staged_install/$configuration/bin
+		$env:_LINK_ = ""
+		$env:_CL_ = ""
+		$env:Path = $oldPath 
+		$ErrorActionPreference = "Stop"
+		Validate "$root/src-stage3/staged_install/$configuration/bin/gnuradio-fosphor.dll" "$root\src-stage3\staged_install\$configuration\lib\site-packages\gnuradio\fosphor\_fosphor_swig.pyd"
 	} else {
 		"Unable to build gr-fosphor, AMD APP SDK not found, skipping"
 	}
@@ -736,7 +741,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:_LINK_= " /DEBUG  /DEFAULTLIB:$root/build/$configuration/lib/log4cpp.lib /DEFAULTLIB:$root/src-stage3/staged_install/$configuration/lib/volk.lib "
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration;$root/src-stage3/staged_install/$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
@@ -764,7 +769,7 @@ function BuildOOTModules
 		cd $root/src-stage3/oot_code/gqrx/build/$configuration
 		$ErrorActionPreference = "Continue"
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration\gqrx" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DBOOST_LIBRARYDIR="$root\build\$configuration\lib" `
@@ -805,7 +810,7 @@ function BuildOOTModules
 	$env:_CL_ = ""
 	$env:_LINK_ = ""
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root\build\$configuration" `
 		-DCMAKE_SYSTEM_LIBRARY_PATH="$root\build\$configuration\lib" `
@@ -845,7 +850,7 @@ function BuildOOTModules
 		# set path to empty to ensure another GR install is not located
 		$env:Path="" 
 		cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DCMAKE_SYSTEM_LIBRARY_PATH="$root\build\$configuration\lib" `
@@ -855,10 +860,10 @@ function BuildOOTModules
 			-DCMAKE_EXE_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_STATIC_LINKER_FLAGS=" $linkflags " `
 			-DCMAKE_MODULE_LINKER_FLAGS=" $linkflags  " `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
 			-DBLAS_LIBRARIES="$froot/build/$configuration/lib/libopenblas_static.lib;$froot/build/$configuration/lib/cblas.lib;$froot/build/$configuration/lib/lapack.lib" `
@@ -906,7 +911,7 @@ function BuildOOTModules
 				$ErrorActionPreference = "Continue"
 				$env:Path="" 
 				& cmake ../../ `
-					-G "Visual Studio 14 2015 Win64" `
+					-G $cmakeGenerator -A x64 `
 					-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 					-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 					-DCMAKE_C_FLAGS=" $arch $runtime  /D_USE_MATH_DEFINES /DNOMINMAX /D_TIMESPEC_DEFINED  /EHsc /Zi " `
@@ -914,10 +919,10 @@ function BuildOOTModules
 					-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 					-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 					-DBOOST_ROOT="$root/build/$configuration/" `
-					-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-					-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-					-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-					-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+					-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+					-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+					-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+					-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 					-DQT_QWTPLOT3D_LIBRARY="$root\build\$configuration\lib\qwtplot3d.lib" `
 					-DQT_QWTPLOT3D_INCLUDE_DIR="$root\build\$configuration\include\qwt3d" `
 					-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
@@ -964,7 +969,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path="" 
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -972,10 +977,10 @@ function BuildOOTModules
 			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
@@ -1011,7 +1016,7 @@ function BuildOOTModules
 	$ErrorActionPreference = "Continue"
 	$env:Path="" 
 	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1020,10 +1025,10 @@ function BuildOOTModules
 		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime  /DBOOST_ALL_DYN_LINK" `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime  /DBOOST_ALL_DYN_LINK" `
@@ -1057,7 +1062,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path="" 
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1065,10 +1070,10 @@ function BuildOOTModules
 			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime " `
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime " `
@@ -1100,7 +1105,7 @@ function BuildOOTModules
 	$ErrorActionPreference = "Continue"
 	#$env:Path="" 
 	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1112,10 +1117,10 @@ function BuildOOTModules
 		-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
 		-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
 		-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
@@ -1150,7 +1155,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path="" 
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1158,10 +1163,10 @@ function BuildOOTModules
 			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
@@ -1197,7 +1202,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path="" 
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1205,10 +1210,10 @@ function BuildOOTModules
 			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
 			-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
@@ -1254,7 +1259,7 @@ function BuildOOTModules
 	$ErrorActionPreference = "Continue"
 	$env:Path="" 
 	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1263,10 +1268,10 @@ function BuildOOTModules
 		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
@@ -1299,7 +1304,7 @@ function BuildOOTModules
 	$ErrorActionPreference = "Continue"
 	$env:Path="" 
 	& cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1308,10 +1313,10 @@ function BuildOOTModules
 		-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 		-DBOOST_ROOT="$root/build/$configuration/" `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
@@ -1346,7 +1351,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path="" 
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1356,10 +1361,10 @@ function BuildOOTModules
 			-DBOOST_ROOT="$root/build/$configuration/" `
 			-DSODIUM_LIBRARIES="$root/build/$configuration/lib/libsodium.lib" `
 			-DSODIUM_INCLUDE_DIRS="$root/build/$configuration/include" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
@@ -1396,7 +1401,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path= ""
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DCMAKE_LIBRARY_PATH="$root/build/$configuration/lib" `
@@ -1406,10 +1411,10 @@ function BuildOOTModules
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_INCLUDE_DIRS="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DCMAKE_CXX_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime /DBOOST_ALL_DYN_LINK  " `
 			-DCMAKE_C_FLAGS=" /D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi /D_ENABLE_ATOMIC_ALIGNMENT_FIX $arch $runtime /DBOOST_ALL_DYN_LINK " `
@@ -1453,7 +1458,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path="" 
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1461,10 +1466,10 @@ function BuildOOTModules
 			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime /DBOOST_ALL_DYN_LINK " `
@@ -1499,19 +1504,19 @@ function BuildOOTModules
 		$env:_CL_ = " $arch -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
 		$env:Path="" 
 		cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 			-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
 			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc /DNOMINMAX $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration"" " `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DFFTW3F_LIBRARIES="$root/build/Release/lib/libfftw3f.lib" `
 			-DFFTW3F_INCLUDE_DIRS="$root/build/Release/include/" `
 			-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
@@ -1549,17 +1554,17 @@ function BuildOOTModules
 	$env:_CL_ = " -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
 	$env:Path = ""
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
 		-DGNURADIO_RUNTIME_INCLUDE_DIRS="$root/src-stage3/staged_install/$configuration/include" `
 		-DCPPUNIT_LIBRARIES="$root/build/$configuration/lib/cppunit.lib" `
 		-DCPPUNIT_INCLUDE_DIRS="$root/build/$configuration/include" `
 		-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime  " `
 		-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED $arch $runtime  /DWIN32 /D_WINDOWS /W3 /I""$root/src-stage3/staged_install/$configuration /DBOOST_ALL_DYN_LINK"" " `
-		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+		-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+		-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+		-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+		-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DBOOST_LIBRARYDIR=" $root/build/$configuration/lib" `
 		-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
@@ -1597,7 +1602,7 @@ function BuildOOTModules
 	$env:_CL_ = $arch + " -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
 	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root\build\$configuration" `
 		-DCMAKE_SYSTEM_LIBRARY_PATH="$root\build\$configuration\lib" `
@@ -1627,7 +1632,7 @@ function BuildOOTModules
 	$env:_LINK_= " $root/src-stage3/staged_install/$configuration/lib/gnuradio-pmt.lib /DEBUG /NODEFAULTLIB:m.lib "
 	$env:_CL_ = $env:_CL_ + " -D_USE_MATH_DEFINES -I""$root/src-stage3/staged_install/$configuration/include""  -I""$root/src-stage3/staged_install/$configuration/include/swig"" "
 	cmake ../../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root\build\$configuration" `
 		-DCMAKE_SYSTEM_LIBRARY_PATH="$root\build\$configuration\lib" `
@@ -1665,7 +1670,7 @@ function BuildOOTModules
 		$ErrorActionPreference = "Continue"
 		$env:Path = ""
 		& cmake ../../ `
-			-G "Visual Studio 14 2015 Win64" `
+			-G $cmakeGenerator -A x64 `
 			-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 			-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_RUNTIME_LIBRARIES="$root/src-stage3/staged_install/$configuration/lib/gnuradio-runtime.lib" `
@@ -1673,10 +1678,10 @@ function BuildOOTModules
 			-DBOOST_LIBRARYDIR="$root/build/$configuration/lib" `
 			-DBOOST_INCLUDEDIR="$root/build/$configuration/include" `
 			-DBOOST_ROOT="$root/build/$configuration/" `
-			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27.lib" `
-			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python27/libs/python27_d.lib" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
-			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python27/include" `
+			-DPYTHON_LIBRARY="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver.lib" `
+			-DPYTHON_LIBRARY_DEBUG="$root/src-stage3/staged_install/$configuration/gr-python$pyver/libs/python$pyver_d.lib" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
+			-DPYTHON_INCLUDE_DIR="$root/src-stage3/staged_install/$configuration/gr-python$pyver/include" `
 			-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 			-DCMAKE_CXX_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /EHsc  /DNOMINMAX  /Zi $arch $runtime  " `
 			-DCMAKE_C_FLAGS="/D_USE_MATH_DEFINES /D_TIMESPEC_DEFINED /DNOMINMAX /Zi $arch $runtime  " `
@@ -1711,7 +1716,7 @@ function BuildOOTModules
 	    $ErrorActionPreference = "Continue"
 		$env:_CL_ = " -DGLOG_NO_ABBREVIATED_SEVERITIES "
 	    & cmake ../../ `
-		    -G "Visual Studio 14 2015 Win64" `
+		    -G $cmakeGenerator -A x64 `
 		    -DCMAKE_PREFIX_PATH="$root\build\$configuration" `
 		    -DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
 			-DGNURADIO_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration" `
@@ -1726,7 +1731,7 @@ function BuildOOTModules
 			-DGLOG_ROOT="$root/build/$configuration/" `
 			-DCMAKE_CXX_FLAGS=" /DGLOG_NO_ABBREVIATED_SEVERITIES /DNOMINMAX" `
 		    -DLAPACK="ON" `
-			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python27/$pythonexe" `
+			-DPYTHON_EXECUTABLE="$root/src-stage3/staged_install/$configuration/gr-python$pyver/$pythonexe" `
 			-Wno-dev *>> $Log
 	    Write-Host -NoNewline "building..."
 	    msbuild .\gnss-sdr.sln /m /p:"configuration=$buildconfig;platform=x64" *>> $Log

@@ -68,22 +68,16 @@ GetPackage https://github.com/pothosware/SoapySDR.git -Stage3 -branch "soapy-sdr
 #
 # osmosdr
 #
-GetPackage https://github.com/osmocom/gr-osmosdr.git -Stage3
-GetPackage https://github.com/osmocom/osmo-sdr.git -Stage3
+GetPackage https://github.com/osmocom/gr-osmosdr.git -Stage3 -branch "$gr_osmosdr_version"
+GetPackage https://github.com/osmocom/osmo-sdr.git -Stage3 
 
 # ____________________________________________________________________________________________________________
 #
 # gr-iqbal
 #
-# upstream: https://github.com/osmocom/gr-iqbal.git 
-if ($mm -eq "3.8") {
-	GetPackage https://github.com/gnieboer/gr-iqbal.git -Stage3 -branch "gr3.8"
-	cd  $root/src-stage3/oot_code/gr-iqbal
-	git pull --recurse-submodules=on
-	git submodule update
-} else {
-	GetPackage http://www.gcndevelopment.com/gnuradio/downloads/sources/gr-iqbal.7z -Stage3
-}
+GetPackage https://github.com/osmocom/gr-iqbal.git -Stage3 -branch "v$iqbal_version"
+cd  $root/src-stage3/oot_code/gr-iqbal
+git submodule update
 
 # ____________________________________________________________________________________________________________
 #
@@ -130,23 +124,14 @@ if ($mm -eq "3.8") {
 #
 # awaiting merge requests to go back to upstream repo instead of my fork
 #
-if ($mm -eq "3.8") {
-	GetPackage https://github.com/osmocom/gr-fosphor.git -Stage3
-} else {
-	GetPackage https://github.com/gnieboer/gr-fosphor.git -Stage3 
-}
+GetPackage https://github.com/osmocom/gr-fosphor.git -Stage3
 GetPackage https://github.com/glfw/glfw.git -Stage3
 
 # ____________________________________________________________________________________________________________
 #
 # gqrx
 #
-if ($mm -eq "3.8") {
-	# GetPackage https://github.com/lukaskuzmiak/gqrx.git -Stage3 -Branch "3.8_tech_preview_compatibility"
-	GetPackage https://github.com/csete/gqrx.git -Stage3 -Branch v$gqrx_version
-} else {
-	GetPackage https://github.com/csete/gqrx.git -Stage3 -Branch v$gqrx_version
-}
+GetPackage https://github.com/csete/gqrx.git -Stage3 -Branch v$gqrx_version
 
 # ____________________________________________________________________________________________________________
 #
@@ -257,11 +242,7 @@ if ($mm -eq "3.8") {
 #
 # gr-paint
 #
-if ($mm -eq "3.8") {
-	GetPackage https://github.com/drmpeg/gr-paint38.git -Stage3 
-} else {
-	GetPackage https://github.com/drmpeg/gr-paint.git -Stage3 
-}
+GetPackage https://github.com/drmpeg/gr-paint.git -Stage3 
 
 # ____________________________________________________________________________________________________________
 #
@@ -270,7 +251,7 @@ if ($mm -eq "3.8") {
 # Awaiting incorporation of pull request 
 #
 if ($mm -eq "3.8") {
-	GetPackage https://github.com/gnieboer/gr-mapper.git -Stage3 -branch "gr-3.8"
+	GetPackage https://github.com/myersw12/gr-mapper.git -Stage3 
 } else {
 	GetPackage https://github.com/gnieboer/gr-mapper.git -Stage3 -branch "msvc_fixes"
 }

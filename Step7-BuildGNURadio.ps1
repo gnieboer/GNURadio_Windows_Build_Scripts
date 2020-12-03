@@ -35,7 +35,7 @@ if (!(Test-Path $root/src-stage3/staged_install)) {
 
 function BuildGNURadio {
 	$configuration = $args[0]
-	if ($configuration -match "Release") {$runtime = "/MD"; $buildtype = "relwithDebInfo"; $pythonexe = "python.exe"; $d=""} else {$runtime = "/MDd"; $buildtype = "DEBUG"; $pythonexe = "python_d.exe";$d="d"}
+	if ($configuration -match "Release") {$runtime = "/MD"; $buildtype = "relwithDebInfo"; $d=""} else {$runtime = "/MDd"; $buildtype = "DEBUG"; $d="d"}
 	if ($configuration -match "AVX") {$DLLconfig="ReleaseDLL-AVX2"; $archflag="/arch:AVX2 /Ox /GS- /EHsc"} else {$DLLconfig = $configuration + "DLL"; $archflag="/EHsc"}
 
 	# prep for cmake
@@ -51,10 +51,10 @@ function BuildGNURadio {
 	cd $root/src-stage3/build/$configuration
 	if (Test-Path CMakeCache.txt) {Remove-Item -Force CMakeCache.txt} # Don't keep the old cache because if the user is fixing a config problem it may not re-check the fix
 
-	$env:PATH = "$root/build/$configuration/lib;$pythonroot;$pythonroot/Dlls;$pythonroot/Lib/site-packages/wx-3.0-msw;" + $oldPath
-	$env:PYTHONPATH="$pythonroot/Lib/site-packages;$pythonroot/Lib/site-packages/wx-3.0-msw;"
+	$env:PATH = "$root/build/$configuration/lib;$pythonroot;$pythonroot/Dlls" + $oldPath
+	$env:PYTHONPATH="$pythonroot/Lib/site-packages"
 
-	# set PYTHONPATH=%~dp0..\gr-python27\Lib\site-packages; %~dp0..\gr-python27\dlls;%~dp0..\gr-python27\libs;%~dp0..\gr-python27\lib;%~dp0..\lib\site-packages;%~dp0..\gr-python27\Lib\site-packages\pkgconfig;%~dp0..\gr-python27\Lib\site-packages\gtk-2.0\glib;%~dp0..\gr-python27\Lib\site-packages\gtk-2.0;%~dp0..\gr-python27\Lib\site-packages\wx-3.0-msw;%~dp0..\gr-python27\Lib\site-packages\sphinx;%~dp0..\gr-python27\Lib\site-packages\lxml-3.4.4-py2.7-win.amd64.egg;%~dp0..\lib\site-packages\gnuradio\gr;%~dp0..\lib\site-packages\pmt;%~dp0..\lib\site-packages\gnuradio\blocks;%~dp0..\lib\site-packages\gnuradio\fec;%~dp0..\lib\site-packages\gnuradio\fft;%~dp0..\lib\site-packages\gnuradio\qtgui;%~dp0..\lib\site-packages\gnuradio\trellis;%~dp0..\lib\site-packages\gnuradio\vocoder;%~dp0..\lib\site-packages\gnuradio\audio;%~dp0..\lib\site-packages\gnuradio\channels;%~dp0..\lib\site-packages\gnuradio\ctrlport;%~dp0..\lib\site-packages\gnuradio\digital;%~dp0..\lib\site-packages\gnuradio\grc;%~dp0..\lib\site-packages\gnuradio\filter;%~dp0..\lib\site-packages\gnuradio\analog;%~dp0..\lib\site-packages\gnuradio\wxgui;%~dp0..\lib\site-packages\gnuradio\zeromq;%~dp0..\lib\site-packages\gnuradio\pager;%~dp0..\lib\site-packages\gnuradio\fcd;%~dp0..\lib\site-packages\gnuradio\video_sdl;%~dp0..\lib\site-packages\gnuradio\wavelet;%~dp0..\lib\site-packages\gnuradio\noaa;%~dp0..\lib\site-packages\gnuradio\dtv;%~dp0..\lib\site-packages\gnuradio\atsc;%~dp0..\lib\site-packages\gnuradio\pmt
+	# set PYTHONPATH=%~dp0..\gr-python$pyver\Lib\site-packages; %~dp0..\gr-python$pyver\dlls;%~dp0..\gr-python$pyver\libs;%~dp0..\gr-python$pyver\lib;%~dp0..\lib\site-packages;%~dp0..\gr-python$pyver\Lib\site-packages\pkgconfig;%~dp0..\gr-python$pyver\Lib\site-packages\gtk-2.0\glib;%~dp0..\gr-python$pyver\Lib\site-packages\gtk-2.0;%~dp0..\gr-python$pyver\Lib\site-packages\wx-3.0-msw;%~dp0..\gr-python$pyver\Lib\site-packages\sphinx;%~dp0..\gr-python$pyver\Lib\site-packages\lxml-3.4.4-py2.7-win.amd64.egg;%~dp0..\lib\site-packages\gnuradio\gr;%~dp0..\lib\site-packages\pmt;%~dp0..\lib\site-packages\gnuradio\blocks;%~dp0..\lib\site-packages\gnuradio\fec;%~dp0..\lib\site-packages\gnuradio\fft;%~dp0..\lib\site-packages\gnuradio\qtgui;%~dp0..\lib\site-packages\gnuradio\trellis;%~dp0..\lib\site-packages\gnuradio\vocoder;%~dp0..\lib\site-packages\gnuradio\audio;%~dp0..\lib\site-packages\gnuradio\channels;%~dp0..\lib\site-packages\gnuradio\ctrlport;%~dp0..\lib\site-packages\gnuradio\digital;%~dp0..\lib\site-packages\gnuradio\grc;%~dp0..\lib\site-packages\gnuradio\filter;%~dp0..\lib\site-packages\gnuradio\analog;%~dp0..\lib\site-packages\gnuradio\wxgui;%~dp0..\lib\site-packages\gnuradio\zeromq;%~dp0..\lib\site-packages\gnuradio\pager;%~dp0..\lib\site-packages\gnuradio\fcd;%~dp0..\lib\site-packages\gnuradio\video_sdl;%~dp0..\lib\site-packages\gnuradio\wavelet;%~dp0..\lib\site-packages\gnuradio\noaa;%~dp0..\lib\site-packages\gnuradio\dtv;%~dp0..\lib\site-packages\gnuradio\atsc;%~dp0..\lib\site-packages\gnuradio\pmt
 	# test notes... the following qa batch files must have the pythonpath prepended instead of appended:
 	# qa_tag_utils_test.bat requires this pythonpath: Z:/gr-build/src-stage3/src/gnuradio/gnuradio-runtime/python;Z:\gr-build\src-stage3\build\Release\gnuradio-runtime\swig\RelWithDebInfo;Z:\gr-build\src-stage3\build\Release\gnuradio-runtime\python;;Z:\gr-build\src-stage3\build\Release\gnuradio-runtime\swig
 	# qa_socket_pdu_test.bat
@@ -71,28 +71,25 @@ function BuildGNURadio {
 	$ErrorActionPreference = "Continue"
 	$libzmquv = $libzmq_version -Replace '\.','_'
 	if ($configuration -match "Debug") { $libzmquv = "gd-" + $libzmquv}
-	# Qwt6 is linked to Qt5 and fails on GR3.7, so ensure qwt5 is used
-	if ($mm -eq '3.8') {$qwtinc = '6'; $qwtlib='6'} else {$qwtinc = ''; $qwtlib='5'}
 	# Always use the DLL version of Qt to avoid errors about parent being on a different thread.
 	cmake ../../src/gnuradio `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DPYTHON_EXECUTABLE="$pythonroot\$pythonexe" `
 		-DQA_PYTHON_EXECUTABLE="$pythonroot\$pythonexe" `
-		-DPYTHON_LIBRARY="$pythonroot\Libs\python27.lib" `
-		-DPYTHON_LIBRARY_DEBUG="$pythonroot\Libs\python27_d.lib" `
+		-DPYTHON_LIBRARY="$pythonroot\Libs\python$pyver.lib" `
 		-DPYTHON_INCLUDE_DIR="$pythonroot\include"  `
 		-DBoost_NO_SYSTEM_PATHS=ON `
 		-DQT_QMAKE_EXECUTABLE="$root/build/$configuration/bin/qmake.exe" `
 		-DQT_UIC_EXECUTABLE="$root/build/$configuration/bin/uic.exe" `
 		-DQT_MOC_EXECUTABLE="$root/build/$configuration/bin/moc.exe" `
 		-DQT_RCC_EXECUTABLE="$root/build/$configuration/bin/rcc.exe" `
-		-DQWT_INCLUDE_DIRS="$root/build/$configuration/include/qwt$qwtinc" `
-		-DQWT_LIBRARIES="$root/build/$configuration/lib/qwt${d}$qwtlib.lib" `
+		-DQWT_INCLUDE_DIRS="$root/build/$configuration/include/qwt6" `
+		-DQWT_LIBRARIES="$root/build/$configuration/lib/qwt6.lib" `
 		-DSWIG_EXECUTABLE="$root/bin/swig.exe" `
 		-DZEROMQ_LIBRARY_NAME="libzmq-v140-mt-$libzmquv" `
 		-DCMAKE_PREFIX_PATH="$root/build/$configuration" `
 		-DCMAKE_INSTALL_PREFIX="$root/src-stage3/staged_install/$configuration/" `
-		-DCMAKE_CXX_FLAGS="$archflag $runtime /W1 /DGSL_DLL " `
+		-DCMAKE_CXX_FLAGS="$archflag $runtime /W1 /DGSL_DLL /DBOOST_BIND_GLOBAL_PLACEHOLDERS " `
 		-DCMAKE_C_FLAGS="$archflag $runtime /W1 /DGSL_DLL " `
 		-DCMAKE_SHARED_LINKER_FLAGS=" /DEBUG /opt:ref,icf " `
 		-DSPHINX_EXECUTABLE="$pythonroot/Scripts/sphinx-build.exe" `
@@ -126,29 +123,29 @@ function BuildGNURadio {
 	# Then combine it into a useable staged install with the dependencies it will need
 	Write-Host -NoNewline "moving add'l libraries..."
 	cp -Recurse -Force $root/build/$configuration/lib/*.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
-	if ($mm -eq "3.8")
-	{
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Svg.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5OpenGL.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Widgets.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Gui.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/bin/Qt5Core.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/lib/gobject-introspection $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/lib/girepository-1.0 $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/lib/gdk-pixbuf-2.0 $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/share/glib-2.0 $root\src-stage3\staged_install\$configuration\share\  *>> $Log 
-		cp -Recurse -Force $root/build/$configuration/share/gir-1.0 $root\src-stage3\staged_install\$configuration\share\  *>> $Log 
-	}
+	# It appears pip install PyQt5 will handle all our Qt5 needs
+	#cp -Recurse -Force $root/build/$configuration/bin/Qt5Svg.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+	#cp -Recurse -Force $root/build/$configuration/bin/Qt5OpenGL.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+	#cp -Recurse -Force $root/build/$configuration/bin/Qt5Widgets.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+	#cp -Recurse -Force $root/build/$configuration/bin/Qt5Gui.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+	#cp -Recurse -Force $root/build/$configuration/bin/Qt5Core.dll $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+	#cp -Recurse -Force $root/build/$configuration/bin/plugins $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+	cp -Recurse -Force $root/build/$configuration/lib/gobject-introspection $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
+	cp -Recurse -Force $root/build/$configuration/lib/girepository-1.0 $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
+	cp -Recurse -Force $root/build/$configuration/lib/gdk-pixbuf-2.0 $root\src-stage3\staged_install\$configuration\lib\  *>> $Log 
+	cp -Recurse -Force $root/build/$configuration/bin/gsettings.exe $root\src-stage3\staged_install\$configuration\bin\  *>> $Log 
+	cp -Recurse -Force $root/build/$configuration/share/glib-2.0 $root\src-stage3\staged_install\$configuration\share\  *>> $Log 
+	cp -Recurse -Force $root/build/$configuration/share/gir-1.0 $root\src-stage3\staged_install\$configuration\share\  *>> $Log 
 	"complete"
 
 	Write-Host -NoNewline "moving python..."
 	Copy-Item -Force -Recurse -Path $pythonroot $root/src-stage3/staged_install/$configuration  *>> $Log
-	if ((Test-Path $root/src-stage3/staged_install/$configuration/gr-python27) -and (($pythonroot -match "avx2") -or ($pythonroot -match "debug"))) 
+	if ((Test-Path $root/src-stage3/staged_install/$configuration/gr-python$pyver) -and (($pythonroot -match "avx2") -or ($pythonroot -match "debug"))) 
 	{
-		del -Recurse -Force $root/src-stage3/staged_install/$configuration/gr-python27
+		del -Recurse -Force $root/src-stage3/staged_install/$configuration/gr-python$pyver
 	}
-	if ($pythonroot -match "avx2") {Rename-Item $root/src-stage3/staged_install/$configuration/gr-python27-avx2 $root/src-stage3/staged_install/$configuration/gr-python27}
-	if ($pythonroot -match "debug") {Rename-Item $root/src-stage3/staged_install/$configuration/gr-python27-debug $root/src-stage3/staged_install/$configuration/gr-python27}
+	if ($pythonroot -match "avx2") {Rename-Item $root/src-stage3/staged_install/$configuration/gr-python$pyver-avx2 $root/src-stage3/staged_install/$configuration/gr-python$pyver}
+	if ($pythonroot -match "debug") {Rename-Item $root/src-stage3/staged_install/$configuration/gr-python$pyver-debug $root/src-stage3/staged_install/$configuration/gr-python$pyver}
 	if ($configuration -match "debug") {
 		# calls python_d.exe instead
 		Copy-Item -Force -Path $root\src-stage3\src\run_gr_d.bat $root/src-stage3/staged_install/$configuration/bin/run_gr.bat  *>> $Log
@@ -160,34 +157,14 @@ function BuildGNURadio {
 	Copy-Item -Force -Path $root\src-stage3\src\gr_filter_design.bat $root/src-stage3/staged_install/$configuration/bin  *>> $Log
 	Copy-Item -Force -Recurse -Path $root\src-stage3\icons $root/src-stage3/staged_install/$configuration/share  *>> $Log
 
-	# the swig libraries aren't properly named for the debug build, so do it here
-	# We will repeat for the OOT modules	
-	if ($configuration -match "Debug") {
-		pushd $root/src-stage3/staged_install/$configuration
-		Get-ChildItem -Filter "*_swig.pyd" -Recurse | Move-Item -Force -Destination {$_.FullName -replace "_swig","_swig_d" } 
-		Get-ChildItem -Filter "*_swig0.pyd" -Recurse | Move-Item -Force -Destination {$_.FullName -replace "_swig0","_swig0_d" } 
-		Get-ChildItem -Filter "*_swig1.pyd" -Recurse | Move-Item -Force -Destination {$_.FullName -replace "_swig1","_swig1_d" } 
-		Get-ChildItem -Filter "*_swig2.pyd" -Recurse | Move-Item -Force -Destination {$_.FullName -replace "_swig2","_swig2_d" } 
-		Get-ChildItem -Filter "*_swig3.pyd" -Recurse | Move-Item -Force -Destination {$_.FullName -replace "_swig3","_swig3_d" } 
-		Get-ChildItem -Filter "*_swig4.pyd" -Recurse | Move-Item -Force -Destination {$_.FullName -replace "_swig4","_swig4_d" } 
-		Get-ChildItem -Filter "*_swig5.pyd" -Recurse | Move-Item -Force -Destination {$_.FullName -replace "_swig5","_swig5_d" } 
-		popd
-	}
-
 	# ensure the GR build went well by checking for newmod package, and if found then build
-	if ($mm -eq "3.8")
-	{
-		Validate  $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/CMakeLists.txt
-		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/build 
-		cd $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/build
-	} else {
-		Validate  $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/CMakeLists.txt
-		New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/build 
-		cd $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/gr-newmod/build
-	}
+	Validate  $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/CMakeLists.txt
+	New-Item -Force -ItemType Directory $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/build 
+	cd $root/src-stage3/staged_install/$configuration/share/gnuradio/modtool/templates/gr-newmod/build
+
 	$ErrorActionPreference = "Continue"
 	cmake ../ `
-		-G "Visual Studio 14 2015 Win64" `
+		-G $cmakeGenerator -A x64 `
 		-DPYTHON_EXECUTABLE="$pythonroot\$pythonexe" `
 		-DQA_PYTHON_EXECUTABLE="$pythonroot\$pythonexe" `
 		-DCMAKE_PREFIX_PATH="$root\build\$configuration" `
@@ -207,50 +184,11 @@ function BuildGNURadio {
 
 # Release build
 if ($configmode -eq "1" -or $configmode -eq "all") {
-	$pythonroot = "$root\src-stage2-python\gr-python27"
 	BuildGNURadio "Release"
 }
 
-# AVX2 build
-if ($configmode -eq "2" -or $configmode -eq "all") {
-	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
-	BuildGNURadio "Release-AVX2"
-}
-
-# Debug build
-# This will probably fail... it is known.
-Try
-{
-	if ($configmode -eq "3" -or $configmode -eq "all") {
-		$pythonroot = "$root\src-stage2-python\gr-python27-debug"
-		BuildGNURadio "Debug"
-	}
-}
-Catch
-{
-	""
-	"Debug GNURadio build FAILED... aborting but continuing with other builds"
-	""
-}
-cd $root/scripts 
 
 ""
 "COMPLETED STEP 7: Core GNURadio has been built from source"
 ""
 
-if ($false)
-{
-
-	#these are just here for quicker debugging
-
-	ResetLog
-
-	$pythonroot = "$root\src-stage2-python\gr-python27-avx2"
-	$configuration = "Release-AVX2"
-
-	$pythonroot = "$root\src-stage2-python\gr-python27"
-	$configuration = "Release"
-
-	$pythonroot = "$root\src-stage2-python\gr-python27-debug"
-	$configuration = "Debug"
-}
