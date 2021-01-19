@@ -47,12 +47,10 @@
 		openlte = '00-20-04'
 		wxpython = '3.0.2.0'# Changing to 3.1+ will require other code changes
 		pygobject = '2.28.6'# Changing to 2.29+ will require other code changes (but don't because 2.29 doesn't have the same setup.py)
-		pygobject3 = '3.34.0'
+		pygobject3 = '3.38.0' # 3.38.0 has a minor bug which has been submitted (uint -> unsigned int)
 		pygtk = '2.24'    # Changing to 2.25+ will require other code changes
-		qt = '4.8.7'        # This isn't actually used.  4.8.7 is hardcoded but 4.8.7 is the last 4.x version to the change to Qt5 will change much more
 		qt5 = '5.15.2'
-		python = '3.7.7'  # 3.8 changes DLL search paths in a very unpleasant way for GTK
-		dp = '1.6'        # dependency pack version
+		python = '3.9.0'  
 		# OOT modules
 		bladerf = '2019.07'
 		rtlsdr = '0.6.0'
@@ -62,7 +60,7 @@
 		freeSRP = '0.3.0'
 		SoapySDR = '0.7.2'
 		iqbal = '0.38.1'
-		gr_osmosdr = '0.2.2'
+		gr_osmosdr = '0.2.3'
 		grdisplay = '3.8'  
 		# TODO The following libraries are currently downloaded from current git snapshot.  This should be replaced by specific release tags
 		# PyQwt (5.2.1, abandoned, no releases marked)

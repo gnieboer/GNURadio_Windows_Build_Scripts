@@ -137,26 +137,26 @@ GetPackage https://github.com/csete/gqrx.git -Stage3 -Branch v$gqrx_version
 #
 # Armadillo
 #
-GetPackage https://downloads.sourceforge.net/project/arma/armadillo-7.800.1.tar.xz -Stage3 
+#GetPackage https://downloads.sourceforge.net/project/arma/armadillo-7.800.1.tar.xz -Stage3 
 
 
 # ____________________________________________________________________________________________________________
 #
 # gflags
 #
-GetPackage https://github.com/gflags/gflags.git -Stage3 
+#GetPackage https://github.com/gflags/gflags.git -Stage3 
 
 # ____________________________________________________________________________________________________________
 #
 # glog
 #
-GetPackage https://github.com/google/glog.git -Stage3
+#GetPackage https://github.com/google/glog.git -Stage3
 
 # ____________________________________________________________________________________________________________
 #
 # GNUTLS (binaries!)
 #
-GetPackage ftp://ftp.gnutls.org/gcrypt/gnutls/w32/gnutls-3.5.8-w64.zip gnutls -Stage3 -AddFolderName 
+#GetPackage ftp://ftp.gnutls.org/gcrypt/gnutls/w32/gnutls-3.5.8-w64.zip gnutls -Stage3 -AddFolderName 
 
 # ____________________________________________________________________________________________________________
 #

@@ -277,6 +277,7 @@ function Validate
 			cd $root/scripts
 			Write-Host ""
 			Write-Host -BackgroundColor Black -ForegroundColor Red "Validation Failed, $i was not found and is required"
+			cd $root/scripts
 			throw ""  2>&1 >> $null
 		}
 	}
@@ -348,12 +349,42 @@ Function PipInstall
 	if ( ($validationfile -ne "") -and ((TryValidate $validationfile) -eq $true)) {
 		Write-Host "already installed"
 	} else {
-		$env:Path = "$pythonroot;$pythonroot/Dlls"+ ";$oldPath"
+		$env:Path = "$pythonroot;$pythonroot/Dlls;$oldPath"
+		$env:INCLUDE = "$pythonroot/../../include;$pythonroot/../../include/python3.9;" + $oldinclude
+		$env:LIB = "$pythonroot/../../lib;" + $oldlib 
 		$env:PYTHONHOME="$pythonroot"
 		if ($NoUsePEP517) {$pep517string = "--no-use-pep517"} else {$pep517string = ""}
-		& $pythonroot/Scripts/pip.exe --disable-pip-version-check install $pep517string $package -U -t $pythonroot\lib\site-packages *>> $log
+		& $pythonroot/$pythonexe -m pip --verbose --disable-pip-version-check install $pep517string $package -U -t $pythonroot\lib\site-packages *>> $log
 		if (-not ($validationfile -eq $null)) {Validate $validationfile} else {Write-Host "complete"}
 		$ErrorActionPreference = "Stop"
+	}
+}
+
+Function VCPkgInstall
+{
+	[CmdletBinding()]
+	Param(
+		[Parameter(Mandatory=$True,Position=1)]
+		[string]$package,
+		
+		[Parameter(Mandatory=$False)]
+		[switch]$static= $false 
+	)
+	SetLog $package
+	Write-Host -NoNewline "installing $package..."
+	# If the user requests a static build, the below specifies that we want static libraries linked against the DYNAMIC CRT.
+	if ($static -eq $true) {$staticstr = "-static-md"} else {$staticstr = ""}
+	if (./vcpkg list | Select-String -Pattern "${package}:x64-windows$staticstr" -Quiet) {
+		Write-Host "already installed"
+	} else {
+		./vcpkg install "${package}:x64-windows$staticstr" >> $Log
+		if (./vcpkg list | Select-String -Pattern "${package}:x64-windows$staticstr" -Quiet) {
+			Write-Host "installed"
+		} else {
+			Write-Host -BackgroundColor Black -ForegroundColor Red "installation failed"
+			cd $root/scripts
+			throw ""  2>&1 >> $null
+		}
 	}
 }
 
@@ -421,96 +452,13 @@ $iqbal_version = $Config.VersionInfo.iqbal
 $grosmosdr_version = $Config.VersionInfo.gr_osmosdr
 $boostbase = $boost_version_.substring(0,$boost_version_.length-2)
 
-$pyverdot = GetMajorMinor($python_version)
-$pyver = $pyverdot -Replace "\.", ""
-Set-Variable -Name "pythonroot" -Value "$root\src-stage2-python\gr-python$pyver" -Option readonly
-$pythonexe = "python.exe"  # used to also support use of python_d.exe, but added no value
-
-# The below libraries will have AVX code detected, even for non-AVX builds
-# these libraries all have guards to ensure the feature is supported 
-# whether in the code itself or because the intel fortran compiler added them
-# or it's a known false alarm
-$AVX_Whitelist = @(
-	"boost_log-vc142-mt-$boostbase.dll",  # specifically built with guards (dump.cpp)
-	"boost_log-vc142-mt-x64-$boostbase.dll",  # specifically built with guards 
-	"libboost_log_setup-vc142-mt-x64-$boostbase.lib",  # specifically built with guards 
-	"libboost_log-vc142-mt-x64-$boostbase.lib",  # specifically built with guards 
-	"boost_log-vc142-mt-gd-$boostbase.dll",  # specifically built with guards (dump.cpp)
-	"boost_log-vc142-mt-gd-x64-$boostbase.dll",  # specifically built with guards 
-	"libboost_log_setup-vc142-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
-	"libboost_log-vc142-mt-gd-x64-$boostbase.lib",  # specifically built with guards 
-	"volk.dll",                     # specifically built with guards
-	"uhd.dll",
-	"multichan_register_iface_test.exe",
-	"sqlite3.dll",
-	"sqlite3_d.dll",
-	"wininst-14.0-amd64.exe",
-	"wininst-9.0-amd64.exe",
-	"gnuradio-specest-fortran.dll", # intel fortran compiler
-	"gnuradio-specest.dll"          # includes openblas_static which uses intel fortran compiler
-	"ssleay32.lib",                 # openssl built with guards
-	"_hashlib.pyd",                 # includes openssl
-	"_ssl.pyd",                     # includes openssl
-	"_hashlib_d.pyd",               # includes openssl 
-	"_ssl_d.pyd",                   # includes openssl
-	"libfftw-3.3.lib",				# fft built with guards
-	"libfftw3f.lib",				# fft built with guards
-	"libfftw-3.3.dll",				# fft built with guards
-	"libfftw3f.dll",				# fft built with guards
-	"_vq.pyd",                      # scipy begin
-	"lsoda.pyd",
-	"vode.pyd",
-	"_odepack.pyd",
-	"_dop.pyd",
-	"_quadpack.pyd",
-	"dfitpack.pyd",
-	"_fitpack.pyd",
-	"_test_fortran.pyd",
-	"_trlib.pyd",
-	"minpack2.pyd",
-	"_cobyla.pyd",
-	"_nnls.pyd",
-	"_superlu.pyd",
-	"cython_special.pyd",
-	"_ufuncs_cxx.pyd",
-	"_test_odeint_banded.pyd",
-	"_ppoly.pyd",
-	"cython_blas.pyd",
-	"cython_lapack.pyd",
-	"_fblas.pyd",
-	"_flapack.pyd",
-	"_flinalg.pyd",
-	"_interpolative.pyd",
-	"__odrpack.pyd",
-	"_lbfgsb.pyd",
-	"_sparsetools.pyd",
-	"_arpack.pyd",
-	"_iterative.pyd",
-	"qhull.pyd",
-	"_distance_wrap.pyd",
-	"specfun.pyd",
-	"_ellip_harm_2.pyd",
-	"_ufuncs.pyd",
-	"_funcs_cxx.pyd",                # scipy end
-	"pangoft2-1.0-0.dll",            # ?
-	"epoxy-0.dll",                   # ?
-	"mpir.lib",	                     # specifically built with guards
-	"gnuradio-runtime.dll"			 # statically links in from mpir 
-	"Qt5Core.dll",					 # specifically built with guards
-	"Qt5Multimedia.dll",    		 # specifically built with guards
-	"Qt5Gui.dll",                    # specifically built with guards
-	"Qt5Cored.dll",                  # specifically built with guards
-	"Qt5Multimediad.dll",            # specifically built with guards
-	"Qt5Guid.dll",                   # specifically built with guards 
-	"Qt53DRender.dll",               # specifically built with guards 
-	"Qt5Widgets.dll",                # specifically built with guards 
-	"qwtd6.dll",					 # inherits from Qt5 
-	"qgltk.exe",
-	"qmake.exe"                      # specifically built with guards
-)
-
 # setup paths
 if (!$Global:root) {$Global:root = Split-Path (Split-Path -Parent $script:MyInvocation.MyCommand.Path)}
+
+$pyverdot = GetMajorMinor($python_version)
+$pyver = $pyverdot -Replace "\.", ""
+$pythonroot = "$root\src-stage1-dependencies\vcpkg\installed\x64-windows\tools\python3" # this is constant until step8 when it switches to the install dir
+$pythonexe = "python.exe"  # used to also support use of python_d.exe, but added no value
 
 # ensure on a 64-bit machine
 if ($env:PROCESSOR_ARCHITECTURE -ne "AMD64") {throw "It appears you are using 32-bit windows.  This build requires 64-bit windows"} 
@@ -528,9 +476,6 @@ set-alias tar (Get-Command "tar.exe").Source
 if ((Get-Command "cmake.exe" -ErrorAction SilentlyContinue) -eq $null)  {throw "CMake must be installed and on the path.  Aborting script"} 
 Set-Alias cmake (Get-Command "cmake.exe").Source
 	
-# ActivePerl (to build OpenSSL)
-if ((Get-Command "perl.exe" -ErrorAction SilentlyContinue) -eq $null)  {throw "ActiveState Perl must be installed and on the path.  Aborting script"} 
-
 # MSVC 2017/2019 (No environment variable to check)
 $VSSetupExists = Get-Command Get-VSSetupInstance -ErrorAction SilentlyContinue
 if (-not $VSSetupExists) { Install-Module VSSetup -Scope CurrentUser -Force }

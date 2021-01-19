@@ -39,7 +39,7 @@
     <Compile Include="Step7-BuildGNURadio.ps1" />
     <Compile Include="Step6-GetStage3Packages.ps1" />
     <Compile Include="Step2-GetStage1Packages.ps1" />
-    <Compile Include="Step3-BuildStage1Packages.ps1" />
+    <Compile Include="Step3a-BuildStage1Packages.ps1" />
     <Compile Include="Step4-BuildPythonPackages.ps1" />
     <Compile Include="Step8-BuildOOTModules.ps1" />
   </ItemGroup>

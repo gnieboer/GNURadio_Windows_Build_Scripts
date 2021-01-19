@@ -15,7 +15,7 @@ if (Test-Path $mypath\Setup.ps1) {
 }
 
 $configmode = $args[0]
-if ($configmode -eq $null) {$configmode = "all"}
+if ($configmode -eq $null) {$configmode = "1"}
 
 SetLog "MSI Creation"
 cd $root\src-stage4-installer
@@ -27,8 +27,6 @@ Function BuildMSI {
 	$configuration = $args[0]
 
 	Write-Host -NoNewline "Building $configuration package..."
-
-	CheckNoAVX "$root/src-stage3/staged_install/$configuration"
 
 	cd $root\src-stage4-installer
 
